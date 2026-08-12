@@ -50,11 +50,15 @@
 "jieli_get_stress" = "Read Stress Data";
 "jieli_get_blood_oxygen" = "Read Blood Oxygen Data";
 "jieli_get_sport_detail" = "Read Sport Details";
+"jieli_get_workouts" = "Read Workout Data";
+"jieli_workout_value" = "Type: %d  Steps: %d  Distance: %d m";
+"jieli_workout_detail_value" = "Calories: %d kcal  Duration: %d  Heart rate: %d bpm\nStart: %@\nEnd: %@";
 "jieli_delete_sleep" = "Delete Sleep Data";
 "jieli_delete_heart_rate" = "Delete Heart Rate Data";
 "jieli_delete_stress" = "Delete Stress Data";
 "jieli_delete_blood_oxygen" = "Delete Blood Oxygen Data";
 "jieli_delete_sport_detail" = "Delete Sport Details";
+"jieli_delete_workouts" = "Delete Workout Data";
 "jieli_delete_confirm" = "Delete this data from the device? This cannot be undone.";
 "jieli_deleting_data" = "Running %@…";
 "jieli_delete_success" = "%@ succeeded";

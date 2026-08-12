@@ -40,6 +40,12 @@ final class JieliHealthRepository {
         }
     }
 
+    func getWorkouts(completion: @escaping (Result<[Any], Error>) -> Void) {
+        center.getWorkoutsBigData { list, error in
+            Self.complete(list, error: error, completion: completion)
+        }
+    }
+
     func deleteSleep(completion: @escaping (Result<Void, Error>) -> Void) {
         sdk.deleteSleeps { success, error in
             Self.completeDelete(success, error: error, completion: completion)
@@ -66,6 +72,12 @@ final class JieliHealthRepository {
 
     func deleteSportDetail(completion: @escaping (Result<Void, Error>) -> Void) {
         sdk.deleteActivities { success, error in
+            Self.completeDelete(success, error: error, completion: completion)
+        }
+    }
+
+    func deleteWorkouts(completion: @escaping (Result<Void, Error>) -> Void) {
+        sdk.deleteWorkouts { success, error in
             Self.completeDelete(success, error: error, completion: completion)
         }
     }

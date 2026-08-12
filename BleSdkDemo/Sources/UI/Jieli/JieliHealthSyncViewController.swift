@@ -21,11 +21,13 @@ final class JieliHealthSyncViewController: UIViewController {
         ActionItem(titleKey: "jieli_get_stress", action: { [weak self] in self?.getStress() }),
         ActionItem(titleKey: "jieli_get_blood_oxygen", action: { [weak self] in self?.getBloodOxygen() }),
         ActionItem(titleKey: "jieli_get_sport_detail", action: { [weak self] in self?.getSportDetail() }),
+        ActionItem(titleKey: "jieli_get_workouts", action: { [weak self] in self?.getWorkouts() }),
         ActionItem(titleKey: "jieli_delete_sleep", action: { [weak self] in self?.confirmDelete(titleKey: "jieli_delete_sleep", operation: self?.repo.deleteSleep) }),
         ActionItem(titleKey: "jieli_delete_heart_rate", action: { [weak self] in self?.confirmDelete(titleKey: "jieli_delete_heart_rate", operation: self?.repo.deleteHeartRate) }),
         ActionItem(titleKey: "jieli_delete_stress", action: { [weak self] in self?.confirmDelete(titleKey: "jieli_delete_stress", operation: self?.repo.deleteStress) }),
         ActionItem(titleKey: "jieli_delete_blood_oxygen", action: { [weak self] in self?.confirmDelete(titleKey: "jieli_delete_blood_oxygen", operation: self?.repo.deleteBloodOxygen) }),
-        ActionItem(titleKey: "jieli_delete_sport_detail", action: { [weak self] in self?.confirmDelete(titleKey: "jieli_delete_sport_detail", operation: self?.repo.deleteSportDetail) })
+        ActionItem(titleKey: "jieli_delete_sport_detail", action: { [weak self] in self?.confirmDelete(titleKey: "jieli_delete_sport_detail", operation: self?.repo.deleteSportDetail) }),
+        ActionItem(titleKey: "jieli_delete_workouts", action: { [weak self] in self?.confirmDelete(titleKey: "jieli_delete_workouts", operation: self?.repo.deleteWorkouts) })
     ]
     private lazy var actionCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
@@ -69,7 +71,7 @@ final class JieliHealthSyncViewController: UIViewController {
             actionCollectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 12),
             actionCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             actionCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-            actionCollectionView.heightAnchor.constraint(equalToConstant: 252),
+            actionCollectionView.heightAnchor.constraint(equalToConstant: 304),
             statusLabel.topAnchor.constraint(equalTo: actionCollectionView.bottomAnchor, constant: 10),
             statusLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             statusLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
@@ -195,6 +197,45 @@ final class JieliHealthSyncViewController: UIViewController {
         )
     }
 
+    private func getWorkouts() {
+        request(
+            title: L10n.tr("jieli_get_workouts"),
+            operation: repo.getWorkouts,
+            map: { [weak self] list in
+                guard let self = self else { return [] }
+                var workouts: [HwWorkout] = list.compactMap { value in
+                    value as? HwWorkout
+                }
+                workouts.sort { first, second in
+                    first.startTime > second.startTime
+                }
+
+                var result: [ResultRow] = []
+                for (offset, item) in workouts.enumerated() {
+                    let type = Int(item.type.rawValue)
+                    let step = Int(item.step)
+                    let distance = Int(item.distance)
+                    let calorie = Int(item.calorie)
+                    let duration = Int(item.duration)
+                    let bpm = Int(item.bpm)
+                    let startTime = self.formatWorkoutTime(TimeInterval(item.startTime))
+                    let endTime = self.formatWorkoutTime(TimeInterval(item.endTime))
+                    let rowTitle = L10n.tr("jieli_workout_value", type, step, distance)
+                    let rowDetail = L10n.tr(
+                        "jieli_workout_detail_value",
+                        calorie,
+                        duration,
+                        bpm,
+                        startTime,
+                        endTime
+                    )
+                    result.append(ResultRow(index: offset + 1, title: rowTitle, detail: rowDetail))
+                }
+                return result
+            }
+        )
+    }
+
     private func request(title: String,
                          operation: (@escaping (Result<[Any], Error>) -> Void) -> Void,
                          map: (([Any]) -> [ResultRow])? = nil) {
@@ -272,6 +313,11 @@ final class JieliHealthSyncViewController: UIViewController {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
         return formatter.string(from: Date(timeIntervalSince1970: timestamp))
+    }
+
+    private func formatWorkoutTime(_ timestamp: TimeInterval) -> String {
+        // HwWorkout start/end timestamps are milliseconds.
+        formatTime(timestamp / 1000)
     }
 
     private func sleepStatusText(_ status: HwSleepStatus) -> String {

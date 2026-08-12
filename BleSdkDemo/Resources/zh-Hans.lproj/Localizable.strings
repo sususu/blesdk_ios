@@ -50,11 +50,15 @@
 "jieli_get_stress" = "读取压力数据";
 "jieli_get_blood_oxygen" = "读取血氧数据";
 "jieli_get_sport_detail" = "读取运动明细";
+"jieli_get_workouts" = "读取 Workout 数据";
+"jieli_workout_value" = "类型：%d  步数：%d  距离：%d 米";
+"jieli_workout_detail_value" = "卡路里：%d kcal  时长：%d  心率：%d bpm\n开始：%@\n结束：%@";
 "jieli_delete_sleep" = "删除睡眠数据";
 "jieli_delete_heart_rate" = "删除心率数据";
 "jieli_delete_stress" = "删除压力数据";
 "jieli_delete_blood_oxygen" = "删除血氧数据";
 "jieli_delete_sport_detail" = "删除运动明细";
+"jieli_delete_workouts" = "删除 Workout 数据";
 "jieli_delete_confirm" = "确认删除设备中的该项数据？删除后无法恢复。";
 "jieli_deleting_data" = "正在执行%@…";
 "jieli_delete_success" = "%@成功";

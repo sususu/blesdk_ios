@@ -12,6 +12,8 @@
 		1C840E956D3B4D0D90A29D75 /* AiWatchfaceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC7FD9CDB3E24795B0A48F3C /* AiWatchfaceViewController.swift */; };
 		22A434D7817C3ABFCE164DA2 /* LocaleHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = D641DF46CA811EC15937CA3B /* LocaleHelper.swift */; };
 		22C33A9279D5EA3A3CBD2212 /* HomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF973DBBA57A72AE5FA132E6 /* HomeViewController.swift */; };
+		22C33A9279D5EA3A3CBD2213 /* JieliHealthSyncViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF973DBBA57A72AE5FA132E7 /* JieliHealthSyncViewController.swift */; };
+		22C33A9279D5EA3A3CBD2214 /* JieliHealthRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF973DBBA57A72AE5FA132E8 /* JieliHealthRepository.swift */; };
 		255E38BE21C4B69BBA9FF1CA /* SifliOtaPusher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E717FEEB44E3BA3EE0B389B /* SifliOtaPusher.swift */; };
 		2ABB1804C393B97C83F072C5 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD34F1A20A84C7AACA9F5217 /* AppDelegate.swift */; };
 		2C076A8A599942B99A769B92 /* OnlineWatchfaceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49B7674D8BD54992BE75ACA4 /* OnlineWatchfaceViewController.swift */; };
@@ -75,6 +77,8 @@
 		CC7FD9CDB3E24795B0A48F3C /* AiWatchfaceViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AiWatchfaceViewController.swift; path = BleSdkDemo/Sources/UI/Watchface/AiWatchfaceViewController.swift; sourceTree = "<group>"; };
 		CF4B2DF9A98E169FCD7FCF4A /* UIHelpers.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = UIHelpers.swift; path = BleSdkDemo/Sources/UI/Common/UIHelpers.swift; sourceTree = "<group>"; };
 		CF973DBBA57A72AE5FA132E6 /* HomeViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = HomeViewController.swift; path = BleSdkDemo/Sources/UI/Home/HomeViewController.swift; sourceTree = "<group>"; };
+		CF973DBBA57A72AE5FA132E7 /* JieliHealthSyncViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = JieliHealthSyncViewController.swift; path = BleSdkDemo/Sources/UI/Jieli/JieliHealthSyncViewController.swift; sourceTree = "<group>"; };
+		CF973DBBA57A72AE5FA132E8 /* JieliHealthRepository.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = JieliHealthRepository.swift; path = BleSdkDemo/Sources/Services/Jieli/JieliHealthRepository.swift; sourceTree = "<group>"; };
 		D4A3290874E6684FE560CA97 /* Assets.xcassets */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder.assetcatalog; name = Assets.xcassets; path = BleSdkDemo/Resources/Assets.xcassets; sourceTree = "<group>"; };
 		D60674E7BC247DD7B39B41FD /* OtaFirmwareApi.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = OtaFirmwareApi.swift; path = BleSdkDemo/Sources/Services/Ota/OtaFirmwareApi.swift; sourceTree = "<group>"; };
 		D641DF46CA811EC15937CA3B /* LocaleHelper.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = LocaleHelper.swift; path = BleSdkDemo/Sources/Services/LocaleHelper.swift; sourceTree = "<group>"; };
@@ -167,6 +171,8 @@
 				6EB3FAFDA08BFDBE6F331860 /* FeatureViewControllers.swift */,
 				02A439A6EEAD381A87B7EC56 /* MusicTransferViewController.swift */,
 				CF973DBBA57A72AE5FA132E6 /* HomeViewController.swift */,
+				CF973DBBA57A72AE5FA132E7 /* JieliHealthSyncViewController.swift */,
+				CF973DBBA57A72AE5FA132E8 /* JieliHealthRepository.swift */,
 				282A2946747604440754D4FC /* ScanConnectViewController.swift */,
 				6579266C6513A7C238F54CFD /* UnbindFlowViewController.swift */,
 				54B5306B5EFC774661A5DB60 /* BleSdkDemo-Bridging-Header.h */,
@@ -531,6 +537,8 @@
 				61331A87A76AF27CCAE6BB3C /* FeatureViewControllers.swift in Sources */,
 				EBF773BDBEDA0F71E4A49AC3 /* MusicTransferViewController.swift in Sources */,
 				22C33A9279D5EA3A3CBD2212 /* HomeViewController.swift in Sources */,
+				22C33A9279D5EA3A3CBD2213 /* JieliHealthSyncViewController.swift in Sources */,
+				22C33A9279D5EA3A3CBD2214 /* JieliHealthRepository.swift in Sources */,
 				FA1FC6D717D864F8AE1B028B /* ScanConnectViewController.swift in Sources */,
 				57AB498C14A031233E7137CE /* UnbindFlowViewController.swift in Sources */,
 				22A434D7817C3ABFCE164DA2 /* LocaleHelper.swift in Sources */,

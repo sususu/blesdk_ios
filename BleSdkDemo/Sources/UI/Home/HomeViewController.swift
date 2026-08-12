@@ -100,6 +100,11 @@ final class HomeViewController: UIViewController {
         content.addArrangedSubview(makeRow([bind, sync]))
         actionButtons.append(contentsOf: [bind, sync])
 
+        let jieliSync = UIHelpers.makeButton("")
+        jieliSync.addTarget(self, action: #selector(tapJieliSync), for: .touchUpInside)
+        content.addArrangedSubview(jieliSync)
+        actionButtons.append(jieliSync)
+
         let unbind = UIHelpers.makeButton("")
         let disconnect = UIHelpers.makeButton("")
         unbind.addTarget(self, action: #selector(tapUnbind), for: .touchUpInside)
@@ -170,7 +175,7 @@ final class HomeViewController: UIViewController {
 
         let titles = [
             L10n.tr("scan_connect"), L10n.tr("bind_watch"), L10n.tr("sync_data"),
-            L10n.tr("unbind_watch"), L10n.tr("disconnect"),
+            L10n.tr("jieli_sync_data"), L10n.tr("unbind_watch"), L10n.tr("disconnect"),
             L10n.tr("goals"), L10n.tr("alarms"), L10n.tr("notify"),
             L10n.tr("music"), L10n.tr("album"), L10n.tr("agps"), L10n.tr("ota"),
             L10n.tr("watchface")
@@ -265,13 +270,14 @@ final class HomeViewController: UIViewController {
         let canUnbind = !busy && bound
         let canFeature = !busy && hasDevice && (bound || phase == .connected)
 
-        guard actionButtons.count >= 13 else { return }
+        guard actionButtons.count >= 14 else { return }
         actionButtons[0].isEnabled = !busy
         actionButtons[1].isEnabled = canBind
         actionButtons[2].isEnabled = canSync
-        actionButtons[3].isEnabled = canUnbind
-        actionButtons[4].isEnabled = !busy && hasDevice
-        for i in 5..<13 { actionButtons[i].isEnabled = canFeature }
+        actionButtons[3].isEnabled = canSync
+        actionButtons[4].isEnabled = canUnbind
+        actionButtons[5].isEnabled = !busy && hasDevice
+        for i in 6..<14 { actionButtons[i].isEnabled = canFeature }
 
         if busy { statusSpinner.startAnimating() } else { statusSpinner.stopAnimating() }
     }
@@ -392,6 +398,11 @@ final class HomeViewController: UIViewController {
             appendLog(L10n.tr("error_no_device_to_sync"))
             refreshUI()
         }
+    }
+
+    @objc private func tapJieliSync() {
+        guard requireConnectedFeature() else { return }
+        navigationController?.pushViewController(JieliHealthSyncViewController(), animated: true)
     }
 
     /// Presents `UnbindFlowViewController`. Disables auto-reconnect first.

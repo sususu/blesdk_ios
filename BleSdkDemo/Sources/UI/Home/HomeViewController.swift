@@ -126,6 +126,11 @@ final class HomeViewController: UIViewController {
         content.addArrangedSubview(makeRow([g, a]))
         actionButtons.append(contentsOf: [g, a])
 
+        let jieliAlarms = UIHelpers.makeButton("")
+        jieliAlarms.addTarget(self, action: #selector(tapJieliAlarms), for: .touchUpInside)
+        content.addArrangedSubview(jieliAlarms)
+        actionButtons.append(jieliAlarms)
+
         let n = UIHelpers.makeButton(""); n.addTarget(self, action: #selector(tapNotify), for: .touchUpInside)
         content.addArrangedSubview(n)
         actionButtons.append(n)
@@ -176,8 +181,8 @@ final class HomeViewController: UIViewController {
         let titles = [
             L10n.tr("scan_connect"), L10n.tr("bind_watch"), L10n.tr("sync_data"),
             L10n.tr("jieli_sync_data"), L10n.tr("unbind_watch"), L10n.tr("disconnect"),
-            L10n.tr("goals"), L10n.tr("alarms"), L10n.tr("notify"),
-            L10n.tr("music"), L10n.tr("album"), L10n.tr("agps"), L10n.tr("ota"),
+            L10n.tr("goals"), L10n.tr("alarms"), L10n.tr("jieli_alarms"),
+            L10n.tr("notify"), L10n.tr("music"), L10n.tr("album"), L10n.tr("agps"), L10n.tr("ota"),
             L10n.tr("watchface")
         ]
         for (i, t) in titles.enumerated() where i < actionButtons.count {
@@ -270,14 +275,14 @@ final class HomeViewController: UIViewController {
         let canUnbind = !busy && bound
         let canFeature = !busy && hasDevice && (bound || phase == .connected)
 
-        guard actionButtons.count >= 14 else { return }
+        guard actionButtons.count >= 15 else { return }
         actionButtons[0].isEnabled = !busy
         actionButtons[1].isEnabled = canBind
         actionButtons[2].isEnabled = canSync
         actionButtons[3].isEnabled = canSync
         actionButtons[4].isEnabled = canUnbind
         actionButtons[5].isEnabled = !busy && hasDevice
-        for i in 6..<14 { actionButtons[i].isEnabled = canFeature }
+        for i in 6..<15 { actionButtons[i].isEnabled = canFeature }
 
         if busy { statusSpinner.startAnimating() } else { statusSpinner.stopAnimating() }
     }
@@ -456,6 +461,10 @@ final class HomeViewController: UIViewController {
     @objc private func tapAlarms() {
         guard requireConnectedFeature() else { return }
         navigationController?.pushViewController(AlarmsViewController(), animated: true)
+    }
+    @objc private func tapJieliAlarms() {
+        guard requireConnectedFeature() else { return }
+        navigationController?.pushViewController(JieliAlarmReminderViewController(), animated: true)
     }
     @objc private func tapNotify() {
         guard requireConnectedFeature() else { return }

@@ -145,6 +145,8 @@ final class OtaUpgradeViewController: UIViewController {
         firmwareLabel.text = L10n.tr("ota_firmware", cachedFw.nilIfEmpty ?? "-")
         let parsed = FirmwareVersionUtils.formatDisplay(cachedFw)
         parsedLabel.text = L10n.tr("ota_parsed", parsed.nilIfEmpty ?? "-")
+        
+        HwBluetoothSDK.sharedInstance()
     }
 
     /// Step 2: ask the test server whether a newer package exists.

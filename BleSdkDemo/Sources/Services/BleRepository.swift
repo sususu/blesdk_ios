@@ -1124,8 +1124,9 @@ final class BleRepository {
             completion(.failure(SdkError(code: -1, message: L10n.tr("err_no_music"))))
             return
         }
-        center.startMultipleFileTransfer(
-            models,
+        
+        HwBluetoothSDK.sharedInstance().multipleFileTransferService.start(
+            withFileModels: models,
             transferType: MultipleFileTransferType(rawValue: 0x01)!,
             readyCallback: { ok, error in
                 DispatchQueue.main.async {
@@ -1133,7 +1134,9 @@ final class BleRepository {
                     if ok { onReady() }
                 }
             },
-            progressCallback: { p, _ in DispatchQueue.main.async { onProgress(p) } },
+            progressCallback: { p, _ in
+                DispatchQueue.main.async { onProgress(p) } }
+            ,
             finishCallback: { ok, error in
                 DispatchQueue.main.async {
                     if let error = error { completion(.failure(error)) }
@@ -1300,8 +1303,8 @@ final class BleRepository {
             completion(.failure(SdkError(code: -1, message: L10n.tr("err_no_images"))))
             return
         }
-        center.startMultipleFileTransfer(
-            models,
+        HwBluetoothSDK.sharedInstance().multipleFileTransferService.start(
+            withFileModels: models,
             transferType: MultipleFileTransferType(rawValue: 0x02)!,
             readyCallback: { ok, error in
                 DispatchQueue.main.async {

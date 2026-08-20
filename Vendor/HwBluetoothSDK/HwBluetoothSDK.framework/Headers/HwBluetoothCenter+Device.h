@@ -239,6 +239,14 @@
 - (HwBluetoothTask *_Nullable) getDeviceTimeWithCallback:(HwDateCallback _Nullable)callback;
 
 /*! @brief
+ 关闭设备 [shutdown watch]
+ 
+ @param callback bool回调
+ @return task
+ */
+- (HwBluetoothTask *_Nullable) shutdownDeviceWithCallback:(HwBoolCallback _Nullable)callback;
+
+/*! @brief
  重启设备 [reset watch]
  
  @param callback bool回调

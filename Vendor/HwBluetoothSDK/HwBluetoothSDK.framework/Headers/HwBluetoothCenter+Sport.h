@@ -12,6 +12,7 @@
 #import "HwHeartRate.h"
 #import "HwActive.h"
 #import "HwSpo2.h"
+#import "HwHrv.h"
 #import "HwStress.h"
 #import "HwSleep.h"
 #import "HwBloodPressure.h"
@@ -98,6 +99,7 @@ typedef void (^HwGoalInfoCallback)(HwGoal * _Nullable goal, NSError * _Nullable 
 extern NSString * _Nonnull HwKeyHeartRateIndex;
 extern NSString * _Nonnull HwKeyHeartRateTime;
 extern NSString * _Nonnull HwKeyHeartRateBmp;
+extern NSString * _Nonnull HwKeyHeartRateResting;
 
 extern NSString * _Nonnull HwKeyHeartRateMin;
 extern NSString * _Nonnull HwKeyHeartRateMax;
@@ -141,6 +143,7 @@ typedef void (^HwActivitiesCallback)(NSArray<HwActivity *> * _Nullable sportArr,
 typedef void (^HwSleepsCallback)(NSArray<HwSleep *> * _Nullable sleepArr, NSError *_Nullable error);
 typedef void (^HwActivesCallback)(NSArray<HwActive *> * _Nullable activeArr, NSError *_Nullable error);
 typedef void (^HwStressCallback)(NSArray<HwStress *> * _Nullable stressArr, NSError *_Nullable error);
+typedef void (^HwHrvCallback)(NSArray<HwHrv *> * _Nullable hrvArr, NSError *_Nullable error);
 typedef void (^HwSpo2sCallback)(NSArray<HwSpo2 *> * _Nullable spo2Arr, NSError *_Nullable error);
 typedef void (^HwBpsCallback)(NSArray<HwBloodPressure *> * _Nullable bpArr, NSError *_Nullable error);
 
@@ -565,6 +568,14 @@ Get heart rate data from device
  @return 任务[task]
  */
 - (HwBluetoothTask *_Nullable) deleteBloodOxygenWithCallback:(HwBoolCallback _Nullable)callback;
+
+/**
+ 删除hrv详情
+ 
+ @param callback 成功与否回调[callback successfully or not]
+ @return 任务[task]
+ */
+- (HwBluetoothTask *_Nullable) deleteHrvWithCallback:(HwBoolCallback _Nullable)callback;
 
 
 #pragma mark - calorie

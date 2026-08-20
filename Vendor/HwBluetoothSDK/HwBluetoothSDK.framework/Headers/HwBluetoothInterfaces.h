@@ -28,5 +28,4 @@ static NSString *HwDeviceHeartRateNotification = @"HwDeviceHeartRateNotification
 #import "HwBluetoothCenter+DrinkWater.h"
 #import "HwBluetoothCenter+PhoneSchedule.h"
 #import "HwBluetoothCenter+StandingSetting.h"
-#import "HwBluetoothSDK+BigDataSport.h"
 

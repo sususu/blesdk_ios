@@ -16,6 +16,7 @@
 		22C33A9279D5EA3A3CBD2214 /* JieliHealthRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF973DBBA57A72AE5FA132E8 /* JieliHealthRepository.swift */; };
 		22C33A9279D5EA3A3CBD2215 /* JieliAlarmRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF973DBBA57A72AE5FA132E9 /* JieliAlarmRepository.swift */; };
 		22C33A9279D5EA3A3CBD2216 /* JieliAlarmReminderViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF973DBBA57A72AE5FA132EA /* JieliAlarmReminderViewController.swift */; };
+		22C33A9279D5EA3A3CBD2217 /* JieliOtaUpgradeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF973DBBA57A72AE5FA132EB /* JieliOtaUpgradeViewController.swift */; };
 		255E38BE21C4B69BBA9FF1CA /* SifliOtaPusher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E717FEEB44E3BA3EE0B389B /* SifliOtaPusher.swift */; };
 		2ABB1804C393B97C83F072C5 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD34F1A20A84C7AACA9F5217 /* AppDelegate.swift */; };
 		2C076A8A599942B99A769B92 /* OnlineWatchfaceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49B7674D8BD54992BE75ACA4 /* OnlineWatchfaceViewController.swift */; };
@@ -83,6 +84,7 @@
 		CF973DBBA57A72AE5FA132E8 /* JieliHealthRepository.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = JieliHealthRepository.swift; path = BleSdkDemo/Sources/Services/Jieli/JieliHealthRepository.swift; sourceTree = "<group>"; };
 		CF973DBBA57A72AE5FA132E9 /* JieliAlarmRepository.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = JieliAlarmRepository.swift; path = BleSdkDemo/Sources/Services/Jieli/JieliAlarmRepository.swift; sourceTree = "<group>"; };
 		CF973DBBA57A72AE5FA132EA /* JieliAlarmReminderViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = JieliAlarmReminderViewController.swift; path = BleSdkDemo/Sources/UI/Jieli/JieliAlarmReminderViewController.swift; sourceTree = "<group>"; };
+		CF973DBBA57A72AE5FA132EB /* JieliOtaUpgradeViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = JieliOtaUpgradeViewController.swift; path = BleSdkDemo/Sources/UI/Jieli/JieliOtaUpgradeViewController.swift; sourceTree = "<group>"; };
 		D4A3290874E6684FE560CA97 /* Assets.xcassets */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder.assetcatalog; name = Assets.xcassets; path = BleSdkDemo/Resources/Assets.xcassets; sourceTree = "<group>"; };
 		D60674E7BC247DD7B39B41FD /* OtaFirmwareApi.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = OtaFirmwareApi.swift; path = BleSdkDemo/Sources/Services/Ota/OtaFirmwareApi.swift; sourceTree = "<group>"; };
 		D641DF46CA811EC15937CA3B /* LocaleHelper.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = LocaleHelper.swift; path = BleSdkDemo/Sources/Services/LocaleHelper.swift; sourceTree = "<group>"; };
@@ -179,6 +181,7 @@
 				CF973DBBA57A72AE5FA132E8 /* JieliHealthRepository.swift */,
 				CF973DBBA57A72AE5FA132E9 /* JieliAlarmRepository.swift */,
 				CF973DBBA57A72AE5FA132EA /* JieliAlarmReminderViewController.swift */,
+				CF973DBBA57A72AE5FA132EB /* JieliOtaUpgradeViewController.swift */,
 				282A2946747604440754D4FC /* ScanConnectViewController.swift */,
 				6579266C6513A7C238F54CFD /* UnbindFlowViewController.swift */,
 				54B5306B5EFC774661A5DB60 /* BleSdkDemo-Bridging-Header.h */,
@@ -547,6 +550,7 @@
 				22C33A9279D5EA3A3CBD2214 /* JieliHealthRepository.swift in Sources */,
 				22C33A9279D5EA3A3CBD2215 /* JieliAlarmRepository.swift in Sources */,
 				22C33A9279D5EA3A3CBD2216 /* JieliAlarmReminderViewController.swift in Sources */,
+				22C33A9279D5EA3A3CBD2217 /* JieliOtaUpgradeViewController.swift in Sources */,
 				FA1FC6D717D864F8AE1B028B /* ScanConnectViewController.swift in Sources */,
 				57AB498C14A031233E7137CE /* UnbindFlowViewController.swift in Sources */,
 				22A434D7817C3ABFCE164DA2 /* LocaleHelper.swift in Sources */,

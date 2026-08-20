@@ -67,7 +67,7 @@ final class BleRepository {
     /// High-level categories of exclusive file-transfer / DFU operations.
     /// Exclusive Sifli file-transfer kinds sharing one BLE lock (`beginTransfer`).
     /// `.watchface` covers online ZIP push and custom dial push (not AiSDK-owned AI send).
-    enum TransferKind { case music, album, agps, ota, watchface }
+    enum TransferKind { case music, album, agps, ota, jieliOta, watchface }
 
     private init() {}
 
@@ -989,6 +989,8 @@ final class BleRepository {
         switch activeTransferKind {
         case .ota:
             SifliOtaPusher.shared.stop()
+        case .jieliOta:
+            sdk.otaV2Service?.stop()
         case .music, .album, .agps, .watchface:
             SifliWatchfaceSDK.getInstance().stop()
         case .none:
@@ -1004,7 +1006,10 @@ final class BleRepository {
     /// Acquires the exclusive transfer lock for `kind`.
     /// Returns an error if another transfer (or Sifli `isWorking` / OTA) is already active.
     private func beginTransfer(_ kind: TransferKind) -> Error? {
-        if isTransferring || SifliWatchfaceSDK.getInstance().isWorking || SifliOtaPusher.shared.isWorking {
+        if isTransferring
+            || SifliWatchfaceSDK.getInstance().isWorking
+            || SifliOtaPusher.shared.isWorking
+            || sdk.otaV2Service?.isRunning == true {
             return SdkError(code: -1, message: L10n.tr("err_transfer_busy"))
         }
         isTransferring = true
@@ -1454,6 +1459,128 @@ final class BleRepository {
                 }
             } catch {
                 DispatchQueue.main.async {
+                    self.endTransfer()
+                    completion(.failure(error))
+                }
+            }
+        }
+    }
+
+    /// Downloads all Jieli firmware fragments in server order, then appends their raw bytes.
+    /// This deliberately does not unzip or reinterpret supplier-provided aggregate-bin data.
+    private func prepareJieliOtaData(
+        info: OtaUpgradeInfo,
+        onProgress: @escaping (Int) -> Void
+    ) throws -> Data {
+        guard !info.firmwares.isEmpty else {
+            throw SdkError(code: -1, message: L10n.tr("ota_err_no_package"))
+        }
+
+        var aggregate = Data()
+        for (index, item) in info.firmwares.enumerated() {
+            let fallbackName = "jieli_ota_\(index).bin"
+            let remoteName = URL(string: item.url)?.lastPathComponent
+            let fileName: String
+            if let name = item.name, !name.isEmpty {
+                fileName = name
+            } else if let remoteName = remoteName, !remoteName.isEmpty {
+                fileName = remoteName
+            } else {
+                fileName = fallbackName
+            }
+            let fileURL = try OtaFirmwareApi.downloadToCache(
+                url: item.url,
+                fileName: fileName,
+                expectMd5: item.md5,
+                subDir: "BleSdkDemo/JieliOTA"
+            ) { fileProgress in
+                let total = ((index * 100) + fileProgress) / info.firmwares.count
+                onProgress(total)
+            }
+            let bytes = try Data(contentsOf: fileURL)
+            guard !bytes.isEmpty else {
+                throw SdkError(code: -1, message: L10n.tr("jieli_ota_err_empty_bin"))
+            }
+            aggregate.append(bytes)
+        }
+
+        guard !aggregate.isEmpty else {
+            throw SdkError(code: -1, message: L10n.tr("jieli_ota_err_empty_bin"))
+        }
+        return aggregate
+    }
+
+    /// Downloads the ordered Jieli aggregate bin and upgrades it through `HwOtaV2Service`.
+    /// Download progress occupies 0...40%; the OTA V2 push occupies 40...100%.
+    func startJieliOta(
+        info: OtaUpgradeInfo,
+        onProgress: @escaping (Int, String) -> Void,
+        onLog: ((String) -> Void)? = nil,
+        completion: @escaping (Result<Void, Error>) -> Void
+    ) {
+        guard let otaService = sdk.otaV2Service else {
+            completion(.failure(SdkError(code: -1, message: L10n.tr("ota_failed"))))
+            return
+        }
+        if let err = beginTransfer(.jieliOta) {
+            completion(.failure(err))
+            return
+        }
+        setAutoReconnectEnabled(false)
+
+        DispatchQueue.global(qos: .userInitiated).async {
+            do {
+                let data = try self.prepareJieliOtaData(info: info) { pct in
+                    DispatchQueue.main.async {
+                        onProgress(Int(Double(pct) * 0.4), L10n.tr("jieli_ota_phase_download"))
+                    }
+                }
+                DispatchQueue.main.async {
+                    guard self.activeTransferKind == .jieliOta else { return }
+                    onLog?(L10n.tr("jieli_ota_log_bytes", data.count))
+                    otaService.start(
+                        withBinData: data,
+                        readyCallback: { ok, error in
+                            DispatchQueue.main.async {
+                                guard self.activeTransferKind == .jieliOta else { return }
+                                if ok {
+                                    onProgress(40, L10n.tr("jieli_ota_phase_push"))
+                                } else if let error = error {
+                                    onLog?(error.localizedDescription)
+                                } else {
+                                    onLog?(L10n.tr("ota_failed"))
+                                }
+                            }
+                        },
+                        progressCallback: { progress, _ in
+                            DispatchQueue.main.async {
+                                guard self.activeTransferKind == .jieliOta else { return }
+                                let normalized = max(0, min(1, progress))
+                                onProgress(
+                                    40 + Int(normalized * 60),
+                                    L10n.tr("jieli_ota_phase_push")
+                                )
+                            }
+                        },
+                        finishCallback: { ok, error in
+                            DispatchQueue.main.async {
+                                guard self.activeTransferKind == .jieliOta else { return }
+                                self.endTransfer()
+                                if ok {
+                                    completion(.success(()))
+                                } else {
+                                    completion(.failure(error ?? SdkError(
+                                        code: -1,
+                                        message: L10n.tr("ota_failed")
+                                    )))
+                                }
+                            }
+                        }
+                    )
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    guard self.activeTransferKind == .jieliOta else { return }
                     self.endTransfer()
                     completion(.failure(error))
                 }

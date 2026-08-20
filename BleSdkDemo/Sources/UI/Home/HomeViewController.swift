@@ -118,7 +118,8 @@ final class HomeViewController: UIViewController {
 
         let featureActions: [Selector] = [
             #selector(tapGoals), #selector(tapAlarms), #selector(tapNotify),
-            #selector(tapMusic), #selector(tapAlbum), #selector(tapAgps), #selector(tapOta)
+            #selector(tapMusic), #selector(tapAlbum), #selector(tapAgps), #selector(tapOta),
+            #selector(tapJieliOta)
         ]
         // Goals|Alarms, Notify, Music|Album, Agps|OTA
         let g = UIHelpers.makeButton(""); g.addTarget(self, action: #selector(tapGoals), for: .touchUpInside)
@@ -144,6 +145,11 @@ final class HomeViewController: UIViewController {
         let ota = UIHelpers.makeButton(""); ota.addTarget(self, action: #selector(tapOta), for: .touchUpInside)
         content.addArrangedSubview(makeRow([ag, ota]))
         actionButtons.append(contentsOf: [ag, ota])
+
+        let jieliOta = UIHelpers.makeButton("")
+        jieliOta.addTarget(self, action: #selector(tapJieliOta), for: .touchUpInside)
+        content.addArrangedSubview(jieliOta)
+        actionButtons.append(jieliOta)
 
         let wf = UIHelpers.makeButton(""); wf.addTarget(self, action: #selector(tapWatchface), for: .touchUpInside)
         content.addArrangedSubview(wf)
@@ -183,7 +189,7 @@ final class HomeViewController: UIViewController {
             L10n.tr("jieli_sync_data"), L10n.tr("unbind_watch"), L10n.tr("disconnect"),
             L10n.tr("goals"), L10n.tr("alarms"), L10n.tr("jieli_alarms"),
             L10n.tr("notify"), L10n.tr("music"), L10n.tr("album"), L10n.tr("agps"), L10n.tr("ota"),
-            L10n.tr("watchface")
+            L10n.tr("jieli_ota"), L10n.tr("watchface")
         ]
         for (i, t) in titles.enumerated() where i < actionButtons.count {
             actionButtons[i].setTitle(t, for: .normal)
@@ -275,14 +281,14 @@ final class HomeViewController: UIViewController {
         let canUnbind = !busy && bound
         let canFeature = !busy && hasDevice && (bound || phase == .connected)
 
-        guard actionButtons.count >= 15 else { return }
+        guard actionButtons.count >= 16 else { return }
         actionButtons[0].isEnabled = !busy
         actionButtons[1].isEnabled = canBind
         actionButtons[2].isEnabled = canSync
         actionButtons[3].isEnabled = canSync
         actionButtons[4].isEnabled = canUnbind
         actionButtons[5].isEnabled = !busy && hasDevice
-        for i in 6..<15 { actionButtons[i].isEnabled = canFeature }
+        for i in 6..<16 { actionButtons[i].isEnabled = canFeature }
 
         if busy { statusSpinner.startAnimating() } else { statusSpinner.stopAnimating() }
     }
@@ -485,6 +491,10 @@ final class HomeViewController: UIViewController {
     @objc private func tapOta() {
         guard requireConnectedFeature() else { return }
         navigationController?.pushViewController(OtaUpgradeViewController(), animated: true)
+    }
+    @objc private func tapJieliOta() {
+        guard requireConnectedFeature() else { return }
+        navigationController?.pushViewController(JieliOtaUpgradeViewController(), animated: true)
     }
     @objc private func tapWatchface() {
         guard requireConnectedFeature() else { return }

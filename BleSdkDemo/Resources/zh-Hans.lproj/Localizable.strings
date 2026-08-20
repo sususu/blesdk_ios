@@ -98,6 +98,7 @@
 "album" = "相册推送";
 "agps" = "AGPS 更新";
 "ota" = "OTA 升级";
+"jieli_ota" = "OTA 升级（杰里）";
 "status_sdk_ready" = "SDK 就绪";
 "status_bound_local" = "已绑定本地设备，尝试重连…";
 "status_connected" = "已连接 %@";
@@ -342,6 +343,11 @@
 "ota_err_unzip" = "固件解压失败";
 "ota_err_diff_resource" = "差分 OTA 需要 resource name/url/md5";
 "ota_err_no_ctrl" = "Zip 缺少 ctrl / diff_ctrl";
+"jieli_ota_phase_download" = "下载杰里聚合包";
+"jieli_ota_phase_push" = "推送到手表（杰里 OTA）";
+"jieli_ota_log_channel" = "通道：杰里 OTA V2";
+"jieli_ota_log_bytes" = "杰里聚合包：%d bytes";
+"jieli_ota_err_empty_bin" = "杰里升级包为空";
 
 /* Watchface */
 "watchface" = "表盘";

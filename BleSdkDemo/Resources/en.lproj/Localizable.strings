@@ -98,6 +98,7 @@
 "album" = "Album Transfer";
 "agps" = "AGPS Update";
 "ota" = "OTA Upgrade";
+"jieli_ota" = "OTA Upgrade (Jieli)";
 "status_sdk_ready" = "SDK ready";
 "status_bound_local" = "Bound locally, reconnecting…";
 "status_connected" = "Connected %@";
@@ -342,6 +343,11 @@
 "ota_err_unzip" = "Failed to unzip firmware";
 "ota_err_diff_resource" = "Diff OTA requires resource name/url/md5";
 "ota_err_no_ctrl" = "Zip missing ctrl / diff_ctrl";
+"jieli_ota_phase_download" = "Download Jieli aggregate bin";
+"jieli_ota_phase_push" = "Push to watch (Jieli OTA)";
+"jieli_ota_log_channel" = "Channel: Jieli OTA V2";
+"jieli_ota_log_bytes" = "Jieli aggregate package: %d bytes";
+"jieli_ota_err_empty_bin" = "Jieli upgrade package is empty";
 
 /* Watchface */
 "watchface" = "Watchface";

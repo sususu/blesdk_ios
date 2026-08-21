@@ -351,6 +351,7 @@
 
 /* Watchface */
 "watchface" = "Watchface";
+"watchface_jieli" = "Watchface (Jieli)";
 "wf_tab_custom" = "Custom";
 "wf_tab_online" = "Online";
 "wf_tab_ai" = "AI";

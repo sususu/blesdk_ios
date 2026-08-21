@@ -351,6 +351,7 @@
 
 /* Watchface */
 "watchface" = "表盘";
+"watchface_jieli" = "表盘（杰里）";
 "wf_tab_custom" = "自定义";
 "wf_tab_online" = "在线";
 "wf_tab_ai" = "AI";

@@ -66,8 +66,8 @@ final class BleRepository {
 
     /// High-level categories of exclusive file-transfer / DFU operations.
     /// Exclusive Sifli file-transfer kinds sharing one BLE lock (`beginTransfer`).
-    /// `.watchface` covers online ZIP push and custom dial push (not AiSDK-owned AI send).
-    enum TransferKind { case music, album, agps, ota, jieliOta, watchface }
+    /// `.watchface` covers Sifli online/custom push; `.jieliWatchface` uses JL multi-file transfer.
+    enum TransferKind { case music, album, agps, ota, jieliOta, watchface, jieliWatchface }
 
     private init() {}
 
@@ -991,6 +991,8 @@ final class BleRepository {
             SifliOtaPusher.shared.stop()
         case .jieliOta:
             sdk.otaV2Service?.stop()
+        case .jieliWatchface:
+            sdk.multipleFileTransferService?.stop()
         case .music, .album, .agps, .watchface:
             SifliWatchfaceSDK.getInstance().stop()
         case .none:
@@ -1009,7 +1011,8 @@ final class BleRepository {
         if isTransferring
             || SifliWatchfaceSDK.getInstance().isWorking
             || SifliOtaPusher.shared.isWorking
-            || sdk.otaV2Service?.isRunning == true {
+            || sdk.otaV2Service?.isRunning == true
+            || sdk.multipleFileTransferService?.isRunning == true {
             return SdkError(code: -1, message: L10n.tr("err_transfer_busy"))
         }
         isTransferring = true
@@ -1832,6 +1835,106 @@ final class BleRepository {
                 }
             }
         }
+    }
+
+    /// Jieli online watchface install. The catalog and download are shared with Sifli;
+    /// only the device transfer uses JL multiple-file transfer (`onlineDial`).
+    func installJieliOnlineWatchface(_ item: OnlineWatchface,
+                                     onPhase: @escaping (OnlineWatchfaceInstallPhase) -> Void,
+                                     onProgress: @escaping (Int) -> Void,
+                                     onLog: ((String) -> Void)? = nil,
+                                     completion: @escaping (Result<Void, Error>) -> Void) {
+        guard isConnected() else {
+            completion(.failure(SdkError(code: 408, message: L10n.tr("status_need_connect"))))
+            return
+        }
+        guard let bin = item.bin, !bin.isEmpty else {
+            completion(.failure(SdkError(code: -1, message: L10n.tr("wf_err_no_bin"))))
+            return
+        }
+
+        onPhase(.downloading)
+        DispatchQueue.global(qos: .userInitiated).async {
+            do {
+                let fileName = (bin as NSString).lastPathComponent
+                let fileURL = try WatchfaceApi.downloadToCache(
+                    url: bin,
+                    fileName: fileName.isEmpty ? "\(item.id).bin" : fileName,
+                    expectMd5: item.binMd5,
+                    onProgress: { pct in
+                        DispatchQueue.main.async { onProgress(min(40, pct * 40 / 100)) }
+                    }
+                )
+                let data = try Data(contentsOf: fileURL)
+                DispatchQueue.main.async {
+                    onLog?("downloaded \(fileURL.lastPathComponent), bytes=\(data.count)")
+                    onPhase(.installing)
+                    self.pushJieliOnlineWatchface(data: data, fileName: item.name, onProgress: { p in
+                        onProgress(40 + Int(p * 60))
+                    }, completion: { result in
+                        switch result {
+                        case .success:
+                            onPhase(.success)
+                            onProgress(100)
+                        case .failure:
+                            onPhase(.failed)
+                        }
+                        completion(result)
+                    })
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    onPhase(.failed)
+                    completion(.failure(error))
+                }
+            }
+        }
+    }
+
+    private func pushJieliOnlineWatchface(data: Data,
+                                          fileName: String,
+                                          onProgress: @escaping (Float) -> Void,
+                                          completion: @escaping (Result<Void, Error>) -> Void) {
+        if let error = beginTransfer(.jieliWatchface) {
+            completion(.failure(error))
+            return
+        }
+        guard let service = sdk.multipleFileTransferService else {
+            endTransfer()
+            completion(.failure(SdkError(code: -1, message: "multipleFileTransferService unavailable")))
+            return
+        }
+
+        let model = HwMultipleFileTransferModel()
+        model.fileData = data
+        model.fileName = fileName
+
+        service.start(
+            withFileModels: [model],
+            transferType: .onlineDial,
+            readyCallback: { [weak self] _, error in
+                guard let error = error else { return }
+                DispatchQueue.main.async {
+                    self?.endTransfer()
+                    completion(.failure(error))
+                }
+            },
+            progressCallback: { progress, _ in
+                DispatchQueue.main.async { onProgress(progress) }
+            },
+            finishCallback: { [weak self] ok, error in
+                DispatchQueue.main.async {
+                    self?.endTransfer()
+                    if let error = error {
+                        completion(.failure(error))
+                    } else if ok {
+                        completion(.success(()))
+                    } else {
+                        completion(.failure(SdkError(code: -1, message: "online watchface transfer failed")))
+                    }
+                }
+            }
+        )
     }
 
     // MARK: - Helpers

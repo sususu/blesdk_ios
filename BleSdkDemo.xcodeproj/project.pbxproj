@@ -21,6 +21,8 @@
 		22C33A9279D5EA3A3CBD2219 /* JieliCustomWatchfaceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF973DBBA57A72AE5FA132ED /* JieliCustomWatchfaceViewController.swift */; };
 		22C33A9279D5EA3A3CBD221A /* JieliOnlineWatchfaceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF973DBBA57A72AE5FA132EE /* JieliOnlineWatchfaceViewController.swift */; };
 		22C33A9279D5EA3A3CBD221B /* JieliAiWatchfaceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF973DBBA57A72AE5FA132EF /* JieliAiWatchfaceViewController.swift */; };
+		22C33A9279D5EA3A3CBD221C /* JieliCustomWatchfaceModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF973DBBA57A72AE5FA132F0 /* JieliCustomWatchfaceModels.swift */; };
+		22C33A9279D5EA3A3CBD221D /* JieliWatchfaceImageEncoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF973DBBA57A72AE5FA132F1 /* JieliWatchfaceImageEncoder.swift */; };
 		255E38BE21C4B69BBA9FF1CA /* SifliOtaPusher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E717FEEB44E3BA3EE0B389B /* SifliOtaPusher.swift */; };
 		2ABB1804C393B97C83F072C5 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD34F1A20A84C7AACA9F5217 /* AppDelegate.swift */; };
 		2C076A8A599942B99A769B92 /* OnlineWatchfaceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49B7674D8BD54992BE75ACA4 /* OnlineWatchfaceViewController.swift */; };
@@ -68,6 +70,7 @@
 		4E717FEEB44E3BA3EE0B389B /* SifliOtaPusher.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SifliOtaPusher.swift; path = BleSdkDemo/Sources/Services/Ota/SifliOtaPusher.swift; sourceTree = "<group>"; };
 		502C1CD344A9B5AA834FD48A /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		54B5306B5EFC774661A5DB60 /* BleSdkDemo-Bridging-Header.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "BleSdkDemo-Bridging-Header.h"; path = "BleSdkDemo/Supporting/BleSdkDemo-Bridging-Header.h"; sourceTree = "<group>"; };
+		54B5306B5EFC774661A5DB61 /* BleSdkDemo-Jieli-Bridging-Header.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "BleSdkDemo-Jieli-Bridging-Header.h"; path = "BleSdkDemo/Supporting/BleSdkDemo-Jieli-Bridging-Header.h"; sourceTree = "<group>"; };
 		6579266C6513A7C238F54CFD /* UnbindFlowViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = UnbindFlowViewController.swift; path = BleSdkDemo/Sources/UI/Unbind/UnbindFlowViewController.swift; sourceTree = "<group>"; };
 		6EB3FAFDA08BFDBE6F331860 /* FeatureViewControllers.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = FeatureViewControllers.swift; path = BleSdkDemo/Sources/UI/Features/FeatureViewControllers.swift; sourceTree = "<group>"; };
 		7866CD6110555D10C1B45FC7 /* AgpsXywBuilder.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AgpsXywBuilder.swift; path = BleSdkDemo/Sources/Services/AgpsXywBuilder.swift; sourceTree = "<group>"; };
@@ -93,6 +96,8 @@
 		CF973DBBA57A72AE5FA132ED /* JieliCustomWatchfaceViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = JieliCustomWatchfaceViewController.swift; path = BleSdkDemo/Sources/UI/Jieli/JieliCustomWatchfaceViewController.swift; sourceTree = "<group>"; };
 		CF973DBBA57A72AE5FA132EE /* JieliOnlineWatchfaceViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = JieliOnlineWatchfaceViewController.swift; path = BleSdkDemo/Sources/UI/Jieli/JieliOnlineWatchfaceViewController.swift; sourceTree = "<group>"; };
 		CF973DBBA57A72AE5FA132EF /* JieliAiWatchfaceViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = JieliAiWatchfaceViewController.swift; path = BleSdkDemo/Sources/UI/Jieli/JieliAiWatchfaceViewController.swift; sourceTree = "<group>"; };
+		CF973DBBA57A72AE5FA132F0 /* JieliCustomWatchfaceModels.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = JieliCustomWatchfaceModels.swift; path = BleSdkDemo/Sources/Models/JieliCustomWatchfaceModels.swift; sourceTree = "<group>"; };
+		CF973DBBA57A72AE5FA132F1 /* JieliWatchfaceImageEncoder.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = JieliWatchfaceImageEncoder.swift; path = BleSdkDemo/Sources/Services/Jieli/JieliWatchfaceImageEncoder.swift; sourceTree = "<group>"; };
 		D4A3290874E6684FE560CA97 /* Assets.xcassets */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder.assetcatalog; name = Assets.xcassets; path = BleSdkDemo/Resources/Assets.xcassets; sourceTree = "<group>"; };
 		D60674E7BC247DD7B39B41FD /* OtaFirmwareApi.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = OtaFirmwareApi.swift; path = BleSdkDemo/Sources/Services/Ota/OtaFirmwareApi.swift; sourceTree = "<group>"; };
 		D641DF46CA811EC15937CA3B /* LocaleHelper.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = LocaleHelper.swift; path = BleSdkDemo/Sources/Services/LocaleHelper.swift; sourceTree = "<group>"; };
@@ -194,9 +199,12 @@
 				CF973DBBA57A72AE5FA132ED /* JieliCustomWatchfaceViewController.swift */,
 				CF973DBBA57A72AE5FA132EE /* JieliOnlineWatchfaceViewController.swift */,
 				CF973DBBA57A72AE5FA132EF /* JieliAiWatchfaceViewController.swift */,
+				CF973DBBA57A72AE5FA132F0 /* JieliCustomWatchfaceModels.swift */,
+				CF973DBBA57A72AE5FA132F1 /* JieliWatchfaceImageEncoder.swift */,
 				282A2946747604440754D4FC /* ScanConnectViewController.swift */,
 				6579266C6513A7C238F54CFD /* UnbindFlowViewController.swift */,
 				54B5306B5EFC774661A5DB60 /* BleSdkDemo-Bridging-Header.h */,
+				54B5306B5EFC774661A5DB61 /* BleSdkDemo-Jieli-Bridging-Header.h */,
 				87FCCB64FDE7373D4B06F7CF /* Info.plist */,
 				D4A3290874E6684FE560CA97 /* Assets.xcassets */,
 				509F9AD6F363D527DCFD01DD /* Resources */,
@@ -567,6 +575,8 @@
 				22C33A9279D5EA3A3CBD2219 /* JieliCustomWatchfaceViewController.swift in Sources */,
 				22C33A9279D5EA3A3CBD221A /* JieliOnlineWatchfaceViewController.swift in Sources */,
 				22C33A9279D5EA3A3CBD221B /* JieliAiWatchfaceViewController.swift in Sources */,
+				22C33A9279D5EA3A3CBD221C /* JieliCustomWatchfaceModels.swift in Sources */,
+				22C33A9279D5EA3A3CBD221D /* JieliWatchfaceImageEncoder.swift in Sources */,
 				FA1FC6D717D864F8AE1B028B /* ScanConnectViewController.swift in Sources */,
 				57AB498C14A031233E7137CE /* UnbindFlowViewController.swift in Sources */,
 				22A434D7817C3ABFCE164DA2 /* LocaleHelper.swift in Sources */,
@@ -662,7 +672,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.huawo.blesdkdemo;
 				SDKROOT = iphoneos;
-				SWIFT_OBJC_BRIDGING_HEADER = "BleSdkDemo/Supporting/BleSdkDemo-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "BleSdkDemo/Supporting/BleSdkDemo-Jieli-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
 				VALIDATE_PRODUCT = YES;
@@ -690,7 +700,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.huawo.blesdkdemo;
 				SDKROOT = iphoneos;
-				SWIFT_OBJC_BRIDGING_HEADER = "BleSdkDemo/Supporting/BleSdkDemo-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "BleSdkDemo/Supporting/BleSdkDemo-Jieli-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
 			};

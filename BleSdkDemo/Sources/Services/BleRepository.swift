@@ -1937,6 +1937,174 @@ final class BleRepository {
         )
     }
 
+    /// Returns the maximum number of Jieli custom-watchface backgrounds that fit on the device.
+    func getJieliCustomWatchfaceCapacity(completion: @escaping (Result<Int, Error>) -> Void) {
+        guard isConnected() else {
+            completion(.failure(SdkError(code: 408, message: L10n.tr("status_need_connect"))))
+            return
+        }
+        sdk.getCoustomInterfaceAvailableStorage { storageKB, error in
+            DispatchQueue.main.async {
+                if let error = error {
+                    completion(.failure(error))
+                } else {
+                    completion(.success(JieliCustomWatchfaceRules.maxBackgroundCount(storageKB: storageKB)))
+                }
+            }
+        }
+    }
+
+    /// Converts album images to Jieli 707N data, transfers them, then writes the dial layout.
+    func pushJieliCustomWatchface(backgroundImages: [UIImage],
+                                  thumbnailImage: UIImage,
+                                  draft: JieliCustomWatchfaceDraft,
+                                  onReady: (() -> Void)? = nil,
+                                  onProgress: @escaping (Float) -> Void,
+                                  completion: @escaping (Result<Void, Error>) -> Void) {
+        guard isConnected() else {
+            completion(.failure(SdkError(code: 408, message: L10n.tr("status_need_connect"))))
+            return
+        }
+
+        DispatchQueue.global(qos: .userInitiated).async {
+            do {
+                let geometry = draft.geometry
+                let targetSize = CGSize(width: CGFloat(geometry.width), height: CGFloat(geometry.height))
+                let thumbSize = CGSize(
+                    width: CGFloat(geometry.thumbnailWidth),
+                    height: CGFloat(geometry.thumbnailHeight)
+                )
+                let images = backgroundImages.isEmpty ? [Self.blackImage()] : backgroundImages
+
+                var fileModels = try images.enumerated().map { index, image -> HwMultipleFileTransferModel in
+                    let model = HwMultipleFileTransferModel()
+                    model.fileName = "bg\(index + 1)"
+                    model.fileData = try JieliWatchfaceImageEncoder.encode(
+                        image,
+                        size: targetSize,
+                        cornerRadius: CGFloat(geometry.cornerRadius)
+                    )
+                    return model
+                }
+
+                let preview = HwMultipleFileTransferModel()
+                preview.fileName = "pw"
+                preview.fileData = try JieliWatchfaceImageEncoder.encode(
+                    thumbnailImage,
+                    size: thumbSize,
+                    cornerRadius: CGFloat(geometry.thumbnailCornerRadius)
+                )
+                fileModels.append(preview)
+
+                let config = Self.makeJieliCustomWatchfaceConfig(draft: draft, imageCount: images.count)
+                DispatchQueue.main.async {
+                    self.transferJieliCustomWatchface(
+                        fileModels: fileModels,
+                        config: config,
+                        onReady: onReady,
+                        onProgress: onProgress,
+                        completion: completion
+                    )
+                }
+            } catch {
+                DispatchQueue.main.async { completion(.failure(error)) }
+            }
+        }
+    }
+
+    private func transferJieliCustomWatchface(fileModels: [HwMultipleFileTransferModel],
+                                               config: HwJLWatchFaceConfigModel,
+                                               onReady: (() -> Void)?,
+                                               onProgress: @escaping (Float) -> Void,
+                                               completion: @escaping (Result<Void, Error>) -> Void) {
+        if let error = beginTransfer(.jieliWatchface) {
+            completion(.failure(error))
+            return
+        }
+        guard let service = sdk.multipleFileTransferService else {
+            endTransfer()
+            completion(.failure(SdkError(code: -1, message: "multipleFileTransferService unavailable")))
+            return
+        }
+
+        service.start(
+            withFileModels: fileModels,
+            transferType: .customDialImage,
+            readyCallback: { _, error in
+                DispatchQueue.main.async {
+                    if let error = error {
+                        self.endTransfer()
+                        completion(.failure(error))
+                    } else {
+                        onReady?()
+                    }
+                }
+            },
+            progressCallback: { value, _ in
+                DispatchQueue.main.async { onProgress(value) }
+            },
+            finishCallback: { ok, error in
+                DispatchQueue.main.async {
+                    guard error == nil, ok else {
+                        self.endTransfer()
+                        completion(.failure(error ?? SdkError(code: -1, message: "custom watchface transfer failed")))
+                        return
+                    }
+                    self.center.updateJLCustomWatceFace(config) { success, configError in
+                        DispatchQueue.main.async {
+                            self.endTransfer()
+                            Self.boolResult(success, configError, completion)
+                        }
+                    }
+                }
+            }
+        )
+    }
+
+    private static func makeJieliCustomWatchfaceConfig(draft: JieliCustomWatchfaceDraft,
+                                                        imageCount: Int) -> HwJLWatchFaceConfigModel {
+        let config = HwJLWatchFaceConfigModel()
+        switch draft.displayMode {
+        case .single: config.displayModeType = .displayModeType_SingleImage
+        case .sequential: config.displayModeType = .displayModeType_QueueShow
+        case .random: config.displayModeType = .displayModeType_RandomShow
+        }
+        config.imageCount = imageCount
+        config.coverImageIndex = Int32(JieliCustomWatchfaceRules.normalizedCoverIndex(
+            draft.coverImageIndex,
+            imageCount: imageCount
+        ))
+        config.pointerStyle = draft.pointerStyle.rawValue
+        config.rgbColorStr = draft.rgbHex
+        config.compentArr = JieliCustomWatchfaceRules.componentPlacements(
+            draft.components,
+            isRound: draft.geometry.isRound
+        ).map { placement in
+            let component = HwJLWatchFaceConfigCompentModel()
+            switch placement.type {
+            case .time: component.compentType = .componentType_Time
+            case .date: component.compentType = .componentType_Date
+            case .heartRate: component.compentType = .componentType_HeartRate
+            case .steps: component.compentType = .componentType_Steps
+            case .distance: component.compentType = .componentType_Distance
+            case .calories: component.compentType = .componentType_Calories
+            case .weather: component.compentType = .componentType_Weather
+            case .battery: component.compentType = .componentType_Battery
+            case .off: break
+            }
+            component.position = placement.position
+            return component
+        }
+        return config
+    }
+
+    private static func blackImage() -> UIImage {
+        UIGraphicsImageRenderer(size: CGSize(width: 1, height: 1)).image { context in
+            UIColor.black.setFill()
+            context.fill(CGRect(x: 0, y: 0, width: 1, height: 1))
+        }
+    }
+
     // MARK: - Helpers
 
     /// Delivers a `ConnectionEvent` to all registered handlers (synchronously on the current queue;

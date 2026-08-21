@@ -401,6 +401,34 @@
 "wf_ai_image_ok" = "AI image ready";
 "wf_ai_preview_ok" = "Preview ready";
 "wf_ai_installing" = "Installing AI watchface…";
+"wf_jl_storage_loading" = "Reading watchface storage…";
+"wf_jl_storage_fail" = "Storage query failed; using a 1-photo limit";
+"wf_jl_bg_count" = "Background photos %d/%d";
+"wf_jl_add_photos" = "Add photos";
+"wf_jl_delete_photo" = "Delete current photo";
+"wf_jl_cover" = "Cover";
+"wf_jl_display_mode" = "Photo display mode";
+"wf_jl_mode_single" = "Single";
+"wf_jl_mode_sequential" = "Sequential";
+"wf_jl_mode_random" = "Random";
+"wf_jl_pointer_style" = "Pointer style";
+"wf_jl_pointer_none" = "Default";
+"wf_jl_pointer_1" = "Style 1";
+"wf_jl_pointer_2" = "Style 2";
+"wf_jl_pointer_3" = "Style 3";
+"wf_jl_component_slot" = "Component %d: %@";
+"wf_jl_component_off" = "Off";
+"wf_jl_component_time" = "Time";
+"wf_jl_component_heart_rate" = "Heart rate";
+"wf_jl_component_steps" = "Steps";
+"wf_jl_component_calories" = "Calories";
+"wf_jl_component_battery" = "Battery";
+"wf_jl_component_weather" = "Weather";
+"wf_jl_component_distance" = "Distance";
+"wf_jl_component_date" = "Date";
+"wf_jl_text_color" = "Text color";
+"wf_jl_converting" = "Converting images…";
+"wf_jl_updating_config" = "Updating watchface configuration…";
 
 /* Errors */
 "err_transfer_busy" = "A transfer is in progress. Cancel or wait.";

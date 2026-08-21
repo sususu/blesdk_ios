@@ -401,6 +401,34 @@
 "wf_ai_image_ok" = "AI 图片已生成";
 "wf_ai_preview_ok" = "预览已就绪";
 "wf_ai_installing" = "正在安装 AI 表盘…";
+"wf_jl_storage_loading" = "正在读取表盘空间…";
+"wf_jl_storage_fail" = "读取空间失败，最多使用 1 张";
+"wf_jl_bg_count" = "背景图片 %d/%d";
+"wf_jl_add_photos" = "添加图片";
+"wf_jl_delete_photo" = "删除当前图片";
+"wf_jl_cover" = "封面";
+"wf_jl_display_mode" = "图片显示方式";
+"wf_jl_mode_single" = "单张";
+"wf_jl_mode_sequential" = "顺序";
+"wf_jl_mode_random" = "随机";
+"wf_jl_pointer_style" = "指针样式";
+"wf_jl_pointer_none" = "默认";
+"wf_jl_pointer_1" = "样式 1";
+"wf_jl_pointer_2" = "样式 2";
+"wf_jl_pointer_3" = "样式 3";
+"wf_jl_component_slot" = "组件 %d：%@";
+"wf_jl_component_off" = "关闭";
+"wf_jl_component_time" = "时间";
+"wf_jl_component_heart_rate" = "心率";
+"wf_jl_component_steps" = "步数";
+"wf_jl_component_calories" = "卡路里";
+"wf_jl_component_battery" = "电量";
+"wf_jl_component_weather" = "天气";
+"wf_jl_component_distance" = "距离";
+"wf_jl_component_date" = "日期";
+"wf_jl_text_color" = "文字颜色";
+"wf_jl_converting" = "正在转换图片…";
+"wf_jl_updating_config" = "正在更新表盘配置…";
 
 /* Errors */
 "err_transfer_busy" = "有传输任务进行中，请先取消或等待完成";

@@ -66,8 +66,8 @@ final class BleRepository {
 
     /// High-level categories of exclusive file-transfer / DFU operations.
     /// Exclusive Sifli file-transfer kinds sharing one BLE lock (`beginTransfer`).
-    /// `.watchface` covers online ZIP push and custom dial push (not AiSDK-owned AI send).
-    enum TransferKind { case music, album, agps, ota, watchface }
+    /// `.watchface` covers Sifli online/custom push; `.jieliWatchface` uses JL multi-file transfer.
+    enum TransferKind { case music, album, agps, ota, jieliOta, watchface, jieliWatchface }
 
     private init() {}
 
@@ -989,6 +989,10 @@ final class BleRepository {
         switch activeTransferKind {
         case .ota:
             SifliOtaPusher.shared.stop()
+        case .jieliOta:
+            sdk.otaV2Service?.stop()
+        case .jieliWatchface:
+            sdk.multipleFileTransferService?.stop()
         case .music, .album, .agps, .watchface:
             SifliWatchfaceSDK.getInstance().stop()
         case .none:
@@ -1004,7 +1008,11 @@ final class BleRepository {
     /// Acquires the exclusive transfer lock for `kind`.
     /// Returns an error if another transfer (or Sifli `isWorking` / OTA) is already active.
     private func beginTransfer(_ kind: TransferKind) -> Error? {
-        if isTransferring || SifliWatchfaceSDK.getInstance().isWorking || SifliOtaPusher.shared.isWorking {
+        if isTransferring
+            || SifliWatchfaceSDK.getInstance().isWorking
+            || SifliOtaPusher.shared.isWorking
+            || sdk.otaV2Service?.isRunning == true
+            || sdk.multipleFileTransferService?.isRunning == true {
             return SdkError(code: -1, message: L10n.tr("err_transfer_busy"))
         }
         isTransferring = true
@@ -1124,8 +1132,9 @@ final class BleRepository {
             completion(.failure(SdkError(code: -1, message: L10n.tr("err_no_music"))))
             return
         }
-        center.startMultipleFileTransfer(
-            models,
+        
+        HwBluetoothSDK.sharedInstance().multipleFileTransferService.start(
+            withFileModels: models,
             transferType: MultipleFileTransferType(rawValue: 0x01)!,
             readyCallback: { ok, error in
                 DispatchQueue.main.async {
@@ -1133,7 +1142,9 @@ final class BleRepository {
                     if ok { onReady() }
                 }
             },
-            progressCallback: { p, _ in DispatchQueue.main.async { onProgress(p) } },
+            progressCallback: { p, _ in
+                DispatchQueue.main.async { onProgress(p) } }
+            ,
             finishCallback: { ok, error in
                 DispatchQueue.main.async {
                     if let error = error { completion(.failure(error)) }
@@ -1300,8 +1311,8 @@ final class BleRepository {
             completion(.failure(SdkError(code: -1, message: L10n.tr("err_no_images"))))
             return
         }
-        center.startMultipleFileTransfer(
-            models,
+        HwBluetoothSDK.sharedInstance().multipleFileTransferService.start(
+            withFileModels: models,
             transferType: MultipleFileTransferType(rawValue: 0x02)!,
             readyCallback: { ok, error in
                 DispatchQueue.main.async {
@@ -1451,6 +1462,128 @@ final class BleRepository {
                 }
             } catch {
                 DispatchQueue.main.async {
+                    self.endTransfer()
+                    completion(.failure(error))
+                }
+            }
+        }
+    }
+
+    /// Downloads all Jieli firmware fragments in server order, then appends their raw bytes.
+    /// This deliberately does not unzip or reinterpret supplier-provided aggregate-bin data.
+    private func prepareJieliOtaData(
+        info: OtaUpgradeInfo,
+        onProgress: @escaping (Int) -> Void
+    ) throws -> Data {
+        guard !info.firmwares.isEmpty else {
+            throw SdkError(code: -1, message: L10n.tr("ota_err_no_package"))
+        }
+
+        var aggregate = Data()
+        for (index, item) in info.firmwares.enumerated() {
+            let fallbackName = "jieli_ota_\(index).bin"
+            let remoteName = URL(string: item.url)?.lastPathComponent
+            let fileName: String
+            if let name = item.name, !name.isEmpty {
+                fileName = name
+            } else if let remoteName = remoteName, !remoteName.isEmpty {
+                fileName = remoteName
+            } else {
+                fileName = fallbackName
+            }
+            let fileURL = try OtaFirmwareApi.downloadToCache(
+                url: item.url,
+                fileName: fileName,
+                expectMd5: item.md5,
+                subDir: "BleSdkDemo/JieliOTA"
+            ) { fileProgress in
+                let total = ((index * 100) + fileProgress) / info.firmwares.count
+                onProgress(total)
+            }
+            let bytes = try Data(contentsOf: fileURL)
+            guard !bytes.isEmpty else {
+                throw SdkError(code: -1, message: L10n.tr("jieli_ota_err_empty_bin"))
+            }
+            aggregate.append(bytes)
+        }
+
+        guard !aggregate.isEmpty else {
+            throw SdkError(code: -1, message: L10n.tr("jieli_ota_err_empty_bin"))
+        }
+        return aggregate
+    }
+
+    /// Downloads the ordered Jieli aggregate bin and upgrades it through `HwOtaV2Service`.
+    /// Download progress occupies 0...40%; the OTA V2 push occupies 40...100%.
+    func startJieliOta(
+        info: OtaUpgradeInfo,
+        onProgress: @escaping (Int, String) -> Void,
+        onLog: ((String) -> Void)? = nil,
+        completion: @escaping (Result<Void, Error>) -> Void
+    ) {
+        guard let otaService = sdk.otaV2Service else {
+            completion(.failure(SdkError(code: -1, message: L10n.tr("ota_failed"))))
+            return
+        }
+        if let err = beginTransfer(.jieliOta) {
+            completion(.failure(err))
+            return
+        }
+        setAutoReconnectEnabled(false)
+
+        DispatchQueue.global(qos: .userInitiated).async {
+            do {
+                let data = try self.prepareJieliOtaData(info: info) { pct in
+                    DispatchQueue.main.async {
+                        onProgress(Int(Double(pct) * 0.4), L10n.tr("jieli_ota_phase_download"))
+                    }
+                }
+                DispatchQueue.main.async {
+                    guard self.activeTransferKind == .jieliOta else { return }
+                    onLog?(L10n.tr("jieli_ota_log_bytes", data.count))
+                    otaService.start(
+                        withBinData: data,
+                        readyCallback: { ok, error in
+                            DispatchQueue.main.async {
+                                guard self.activeTransferKind == .jieliOta else { return }
+                                if ok {
+                                    onProgress(40, L10n.tr("jieli_ota_phase_push"))
+                                } else if let error = error {
+                                    onLog?(error.localizedDescription)
+                                } else {
+                                    onLog?(L10n.tr("ota_failed"))
+                                }
+                            }
+                        },
+                        progressCallback: { progress, _ in
+                            DispatchQueue.main.async {
+                                guard self.activeTransferKind == .jieliOta else { return }
+                                let normalized = max(0, min(1, progress))
+                                onProgress(
+                                    40 + Int(normalized * 60),
+                                    L10n.tr("jieli_ota_phase_push")
+                                )
+                            }
+                        },
+                        finishCallback: { ok, error in
+                            DispatchQueue.main.async {
+                                guard self.activeTransferKind == .jieliOta else { return }
+                                self.endTransfer()
+                                if ok {
+                                    completion(.success(()))
+                                } else {
+                                    completion(.failure(error ?? SdkError(
+                                        code: -1,
+                                        message: L10n.tr("ota_failed")
+                                    )))
+                                }
+                            }
+                        }
+                    )
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    guard self.activeTransferKind == .jieliOta else { return }
                     self.endTransfer()
                     completion(.failure(error))
                 }
@@ -1701,6 +1834,274 @@ final class BleRepository {
                     completion(.failure(error))
                 }
             }
+        }
+    }
+
+    /// Jieli online watchface install. The catalog and download are shared with Sifli;
+    /// only the device transfer uses JL multiple-file transfer (`onlineDial`).
+    func installJieliOnlineWatchface(_ item: OnlineWatchface,
+                                     onPhase: @escaping (OnlineWatchfaceInstallPhase) -> Void,
+                                     onProgress: @escaping (Int) -> Void,
+                                     onLog: ((String) -> Void)? = nil,
+                                     completion: @escaping (Result<Void, Error>) -> Void) {
+        guard isConnected() else {
+            completion(.failure(SdkError(code: 408, message: L10n.tr("status_need_connect"))))
+            return
+        }
+        guard let bin = item.bin, !bin.isEmpty else {
+            completion(.failure(SdkError(code: -1, message: L10n.tr("wf_err_no_bin"))))
+            return
+        }
+
+        onPhase(.downloading)
+        DispatchQueue.global(qos: .userInitiated).async {
+            do {
+                let fileName = (bin as NSString).lastPathComponent
+                let fileURL = try WatchfaceApi.downloadToCache(
+                    url: bin,
+                    fileName: fileName.isEmpty ? "\(item.id).bin" : fileName,
+                    expectMd5: item.binMd5,
+                    onProgress: { pct in
+                        DispatchQueue.main.async { onProgress(min(40, pct * 40 / 100)) }
+                    }
+                )
+                let data = try Data(contentsOf: fileURL)
+                DispatchQueue.main.async {
+                    onLog?("downloaded \(fileURL.lastPathComponent), bytes=\(data.count)")
+                    onPhase(.installing)
+                    self.pushJieliOnlineWatchface(data: data, fileName: item.name, onProgress: { p in
+                        onProgress(40 + Int(p * 60))
+                    }, completion: { result in
+                        switch result {
+                        case .success:
+                            onPhase(.success)
+                            onProgress(100)
+                        case .failure:
+                            onPhase(.failed)
+                        }
+                        completion(result)
+                    })
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    onPhase(.failed)
+                    completion(.failure(error))
+                }
+            }
+        }
+    }
+
+    private func pushJieliOnlineWatchface(data: Data,
+                                          fileName: String,
+                                          onProgress: @escaping (Float) -> Void,
+                                          completion: @escaping (Result<Void, Error>) -> Void) {
+        if let error = beginTransfer(.jieliWatchface) {
+            completion(.failure(error))
+            return
+        }
+        guard let service = sdk.multipleFileTransferService else {
+            endTransfer()
+            completion(.failure(SdkError(code: -1, message: "multipleFileTransferService unavailable")))
+            return
+        }
+
+        let model = HwMultipleFileTransferModel()
+        model.fileData = data
+        model.fileName = fileName
+
+        service.start(
+            withFileModels: [model],
+            transferType: .onlineDial,
+            readyCallback: { [weak self] _, error in
+                guard let error = error else { return }
+                DispatchQueue.main.async {
+                    self?.endTransfer()
+                    completion(.failure(error))
+                }
+            },
+            progressCallback: { progress, _ in
+                DispatchQueue.main.async { onProgress(progress) }
+            },
+            finishCallback: { [weak self] ok, error in
+                DispatchQueue.main.async {
+                    self?.endTransfer()
+                    if let error = error {
+                        completion(.failure(error))
+                    } else if ok {
+                        completion(.success(()))
+                    } else {
+                        completion(.failure(SdkError(code: -1, message: "online watchface transfer failed")))
+                    }
+                }
+            }
+        )
+    }
+
+    /// Returns the maximum number of Jieli custom-watchface backgrounds that fit on the device.
+    func getJieliCustomWatchfaceCapacity(completion: @escaping (Result<Int, Error>) -> Void) {
+        guard isConnected() else {
+            completion(.failure(SdkError(code: 408, message: L10n.tr("status_need_connect"))))
+            return
+        }
+        sdk.getCoustomInterfaceAvailableStorage { storageKB, error in
+            DispatchQueue.main.async {
+                if let error = error {
+                    completion(.failure(error))
+                } else {
+                    completion(.success(JieliCustomWatchfaceRules.maxBackgroundCount(storageKB: storageKB)))
+                }
+            }
+        }
+    }
+
+    /// Converts album images to Jieli 707N data, transfers them, then writes the dial layout.
+    func pushJieliCustomWatchface(backgroundImages: [UIImage],
+                                  thumbnailImage: UIImage,
+                                  draft: JieliCustomWatchfaceDraft,
+                                  onReady: (() -> Void)? = nil,
+                                  onProgress: @escaping (Float) -> Void,
+                                  completion: @escaping (Result<Void, Error>) -> Void) {
+        guard isConnected() else {
+            completion(.failure(SdkError(code: 408, message: L10n.tr("status_need_connect"))))
+            return
+        }
+
+        DispatchQueue.global(qos: .userInitiated).async {
+            do {
+                let geometry = draft.geometry
+                let targetSize = CGSize(width: CGFloat(geometry.width), height: CGFloat(geometry.height))
+                let thumbSize = CGSize(
+                    width: CGFloat(geometry.thumbnailWidth),
+                    height: CGFloat(geometry.thumbnailHeight)
+                )
+                let images = backgroundImages.isEmpty ? [Self.blackImage()] : backgroundImages
+
+                var fileModels = try images.enumerated().map { index, image -> HwMultipleFileTransferModel in
+                    let model = HwMultipleFileTransferModel()
+                    model.fileName = "bg\(index + 1)"
+                    model.fileData = try JieliWatchfaceImageEncoder.encode(
+                        image,
+                        size: targetSize,
+                        cornerRadius: CGFloat(geometry.cornerRadius)
+                    )
+                    return model
+                }
+
+                let preview = HwMultipleFileTransferModel()
+                preview.fileName = "pw"
+                preview.fileData = try JieliWatchfaceImageEncoder.encode(
+                    thumbnailImage,
+                    size: thumbSize,
+                    cornerRadius: CGFloat(geometry.thumbnailCornerRadius)
+                )
+                fileModels.append(preview)
+
+                let config = Self.makeJieliCustomWatchfaceConfig(draft: draft, imageCount: images.count)
+                DispatchQueue.main.async {
+                    self.transferJieliCustomWatchface(
+                        fileModels: fileModels,
+                        config: config,
+                        onReady: onReady,
+                        onProgress: onProgress,
+                        completion: completion
+                    )
+                }
+            } catch {
+                DispatchQueue.main.async { completion(.failure(error)) }
+            }
+        }
+    }
+
+    private func transferJieliCustomWatchface(fileModels: [HwMultipleFileTransferModel],
+                                               config: HwJLWatchFaceConfigModel,
+                                               onReady: (() -> Void)?,
+                                               onProgress: @escaping (Float) -> Void,
+                                               completion: @escaping (Result<Void, Error>) -> Void) {
+        if let error = beginTransfer(.jieliWatchface) {
+            completion(.failure(error))
+            return
+        }
+        guard let service = sdk.multipleFileTransferService else {
+            endTransfer()
+            completion(.failure(SdkError(code: -1, message: "multipleFileTransferService unavailable")))
+            return
+        }
+
+        service.start(
+            withFileModels: fileModels,
+            transferType: .customDialImage,
+            readyCallback: { _, error in
+                DispatchQueue.main.async {
+                    if let error = error {
+                        self.endTransfer()
+                        completion(.failure(error))
+                    } else {
+                        onReady?()
+                    }
+                }
+            },
+            progressCallback: { value, _ in
+                DispatchQueue.main.async { onProgress(value) }
+            },
+            finishCallback: { ok, error in
+                DispatchQueue.main.async {
+                    guard error == nil, ok else {
+                        self.endTransfer()
+                        completion(.failure(error ?? SdkError(code: -1, message: "custom watchface transfer failed")))
+                        return
+                    }
+                    self.center.updateJLCustomWatceFace(config) { success, configError in
+                        DispatchQueue.main.async {
+                            self.endTransfer()
+                            Self.boolResult(success, configError, completion)
+                        }
+                    }
+                }
+            }
+        )
+    }
+
+    private static func makeJieliCustomWatchfaceConfig(draft: JieliCustomWatchfaceDraft,
+                                                        imageCount: Int) -> HwJLWatchFaceConfigModel {
+        let config = HwJLWatchFaceConfigModel()
+        switch draft.displayMode {
+        case .single: config.displayModeType = .displayModeType_SingleImage
+        case .sequential: config.displayModeType = .displayModeType_QueueShow
+        case .random: config.displayModeType = .displayModeType_RandomShow
+        }
+        config.imageCount = imageCount
+        config.coverImageIndex = Int32(JieliCustomWatchfaceRules.normalizedCoverIndex(
+            draft.coverImageIndex,
+            imageCount: imageCount
+        ))
+        config.pointerStyle = draft.pointerStyle.rawValue
+        config.rgbColorStr = draft.rgbHex
+        config.compentArr = JieliCustomWatchfaceRules.componentPlacements(
+            draft.components,
+            isRound: draft.geometry.isRound
+        ).map { placement in
+            let component = HwJLWatchFaceConfigCompentModel()
+            switch placement.type {
+            case .time: component.compentType = .componentType_Time
+            case .date: component.compentType = .componentType_Date
+            case .heartRate: component.compentType = .componentType_HeartRate
+            case .steps: component.compentType = .componentType_Steps
+            case .distance: component.compentType = .componentType_Distance
+            case .calories: component.compentType = .componentType_Calories
+            case .weather: component.compentType = .componentType_Weather
+            case .battery: component.compentType = .componentType_Battery
+            case .off: break
+            }
+            component.position = placement.position
+            return component
+        }
+        return config
+    }
+
+    private static func blackImage() -> UIImage {
+        UIGraphicsImageRenderer(size: CGSize(width: 1, height: 1)).image { context in
+            UIColor.black.setFill()
+            context.fill(CGRect(x: 0, y: 0, width: 1, height: 1))
         }
     }
 

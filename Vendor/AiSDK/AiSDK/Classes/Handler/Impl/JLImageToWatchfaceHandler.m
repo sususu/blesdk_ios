@@ -13,7 +13,6 @@
 #import "AiFileUtils.h"
 #import "HwBluetoothSDK.h"
 #import "JLBmpConvertKit/JLBmpConvertKit.h"
-#import "HwBluetoothCenter+MultipleFileTransfer.h"
 #import "WatchfaceSDK/WatchfaceSDK-Swift.h"
 
 @interface JLImageToWatchfaceHandler()
@@ -108,20 +107,23 @@
     
     [AiLogger e:@"will sync watchface to device size: %ld", trModel.fileData.length];
     
-    [[HwBluetoothCenter sharedInstance] startMultipleFileTransfer:fileModelArr transferType:MultipleFileTransferTypeAIDialImage readyCallback:^(BOOL b, NSError *error) {
-
-    } progressCallback:^(float f, NSError *error) {
-        [[AiSDK sharedInstance] watchfaceSyncProgressUpdated:f];
-        [AiLogger i:@"watchface progress:%f",f];
-    } finishCallback:^(BOOL b, NSError *error) {
-        if (!b) {
-            [AiLogger e:@"sync watchface to device failed: %@", @(error.code)];
-            [self generateDone:nil code:AiErrorMakeQjsWatchfaceFailed errorMsg:[[AiSDK sharedInstance] errorMsgWithCode:AiErrorMakeQjsWatchfaceFailed]];
-            return;
-        } else {
+    [[HwBluetoothSDK sharedInstance].multipleFileTransferService
+        startWithFileModels:fileModelArr
+               transferType:MultipleFileTransferTypeAIDialImage
+              readyCallback:^(BOOL b, NSError *error) {
+        } progressCallback:^(float f, NSError *error) {
+            [[AiSDK sharedInstance] watchfaceSyncProgressUpdated:f];
+            [AiLogger i:@"watchface progress:%f", f];
+        } finishCallback:^(BOOL b, NSError *error) {
+            if (!b) {
+                [AiLogger e:@"sync watchface to device failed: %@", @(error.code)];
+                [self generateDone:nil
+                               code:AiErrorMakeQjsWatchfaceFailed
+                           errorMsg:[[AiSDK sharedInstance] errorMsgWithCode:AiErrorMakeQjsWatchfaceFailed]];
+                return;
+            }
             [self generateDone:watchface.name code:0 errorMsg:nil];
-        }
-    }];
+        }];
 }
 
 - (SlifiCustomWatchface *) generateWithImage:(UIImage *)image

@@ -9,6 +9,14 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+typedef NS_ENUM(NSInteger, HwBluetoothLogLevel) {
+    HwBluetoothLogLevelDebug = 0,
+    HwBluetoothLogLevelInfo,
+    HwBluetoothLogLevelWarn,
+    HwBluetoothLogLevelError,
+    HwBluetoothLogLevelNone,
+};
+
 @protocol HwBluetoothLoggerProtocol <NSObject>
 
 @required
@@ -28,6 +36,8 @@ NS_ASSUME_NONNULL_BEGIN
 + (HwBluetoothLogger *) sharedInstance;
 
 @property(nonatomic, assign) BOOL logOn;
+@property(nonatomic, assign) HwBluetoothLogLevel minimumLogLevel;
+
 - (void) setLogger:(id<HwBluetoothLoggerProtocol>)logger;
 - (void) setLogTag:(NSString *)tag;
 

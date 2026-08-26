@@ -27,6 +27,8 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property(nonatomic, assign) NSUInteger bmp;
 
+@property(nonatomic, assign) BOOL resting;
+
 @end
 
 NS_ASSUME_NONNULL_END

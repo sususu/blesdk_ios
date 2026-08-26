@@ -1,23 +1,23 @@
-#import <Foundation/Foundation.h>
+//
+//  HwBluetoothCenter+SimpleFileTransfer.h
+//  HwBluetoothSDK
+//
+//  Created by kingwear on 2025/11/13.
+//
+
+#import "HwBluetoothCenter.h"
 #import "HwSimpleFileTransferModel.h"
 
-NS_ASSUME_NONNULL_BEGIN
-
-typedef void (^HwSimpleFileTransferReadyCallback)(BOOL success, NSError * _Nullable error);
-typedef void (^HwSimpleFileTransferProgressCallback)(float progress, NSError * _Nullable error);
-typedef void (^HwSimpleFileTransferFinishCallback)(BOOL success, NSError * _Nullable error);
-
-@class HwBluetoothCenter;
+typedef void(^SftLogBlock)(NSString *logMessage);
 
 @interface HwBluetoothCenter (SimpleFileTransfer)
 
-- (void)startSimpleFileTransfer:(HwSimpleFileTransferModel *)model
-                  readyCallback:(HwSimpleFileTransferReadyCallback _Nullable)readyCallback
-               progressCallback:(HwSimpleFileTransferProgressCallback _Nullable)progressCallback
-                 finishCallback:(HwSimpleFileTransferFinishCallback _Nullable)finishCallback;
+- (void)startSimpleFileTransfer:(HwSimpleFileTransferModel *)transferModel
+                    readyCallback:(HwBoolCallback)readyCallback
+                 progressCallback:(HwBCFloatCallback)progressCallback
+                   finishCallback:(HwBoolCallback)finishCallback;
 
-- (void)setSftLogBlock:(void (^ _Nullable)(NSString *log))logBlock;
+- (void)setSftLogBlock:(SftLogBlock)logBlock;
 
 @end
 
-NS_ASSUME_NONNULL_END

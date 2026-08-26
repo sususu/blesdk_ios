@@ -32,5 +32,8 @@
 #pragma mark - AI record
 - (void)getAiRecordBigDataWithCallback:(HwDataCallback _Nonnull)callback;
 
+#pragma mark - Hrv
+- (void)getHrvBigDataWithCallback:(HwHrvCallback _Nonnull)callback;
+
 @end
 

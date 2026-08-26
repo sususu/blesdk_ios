@@ -14,7 +14,6 @@
 #import "HwBluetoothSDK.h"
 #import "WatchfaceSDK/WatchfaceSDK-Swift.h"
 #import "JLBmpConvertKit/JLBmpConvertKit.h"
-#import "HwBluetoothCenter+MultipleFileTransfer.h"
 
 @interface JLImageToPreviewHandler()
 
@@ -127,19 +126,21 @@
     
     [AiLogger e:@"will sync preview to device size: %ld", trModel.fileData.length];
     
-    [[HwBluetoothCenter sharedInstance] startMultipleFileTransfer:fileModelArr transferType:MultipleFileTransferTypeAIDialPreview readyCallback:^(BOOL b, NSError *error) {
-       
-    } progressCallback:^(float f, NSError *error) {
-        NSLog(@"jl preview progress: %@", @(f));
-    } finishCallback:^(BOOL b, NSError *error) {
-        if (!b) {
-            [AiLogger e:@"sync preview to device failed: %@", @(b)];
-            [self syncToDeviceDone:AiErrorMakeQjsWatchfaceFailed errorMsg:[[AiSDK sharedInstance] errorMsgWithCode:AiErrorMakeQjsWatchfaceFailed]];
-            return;
-        } else {
+    [[HwBluetoothSDK sharedInstance].multipleFileTransferService
+        startWithFileModels:fileModelArr
+               transferType:MultipleFileTransferTypeAIDialPreview
+              readyCallback:^(BOOL b, NSError *error) {
+        } progressCallback:^(float f, NSError *error) {
+            NSLog(@"jl preview progress: %@", @(f));
+        } finishCallback:^(BOOL b, NSError *error) {
+            if (!b) {
+                [AiLogger e:@"sync preview to device failed: %@", @(b)];
+                [self syncToDeviceDone:AiErrorMakeQjsWatchfaceFailed
+                              errorMsg:[[AiSDK sharedInstance] errorMsgWithCode:AiErrorMakeQjsWatchfaceFailed]];
+                return;
+            }
             [self syncToDeviceDone:0 errorMsg:nil];
-        }
-    }];
+        }];
 }
 
 - (void) syncToDeviceDone:(NSInteger)code

@@ -1,16 +1,23 @@
+//
+//  HwSimpleFileTransferModel.h
+//  HwBluetoothSDK
+//
+//  Created by kingwear on 2025/11/13.
+//
+
 #import <Foundation/Foundation.h>
+
+typedef NS_ENUM(NSInteger, SimpleFileTransferType) {
+    SimpleFileTransferTypeWatchFace = 0x06
+};
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef NS_ENUM(NSInteger, SimpleFileTransferType) {
-    SimpleFileTransferTypeWatchFace = 0,
-};
-
 @interface HwSimpleFileTransferModel : NSObject
 
-@property (nonatomic, assign) SimpleFileTransferType transferType;
-@property (nonatomic, assign) NSInteger watchFaceID;
-@property (nonatomic, strong, nullable) NSData *fileData;
+@property(nonatomic, assign) SimpleFileTransferType transferType;
+@property(nonatomic, strong) NSString *watchFaceID;
+@property(nonatomic, strong) NSData *fileData;
 
 @end
 

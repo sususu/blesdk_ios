@@ -100,6 +100,11 @@ final class HomeViewController: UIViewController {
         content.addArrangedSubview(makeRow([bind, sync]))
         actionButtons.append(contentsOf: [bind, sync])
 
+        let jieliSync = UIHelpers.makeButton("")
+        jieliSync.addTarget(self, action: #selector(tapJieliSync), for: .touchUpInside)
+        content.addArrangedSubview(jieliSync)
+        actionButtons.append(jieliSync)
+
         let unbind = UIHelpers.makeButton("")
         let disconnect = UIHelpers.makeButton("")
         unbind.addTarget(self, action: #selector(tapUnbind), for: .touchUpInside)
@@ -113,13 +118,19 @@ final class HomeViewController: UIViewController {
 
         let featureActions: [Selector] = [
             #selector(tapGoals), #selector(tapAlarms), #selector(tapNotify),
-            #selector(tapMusic), #selector(tapAlbum), #selector(tapAgps), #selector(tapOta)
+            #selector(tapMusic), #selector(tapAlbum), #selector(tapAgps), #selector(tapOta),
+            #selector(tapJieliOta), #selector(tapJieliWatchface)
         ]
         // Goals|Alarms, Notify, Music|Album, Agps|OTA
         let g = UIHelpers.makeButton(""); g.addTarget(self, action: #selector(tapGoals), for: .touchUpInside)
         let a = UIHelpers.makeButton(""); a.addTarget(self, action: #selector(tapAlarms), for: .touchUpInside)
         content.addArrangedSubview(makeRow([g, a]))
         actionButtons.append(contentsOf: [g, a])
+
+        let jieliAlarms = UIHelpers.makeButton("")
+        jieliAlarms.addTarget(self, action: #selector(tapJieliAlarms), for: .touchUpInside)
+        content.addArrangedSubview(jieliAlarms)
+        actionButtons.append(jieliAlarms)
 
         let n = UIHelpers.makeButton(""); n.addTarget(self, action: #selector(tapNotify), for: .touchUpInside)
         content.addArrangedSubview(n)
@@ -135,9 +146,19 @@ final class HomeViewController: UIViewController {
         content.addArrangedSubview(makeRow([ag, ota]))
         actionButtons.append(contentsOf: [ag, ota])
 
+        let jieliOta = UIHelpers.makeButton("")
+        jieliOta.addTarget(self, action: #selector(tapJieliOta), for: .touchUpInside)
+        content.addArrangedSubview(jieliOta)
+        actionButtons.append(jieliOta)
+
         let wf = UIHelpers.makeButton(""); wf.addTarget(self, action: #selector(tapWatchface), for: .touchUpInside)
         content.addArrangedSubview(wf)
         actionButtons.append(wf)
+
+        let jieliWf = UIHelpers.makeButton("")
+        jieliWf.addTarget(self, action: #selector(tapJieliWatchface), for: .touchUpInside)
+        content.addArrangedSubview(jieliWf)
+        actionButtons.append(jieliWf)
         _ = featureActions
     }
 
@@ -170,10 +191,10 @@ final class HomeViewController: UIViewController {
 
         let titles = [
             L10n.tr("scan_connect"), L10n.tr("bind_watch"), L10n.tr("sync_data"),
-            L10n.tr("unbind_watch"), L10n.tr("disconnect"),
-            L10n.tr("goals"), L10n.tr("alarms"), L10n.tr("notify"),
-            L10n.tr("music"), L10n.tr("album"), L10n.tr("agps"), L10n.tr("ota"),
-            L10n.tr("watchface")
+            L10n.tr("jieli_sync_data"), L10n.tr("unbind_watch"), L10n.tr("disconnect"),
+            L10n.tr("goals"), L10n.tr("alarms"), L10n.tr("jieli_alarms"),
+            L10n.tr("notify"), L10n.tr("music"), L10n.tr("album"), L10n.tr("agps"), L10n.tr("ota"),
+            L10n.tr("jieli_ota"), L10n.tr("watchface"), L10n.tr("watchface_jieli")
         ]
         for (i, t) in titles.enumerated() where i < actionButtons.count {
             actionButtons[i].setTitle(t, for: .normal)
@@ -265,13 +286,14 @@ final class HomeViewController: UIViewController {
         let canUnbind = !busy && bound
         let canFeature = !busy && hasDevice && (bound || phase == .connected)
 
-        guard actionButtons.count >= 13 else { return }
+        guard actionButtons.count >= 17 else { return }
         actionButtons[0].isEnabled = !busy
         actionButtons[1].isEnabled = canBind
         actionButtons[2].isEnabled = canSync
-        actionButtons[3].isEnabled = canUnbind
-        actionButtons[4].isEnabled = !busy && hasDevice
-        for i in 5..<13 { actionButtons[i].isEnabled = canFeature }
+        actionButtons[3].isEnabled = canSync
+        actionButtons[4].isEnabled = canUnbind
+        actionButtons[5].isEnabled = !busy && hasDevice
+        for i in 6..<17 { actionButtons[i].isEnabled = canFeature }
 
         if busy { statusSpinner.startAnimating() } else { statusSpinner.stopAnimating() }
     }
@@ -394,6 +416,11 @@ final class HomeViewController: UIViewController {
         }
     }
 
+    @objc private func tapJieliSync() {
+        guard requireConnectedFeature() else { return }
+        navigationController?.pushViewController(JieliHealthSyncViewController(), animated: true)
+    }
+
     /// Presents `UnbindFlowViewController`. Disables auto-reconnect first.
     /// On success, clears home bind state. The flow itself prompts the user to
     /// **Forget This Device** in system Bluetooth settings (iOS cannot `removeBond`).
@@ -446,6 +473,10 @@ final class HomeViewController: UIViewController {
         guard requireConnectedFeature() else { return }
         navigationController?.pushViewController(AlarmsViewController(), animated: true)
     }
+    @objc private func tapJieliAlarms() {
+        guard requireConnectedFeature() else { return }
+        navigationController?.pushViewController(JieliAlarmReminderViewController(), animated: true)
+    }
     @objc private func tapNotify() {
         guard requireConnectedFeature() else { return }
         navigationController?.pushViewController(NotifyViewController(), animated: true)
@@ -466,9 +497,17 @@ final class HomeViewController: UIViewController {
         guard requireConnectedFeature() else { return }
         navigationController?.pushViewController(OtaUpgradeViewController(), animated: true)
     }
+    @objc private func tapJieliOta() {
+        guard requireConnectedFeature() else { return }
+        navigationController?.pushViewController(JieliOtaUpgradeViewController(), animated: true)
+    }
     @objc private func tapWatchface() {
         guard requireConnectedFeature() else { return }
         navigationController?.pushViewController(WatchfaceHostViewController(), animated: true)
+    }
+    @objc private func tapJieliWatchface() {
+        guard requireConnectedFeature() else { return }
+        navigationController?.pushViewController(JieliWatchfaceHostViewController(), animated: true)
     }
 }
 

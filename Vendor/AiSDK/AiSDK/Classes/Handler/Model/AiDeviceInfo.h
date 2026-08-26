@@ -7,13 +7,9 @@
 
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
+#import "HwBluetoothSDK.h"
 
 NS_ASSUME_NONNULL_BEGIN
-
-typedef NS_ENUM(NSInteger, HWPlatformType) {
-    HWPlatformTypeSifli = 0,
-    HWPlatformTypeJieLi = 1,
-};
 
 @interface AiDeviceInfo : NSObject
 

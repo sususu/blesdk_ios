@@ -1,6 +1,0 @@
-framework module VideoWatchfaceSDK {
-  umbrella header "VideoWatchfaceSDK.h"
-  export *
-
-  module * { export * }
-}

@@ -1,4 +1,0 @@
-framework module SFDialPlateSDK {
-  header "SFDialPlateSDK-Swift.h"
-  requires objc
-}

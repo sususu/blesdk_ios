@@ -100,6 +100,8 @@ final class BleRepository {
         guard !initialized else { return }
         sdk.initSDK()
         SifliWatchfaceSDK.getInstance().initSDK()
+        // HaWoFit AppDelegate also warms SFDialPlateManager before any dial push.
+        _ = SFDialPlateManager.share
         SifliOtaPusher.shared.warmUp()
         initialized = true
 
@@ -2137,3 +2139,91 @@ private extension Array {
         indices.contains(index) ? self[index] : nil
     }
 }
+
+// MARK: - AiSDK device info (HaWoFit `HwAIManager.updateDeviceInfo` parity)
+
+/// Resolves AiSDK `HWPlatformType` for the connected watch.
+///
+/// HaWoFit uses `Watch.isJLProtocol` → `product.mcu == "JieLi"` from the product catalog.
+/// BleSdkDemo has no catalog, so we fall back to `protocolVersion >= 100` plus the manual JieLi switch.
+enum AiPlatformHelper {
+    static func isJieliProtocol(_ protocolVersion: Int?) -> Bool {
+        guard let pv = protocolVersion else { return false }
+        return pv >= 100
+    }
+
+    static func platformType(protocolVersion: Int?, userPrefersJieli: Bool) -> HWPlatformType {
+        if isJieliProtocol(protocolVersion) || userPrefersJieli {
+            return .jieLi
+        }
+        return .sifli
+    }
+
+    static func platformLabel(_ type: HWPlatformType) -> String {
+        switch type {
+        case .jieLi: return "JieLi(2)"
+        case .realtek: return "Realtek(1)"
+        default: return "Sifli(0)"
+        }
+    }
+}
+
+enum AiDeviceInfoBuilder {
+    struct Panel {
+        var width: Int
+        var height: Int
+        var cornerRadius: Int
+        var thumbnailWidth: Int
+        var thumbnailHeight: Int
+        var thumbnailCornerRadius: Int
+    }
+
+    static func make(
+        repo: BleRepository,
+        deviceId: String,
+        panel: Panel,
+        protocolVersion: Int?,
+        userPrefersJieli: Bool,
+        locale: String? = nil
+    ) -> AiDeviceInfo {
+        let info = AiDeviceInfo()
+        if !deviceId.isEmpty { info.setValue(deviceId, forKey: "Id") }
+        info.mac = repo.connectedMac() ?? ""
+        info.name = repo.connectedName() ?? ""
+        info.type = repo.loadBoundDevice()?.type ?? ""
+
+        let boundPv = repo.loadBoundDevice()?.protocolVersion
+        let resolvedPv = protocolVersion ?? boundPv
+        _ = AiPlatformHelper.platformType(
+            protocolVersion: resolvedPv,
+            userPrefersJieli: userPrefersJieli
+        )
+
+        info.width = panel.width > 0 ? panel.width : 480
+        info.height = panel.height > 0 ? panel.height : 480
+        info.cornerRadius = panel.cornerRadius > 0 ? panel.cornerRadius : 240
+        info.thumbnailWidth = panel.thumbnailWidth > 0 ? panel.thumbnailWidth : 264
+        info.thumbnailHeight = panel.thumbnailHeight > 0 ? panel.thumbnailHeight : 264
+        info.thumbnailCornerRadius = panel.thumbnailCornerRadius > 0 ? panel.thumbnailCornerRadius : 132
+
+        info.currentLocale = locale ?? Locale.current.languageCode ?? "en"
+        return info
+    }
+
+    private static func isRoundPanel(_ info: AiDeviceInfo) -> Bool {
+        let shortSide = min(info.width, info.height)
+        return info.cornerRadius * 2 >= shortSide
+    }
+
+    static func resolvedPlatform(
+        protocolVersion: Int?,
+        userPrefersJieli: Bool,
+        repo: BleRepository
+    ) -> HWPlatformType {
+        AiPlatformHelper.platformType(
+            protocolVersion: protocolVersion ?? repo.loadBoundDevice()?.protocolVersion,
+            userPrefersJieli: userPrefersJieli
+        )
+    }
+}
+

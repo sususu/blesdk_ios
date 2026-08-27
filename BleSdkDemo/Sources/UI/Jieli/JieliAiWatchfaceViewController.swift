@@ -244,9 +244,9 @@ final class JieliAiWatchfaceViewController: UIViewController {
         let info = AiDeviceInfo()
         // ObjC property `Id` — set via KVC to avoid Swift `id` keyword clash.
         if !deviceId.isEmpty { info.setValue(deviceId, forKey: "Id") }
-        info.mac = repo.connectedMac()
-        info.name = repo.connectedName()
-        info.type = repo.loadBoundDevice()?.type
+        info.mac = repo.connectedMac() ?? ""
+        info.name = repo.connectedName() ?? ""
+        info.type = repo.loadBoundDevice()?.type ?? ""
         info.width = Int(widthField.text ?? "") ?? 480
         info.height = Int(heightField.text ?? "") ?? 480
         info.cornerRadius = Int(cornerField.text ?? "") ?? 240
@@ -254,15 +254,18 @@ final class JieliAiWatchfaceViewController: UIViewController {
         info.thumbnailHeight = Int(thumbHField.text ?? "") ?? 264
         info.thumbnailCornerRadius = Int(thumbCornerField.text ?? "") ?? 132
         info.currentLocale = Locale.current.languageCode ?? "en"
-        info.platformType = .sifli
         bridge.setDeviceInfo(info)
         append(L10n.tr("wf_ai_applied", info.width, info.height))
         statusLabel.text = L10n.tr("wf_ai_ready_on_watch")
     }
 
     private func append(_ s: String) {
-        let ts = DateFormatter.localizedString(from: Date(), dateStyle: .none, timeStyle: .medium)
-        logView.text = (logView.text ?? "") + "\(ts)  \(s)\n"
+        let work = { [weak self] in
+            guard let self else { return }
+            let ts = DateFormatter.localizedString(from: Date(), dateStyle: .none, timeStyle: .medium)
+            self.logView.text = (self.logView.text ?? "") + "\(ts)  \(s)\n"
+        }
+        if Thread.isMainThread { work() } else { DispatchQueue.main.async(execute: work) }
     }
 }
 
@@ -290,7 +293,6 @@ final class JieliAiWatchfaceBridge: NSObject, AiSDKCallback, ILog, IAiErrorMessa
 
     func stopWorking() {
         AiSDK.sharedInstance().stopWorking()
-        AiSDK.sharedInstance().callback = nil
     }
 
     func setDeviceInfo(_ info: AiDeviceInfo) {
@@ -303,10 +305,18 @@ final class JieliAiWatchfaceBridge: NSObject, AiSDKCallback, ILog, IAiErrorMessa
     }
 
     // MARK: - ILog
-    func d(_ msg: String!) { onLog?("[D] \(msg ?? "")") }
-    func i(_ msg: String!) { onLog?("[I] \(msg ?? "")") }
-    func w(_ msg: String!) { onLog?("[W] \(msg ?? "")") }
-    func e(_ msg: String!) { onLog?("[E] \(msg ?? "")") }
+    func d(_ msg: String!) { emitLog("[D] \(msg ?? "")") }
+    func i(_ msg: String!) { emitLog("[I] \(msg ?? "")") }
+    func w(_ msg: String!) { emitLog("[W] \(msg ?? "")") }
+    func e(_ msg: String!) { emitLog("[E] \(msg ?? "")") }
+
+    private func emitLog(_ msg: String) {
+        if Thread.isMainThread {
+            onLog?(msg)
+        } else {
+            DispatchQueue.main.async { [weak self] in self?.onLog?(msg) }
+        }
+    }
 
     // MARK: - IAiErrorMessageProvider
     func message(forCode code: Int) -> String! {

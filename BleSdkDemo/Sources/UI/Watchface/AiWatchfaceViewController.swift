@@ -225,44 +225,56 @@ final class AiWatchfaceViewController: UIViewController {
     }
 
     private func fetchIdAndApply() {
-        repo.getDeviceId { [weak self] result in
+        repo.getDeviceInfo { [weak self] result in
             guard let self = self else { return }
             switch result {
             case .failure(let e):
                 self.append(e.localizedDescription)
-                // Bound device id is a soft fallback when the live query fails.
-                self.applyInfo(deviceId: self.repo.loadBoundDevice()?.deviceId ?? "")
-            case .success(let id):
-                self.deviceIdLabel.text = L10n.tr("wf_ai_device_id", id.isEmpty ? "-" : id)
-                self.applyInfo(deviceId: id)
+                self.applyInfo(deviceId: self.repo.loadBoundDevice()?.deviceId ?? "",
+                               protocolVersion: self.repo.loadBoundDevice()?.protocolVersion)
+            case .success(let info):
+                self.deviceIdLabel.text = L10n.tr("wf_ai_device_id", info.id ?? "-")
+                self.applyInfo(deviceId: info.id ?? "", protocolVersion: info.protocolVersion)
             }
         }
     }
 
     /// Builds `AiDeviceInfo` from fields + connection metadata and pushes to AiSDK.
-    private func applyInfo(deviceId: String) {
-        let info = AiDeviceInfo()
-        // ObjC property `Id` — set via KVC to avoid Swift `id` keyword clash.
-        if !deviceId.isEmpty { info.setValue(deviceId, forKey: "Id") }
-        info.mac = repo.connectedMac()
-        info.name = repo.connectedName()
-        info.type = repo.loadBoundDevice()?.type
-        info.width = Int(widthField.text ?? "") ?? 480
-        info.height = Int(heightField.text ?? "") ?? 480
-        info.cornerRadius = Int(cornerField.text ?? "") ?? 240
-        info.thumbnailWidth = Int(thumbWField.text ?? "") ?? 264
-        info.thumbnailHeight = Int(thumbHField.text ?? "") ?? 264
-        info.thumbnailCornerRadius = Int(thumbCornerField.text ?? "") ?? 132
-        info.currentLocale = Locale.current.languageCode ?? "en"
-        info.platformType = .sifli
+    private func applyInfo(deviceId: String, protocolVersion: Int?) {
+        let panel = AiDeviceInfoBuilder.Panel(
+            width: Int(widthField.text ?? "") ?? 480,
+            height: Int(heightField.text ?? "") ?? 480,
+            cornerRadius: Int(cornerField.text ?? "") ?? 240,
+            thumbnailWidth: Int(thumbWField.text ?? "") ?? 264,
+            thumbnailHeight: Int(thumbHField.text ?? "") ?? 264,
+            thumbnailCornerRadius: Int(thumbCornerField.text ?? "") ?? 132
+        )
+        let info = AiDeviceInfoBuilder.make(
+            repo: repo,
+            deviceId: deviceId,
+            panel: panel,
+            protocolVersion: protocolVersion,
+            userPrefersJieli: false
+        )
         bridge.setDeviceInfo(info)
         append(L10n.tr("wf_ai_applied", info.width, info.height))
+        let pv = protocolVersion ?? repo.loadBoundDevice()?.protocolVersion
+        let platform = AiDeviceInfoBuilder.resolvedPlatform(
+            protocolVersion: pv,
+            userPrefersJieli: false,
+            repo: repo
+        )
+        append("protocolVersion=\(pv.map(String.init) ?? "-") platform=\(AiPlatformHelper.platformLabel(platform)) type=\(info.type ?? "-")")
         statusLabel.text = L10n.tr("wf_ai_ready_on_watch")
     }
 
     private func append(_ s: String) {
-        let ts = DateFormatter.localizedString(from: Date(), dateStyle: .none, timeStyle: .medium)
-        logView.text = (logView.text ?? "") + "\(ts)  \(s)\n"
+        let work = { [weak self] in
+            guard let self else { return }
+            let ts = DateFormatter.localizedString(from: Date(), dateStyle: .none, timeStyle: .medium)
+            self.logView.text = (self.logView.text ?? "") + "\(ts)  \(s)\n"
+        }
+        if Thread.isMainThread { work() } else { DispatchQueue.main.async(execute: work) }
     }
 }
 
@@ -280,6 +292,7 @@ final class AiWatchfaceBridge: NSObject, AiSDKCallback, ILog, IAiErrorMessagePro
     var onInstalling: ((Bool) -> Void)?
 
     func startWorking() {
+        clearAiPreviewZipCache()
         let ai = AiSDK.sharedInstance()
         ai.setLogger(self)
         ai.setAiErrorMessageProvider(self)
@@ -288,9 +301,17 @@ final class AiWatchfaceBridge: NSObject, AiSDKCallback, ILog, IAiErrorMessagePro
         setAnimeStyle(true)
     }
 
+    private func clearAiPreviewZipCache() {
+        let caches = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first
+        guard let caches else { return }
+        let fm = FileManager.default
+        for name in ["tempZipFolder", "target.zip", "JW_AIPreview1.bin"] {
+            try? fm.removeItem(at: caches.appendingPathComponent(name))
+        }
+    }
+
     func stopWorking() {
         AiSDK.sharedInstance().stopWorking()
-        AiSDK.sharedInstance().callback = nil
     }
 
     func setDeviceInfo(_ info: AiDeviceInfo) {
@@ -303,10 +324,26 @@ final class AiWatchfaceBridge: NSObject, AiSDKCallback, ILog, IAiErrorMessagePro
     }
 
     // MARK: - ILog
-    func d(_ msg: String!) { onLog?("[D] \(msg ?? "")") }
-    func i(_ msg: String!) { onLog?("[I] \(msg ?? "")") }
-    func w(_ msg: String!) { onLog?("[W] \(msg ?? "")") }
-    func e(_ msg: String!) { onLog?("[E] \(msg ?? "")") }
+    func d(_ msg: String!) { emitLog("[D] \(msg ?? "")") }
+    func i(_ msg: String!) { emitLog("[I] \(msg ?? "")") }
+    func w(_ msg: String!) { emitLog("[W] \(msg ?? "")") }
+    func e(_ msg: String!) { emitLog("[E] \(msg ?? "")") }
+
+    private func emitLog(_ msg: String) {
+        if Thread.isMainThread {
+            onLog?(msg)
+        } else {
+            DispatchQueue.main.async { [weak self] in self?.onLog?(msg) }
+        }
+    }
+
+    private func emitStatus(_ msg: String) {
+        if Thread.isMainThread {
+            onStatus?(msg)
+        } else {
+            DispatchQueue.main.async { [weak self] in self?.onStatus?(msg) }
+        }
+    }
 
     // MARK: - IAiErrorMessageProvider
     func message(forCode code: Int) -> String! {
@@ -336,6 +373,21 @@ final class AiWatchfaceBridge: NSObject, AiSDKCallback, ILog, IAiErrorMessagePro
                 self.onLog?(errorMsg ?? "preview code=\(code)")
             } else {
                 self.onStatus?(L10n.tr("wf_ai_preview_ok"))
+            }
+        }
+    }
+
+    func aiStartSendingPreview() {
+        DispatchQueue.main.async {
+            self.onLog?("[CB] aiStartSendingPreview")
+        }
+    }
+
+    func aiSentPreview(_ code: Int, errorMsg: String?) {
+        DispatchQueue.main.async {
+            self.onLog?("[CB] aiSentPreview code=\(code) \(errorMsg ?? "")")
+            if code != 0 {
+                self.onStatus?(L10n.tr("ai_preview_push_failed_hint"))
             }
         }
     }

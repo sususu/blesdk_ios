@@ -14,50 +14,59 @@ PODS:
   - AFNetworking/Serialization (4.0.1)
   - AFNetworking/UIKit (4.0.1):
     - AFNetworking/NSURLSession
-  - AiSDK (1.3.2):
+  - AiSDK (1.3.3):
     - AFNetworking (~> 4.0.1)
-    - HwBluetoothSDK
     - SSZipArchive
     - WatchfaceSDK
   - HwBluetoothSDK (3.2.7)
+  - Masonry (1.1.0)
   - SSZipArchive (2.4.3)
   - WatchfaceSDK (1.0.6):
+    - Masonry
     - SSZipArchive
     - Zip (~> 2.1)
   - Zip (2.1.2)
 
 DEPENDENCIES:
   - AFNetworking (~> 4.0.1)
-  - AiSDK (from `Vendor/AiSDK`)
+  - AiSDK (from `https://github.com/HWdan/HwAiSDK.git`, branch `main`)
   - HwBluetoothSDK (from `Vendor/HwBluetoothSDK`)
-  - SSZipArchive (from `Vendor/SSZipArchive`)
-  - WatchfaceSDK (from `Vendor/WatchfaceSDK`)
-  - Zip (from `Vendor/Zip`)
+  - WatchfaceSDK (from `https://github.com/HWdan/WatchfaceSDK.git`, branch `main`)
 
 SPEC REPOS:
   trunk:
     - AFNetworking
+    - Masonry
+    - SSZipArchive
+    - Zip
 
 EXTERNAL SOURCES:
   AiSDK:
-    :path: Vendor/AiSDK
+    :branch: main
+    :git: https://github.com/HWdan/HwAiSDK.git
   HwBluetoothSDK:
     :path: Vendor/HwBluetoothSDK
-  SSZipArchive:
-    :path: Vendor/SSZipArchive
   WatchfaceSDK:
-    :path: Vendor/WatchfaceSDK
-  Zip:
-    :path: Vendor/Zip
+    :branch: main
+    :git: https://github.com/HWdan/WatchfaceSDK.git
+
+CHECKOUT OPTIONS:
+  AiSDK:
+    :commit: d897c1a9182cb09093ef667b9086cbf15ebfccb4
+    :git: https://github.com/HWdan/HwAiSDK.git
+  WatchfaceSDK:
+    :commit: 4ddc2f1d7b007233306c2244752a7c5fa6c275b1
+    :git: https://github.com/HWdan/WatchfaceSDK.git
 
 SPEC CHECKSUMS:
   AFNetworking: 3bd23d814e976cd148d7d44c3ab78017b744cd58
-  AiSDK: 11027e1092e018cbc0e10cb161e27ce70163c653
+  AiSDK: 9a0b2e09ed7bc108860018a08a1615a2079b4e45
   HwBluetoothSDK: 36869338a96693703dace73d10f40511e9c4c551
-  SSZipArchive: 5c0810d645ad942b3375a747ceaead8a645d596e
-  WatchfaceSDK: e51738272f076640278b8449dcf0a23c7181eb33
-  Zip: 29fd4b9644db1cce7b9b49f1ece5f4627e06c34c
+  Masonry: 678fab65091a9290e40e2832a55e7ab731aad201
+  SSZipArchive: fe6a26b2a54d5a0890f2567b5cc6de5caa600aef
+  WatchfaceSDK: 357f3dad712d7babd6d19a7ddb4607384a840453
+  Zip: b3fef584b147b6e582b2256a9815c897d60ddc67
 
-PODFILE CHECKSUM: 7e9115399082421a5324ef5b58c71747ed89902c
+PODFILE CHECKSUM: 927666bf50d1aeb64eafcc01aee69472a5a8e102
 
 COCOAPODS: 1.16.2

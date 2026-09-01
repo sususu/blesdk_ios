@@ -1,5 +1,6 @@
 import Foundation
 import UIKit
+import AiSDK
 import WatchfaceSDK
 
 /// Central facade over `HwBluetoothSDK` / `SifliWatchfaceSDK`, mirroring the Android
@@ -103,6 +104,9 @@ final class BleRepository {
         // HaWoFit AppDelegate also warms SFDialPlateManager before any dial push.
         _ = SFDialPlateManager.share
         SifliOtaPusher.shared.warmUp()
+        AiSDK.sharedInstance().setJLBmpDataConverter {
+            JieliWatchfaceImageEncoder.convert($0)
+        }
         initialized = true
 
         // Debounce connection-state handling by 0.3s (BleConnectManager parity).
@@ -2226,4 +2230,3 @@ enum AiDeviceInfoBuilder {
         )
     }
 }
-

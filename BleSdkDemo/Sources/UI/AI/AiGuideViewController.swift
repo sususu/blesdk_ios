@@ -39,8 +39,9 @@ final class AiGuideViewController: UIViewController {
     - `AiSDK` (git: github.com/HWdan/HwAiSDK, branch `main`)
     - `HwBluetoothSDK` (path: Vendor/HwBluetoothSDK, required)
     - `WatchfaceSDK` (git: github.com/HWdan/WatchfaceSDK, branch `main`; pulls Zip + SSZipArchive transitively)
+    - `JLBmpConvertKit` (git: github.com/sususu/JLBmpConvertKit, tag `1.2.0`; provided by the host)
     - `AFNetworking`
-    - Vendored inside AiSDK pod: `NativeLib.xcframework` (AFlash), `JLBmpConvertKit.xcframework` (JieLi)
+    - Vendored inside AiSDK pod: `NativeLib.xcframework` (AFlash)
 
     Info.plist must declare `NSMicrophoneUsageDescription` (voice Q&A / watchface recording).
 

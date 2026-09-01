@@ -350,7 +350,7 @@
 				"${BUILT_PRODUCTS_DIR}/SSZipArchive/SSZipArchive.framework",
 				"${BUILT_PRODUCTS_DIR}/WatchfaceSDK/WatchfaceSDK.framework",
 				"${BUILT_PRODUCTS_DIR}/Zip/Zip.framework",
-				"${PODS_XCFRAMEWORKS_BUILD_DIR}/AiSDK/JLBmpConvertKit.framework/JLBmpConvertKit",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/JLBmpConvertKit/JLBmpConvertKit.framework/JLBmpConvertKit",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (

@@ -42,13 +42,14 @@ Exclusive file transfers (music, album, AGPS, OTA) share one lock so concurrent 
 | `AiSDK` | [HWdan/HwAiSDK](https://github.com/HWdan/HwAiSDK.git) `main` | AI watchface pipeline (AFlash + Sifli install) |
 | `AFNetworking` | CocoaPods | AiSDK HTTP dependency |
 | `Zip` / `SSZipArchive` | Transitive (WatchfaceSDK) | Zip packaging — do not vendor locally |
-| `JLBmpConvertKit` | Vendored by AiSDK | JieLi image encode |
+| `JLBmpConvertKit` | [sususu/JLBmpConvertKit](https://github.com/sususu/JLBmpConvertKit.git) `1.2.0` | Host-owned JieLi image converter injected into AiSDK |
 
 BleSdkDemo uses **dynamic** `use_frameworks!` (same as AiSDK Example) so Zip and SSZipArchive keep separate minizip symbols.
 
 ```ruby
 pod 'AiSDK', :git => 'https://github.com/HWdan/HwAiSDK.git', :branch => 'main'
 pod 'WatchfaceSDK', :git => 'https://github.com/HWdan/WatchfaceSDK.git', :branch => 'main'
+pod 'JLBmpConvertKit', :git => 'https://github.com/sususu/JLBmpConvertKit.git', :tag => '1.2.0'
 ```
 
 ---

@@ -16,23 +16,10 @@ target 'BleSdkDemo' do
   # Zip + SSZipArchive are pulled transitively by WatchfaceSDK / AiSDK — do not vendor locally.
   pod 'AiSDK', :git => 'https://github.com/HWdan/HwAiSDK.git', :branch => 'main'
   pod 'WatchfaceSDK', :git => 'https://github.com/HWdan/WatchfaceSDK.git', :branch => 'main'
-  # JLBmpConvertKit comes from AiSDK vendored_frameworks — do not add a local duplicate pod.
+  # Host-owned JieLi converter; injected into AiSDK at app startup.
+  pod 'JLBmpConvertKit', :git => 'https://github.com/sususu/JLBmpConvertKit.git', :tag => '1.2.0'
 
   pod 'AFNetworking', '~> 4.0.1'
-end
-
-# Git AiSDK also vendors `HwBluetoothSDK.framework`; Demo already links the local `:path` pod.
-# Strip only HwBluetoothSDK to avoid duplicate ObjC symbols. Keep NativeLib + JLBmpConvertKit.
-pre_install do |installer|
-  installer.analysis_result.specifications.each do |spec|
-    next unless spec.name == 'AiSDK'
-    vendored = spec.attributes_hash['vendored_frameworks']
-    next if vendored.nil?
-    filtered = Array(vendored).flat_map { |entry| entry.to_s.split(/,\s*/) }
-      .map(&:strip)
-      .reject { |f| f.empty? || f.include?('HwBluetoothSDK') }
-    spec.attributes_hash['vendored_frameworks'] = filtered
-  end
 end
 
 post_install do |installer|
@@ -42,6 +29,10 @@ post_install do |installer|
     "\"#{hw_root}/include\"",
     "\"#{hw_root}/include/HwBluetoothSDK\"",
     "\"#{hw_root}/HwBluetoothSDK.framework/Headers\""
+  ]
+  hw_framework_paths = [
+    '$(inherited)',
+    "\"#{hw_root}\""
   ]
 
   installer.pods_project.targets.each do |target|
@@ -55,6 +46,7 @@ post_install do |installer|
         config.build_settings['DEFINES_MODULE'] = 'YES'
         config.build_settings['CLANG_ENABLE_MODULES'] = 'YES'
         config.build_settings['HEADER_SEARCH_PATHS'] = hw_header_paths
+        config.build_settings['FRAMEWORK_SEARCH_PATHS'] = hw_framework_paths
       end
     end
   end
@@ -66,6 +58,11 @@ post_install do |installer|
     unless contents.include?('HwBluetoothSDK.framework/Headers')
       File.open(xcconfig_path, 'a') do |f|
         f.puts "HEADER_SEARCH_PATHS = $(inherited) \"#{hw_root}/include\" \"#{hw_root}/include/HwBluetoothSDK\" \"#{hw_root}/HwBluetoothSDK.framework/Headers\""
+      end
+    end
+    unless contents.lines.any? { |line| line.start_with?('FRAMEWORK_SEARCH_PATHS') && line.include?('../Vendor/HwBluetoothSDK') }
+      File.open(xcconfig_path, 'a') do |f|
+        f.puts "FRAMEWORK_SEARCH_PATHS = $(inherited) \"#{hw_root}\""
       end
     end
   end
@@ -94,16 +91,5 @@ post_install do |installer|
 
       #import "../../../Vendor/HwBluetoothSDK/HwBluetoothSDK.framework/Headers/HwBluetoothSDK.h"
     HDR
-  end
-
-  hw_dup = File.join(installer.sandbox.root, 'AiSDK/HwBluetoothSDK.framework')
-  FileUtils.rm_rf(hw_dup) if File.directory?(hw_dup)
-
-  %w[debug release].each do |cfg|
-    aggregate = File.join(installer.sandbox.root, 'Target Support Files/Pods-BleSdkDemo', "Pods-BleSdkDemo.#{cfg}.xcconfig")
-    next unless File.exist?(aggregate)
-    contents = File.read(aggregate)
-    contents = contents.gsub(/-framework "HwBluetoothSDK"\s*/, '')
-    File.write(aggregate, contents)
   end
 end

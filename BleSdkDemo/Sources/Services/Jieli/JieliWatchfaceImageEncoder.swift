@@ -2,6 +2,13 @@ import UIKit
 import JLBmpConvertKit
 
 enum JieliWatchfaceImageEncoder {
+    static func convert(_ imageData: Data) -> Data? {
+        let option = JLBmpConvertOption()
+        option.convertType = .type707N_ARGB
+        option.pixelformat = ._Auto
+        return JLBmpConvert.convert(option, imageData: imageData).outFileData
+    }
+
     static func renderedImage(_ image: UIImage,
                               size: CGSize,
                               cornerRadius: CGFloat) throws -> UIImage {
@@ -41,11 +48,7 @@ enum JieliWatchfaceImageEncoder {
             throw SdkError(code: -1, message: "image encode failed")
         }
 
-        let option = JLBmpConvertOption()
-        option.convertType = .type707N_ARGB
-        option.pixelformat = ._Auto
-        let result = JLBmpConvert.convert(option, imageData: imageData)
-        guard let data = result.outFileData, !data.isEmpty else {
+        guard let data = convert(imageData), !data.isEmpty else {
             throw SdkError(code: -1, message: "JL image convert failed")
         }
         return data

@@ -47,39 +47,21 @@ final class HomeViewController: UIViewController {
         content.translatesAutoresizingMaskIntoConstraints = false
         scroll.addSubview(content)
 
-        logTitle.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(logTitle)
-
-        logView.translatesAutoresizingMaskIntoConstraints = false
-        logView.font = .monospacedSystemFont(ofSize: 12, weight: .regular)
-        logView.isEditable = false
-        logView.isSelectable = true
-        logView.backgroundColor = .secondarySystemBackground
-        logView.layer.cornerRadius = 8
-        logView.textContainerInset = UIEdgeInsets(top: 8, left: 8, bottom: 8, right: 8)
-        logView.textColor = .label
-        view.addSubview(logView)
+        // 日志区默认隐藏：保留 appendLog 能力，不占用首页布局
+        logTitle.isHidden = true
+        logView.isHidden = true
 
         NSLayoutConstraint.activate([
             scroll.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             scroll.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             scroll.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            scroll.bottomAnchor.constraint(equalTo: logTitle.topAnchor, constant: -8),
+            scroll.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
 
             content.topAnchor.constraint(equalTo: scroll.contentLayoutGuide.topAnchor, constant: 16),
             content.leadingAnchor.constraint(equalTo: scroll.frameLayoutGuide.leadingAnchor, constant: 16),
             content.trailingAnchor.constraint(equalTo: scroll.frameLayoutGuide.trailingAnchor, constant: -16),
             content.bottomAnchor.constraint(equalTo: scroll.contentLayoutGuide.bottomAnchor, constant: -16),
-            content.widthAnchor.constraint(equalTo: scroll.frameLayoutGuide.widthAnchor, constant: -32),
-
-            logTitle.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            logTitle.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-            logTitle.bottomAnchor.constraint(equalTo: logView.topAnchor, constant: -6),
-
-            logView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            logView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-            logView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -8),
-            logView.heightAnchor.constraint(equalToConstant: 200)
+            content.widthAnchor.constraint(equalTo: scroll.frameLayoutGuide.widthAnchor, constant: -32)
         ])
 
         content.addArrangedSubview(makeStatusRow())
@@ -142,9 +124,14 @@ final class HomeViewController: UIViewController {
         actionButtons.append(contentsOf: [m, al])
 
         let ag = UIHelpers.makeButton(""); ag.addTarget(self, action: #selector(tapAgps), for: .touchUpInside)
+        let offlineMap = UIHelpers.makeButton("")
+        offlineMap.addTarget(self, action: #selector(tapOfflineMap), for: .touchUpInside)
+        content.addArrangedSubview(makeRow([ag, offlineMap]))
+        actionButtons.append(contentsOf: [ag, offlineMap])
+
         let ota = UIHelpers.makeButton(""); ota.addTarget(self, action: #selector(tapOta), for: .touchUpInside)
-        content.addArrangedSubview(makeRow([ag, ota]))
-        actionButtons.append(contentsOf: [ag, ota])
+        content.addArrangedSubview(ota)
+        actionButtons.append(ota)
 
         let jieliOta = UIHelpers.makeButton("")
         jieliOta.addTarget(self, action: #selector(tapJieliOta), for: .touchUpInside)
@@ -152,13 +139,15 @@ final class HomeViewController: UIViewController {
         actionButtons.append(jieliOta)
 
         let wf = UIHelpers.makeButton(""); wf.addTarget(self, action: #selector(tapWatchface), for: .touchUpInside)
-        content.addArrangedSubview(wf)
-        actionButtons.append(wf)
-
         let jieliWf = UIHelpers.makeButton("")
         jieliWf.addTarget(self, action: #selector(tapJieliWatchface), for: .touchUpInside)
-        content.addArrangedSubview(jieliWf)
-        actionButtons.append(jieliWf)
+        content.addArrangedSubview(makeRow([wf, jieliWf]))
+        actionButtons.append(contentsOf: [wf, jieliWf])
+
+        let studio = UIHelpers.makeButton("")
+        studio.addTarget(self, action: #selector(tapWatchfaceStudio), for: .touchUpInside)
+        content.addArrangedSubview(studio)
+        actionButtons.append(studio)
 
         let ai = UIHelpers.makeButton("")
         ai.addTarget(self, action: #selector(tapAi), for: .touchUpInside)
@@ -198,8 +187,9 @@ final class HomeViewController: UIViewController {
             L10n.tr("scan_connect"), L10n.tr("bind_watch"), L10n.tr("sync_data"),
             L10n.tr("jieli_sync_data"), L10n.tr("unbind_watch"), L10n.tr("disconnect"),
             L10n.tr("goals"), L10n.tr("alarms"), L10n.tr("jieli_alarms"),
-            L10n.tr("notify"), L10n.tr("music"), L10n.tr("album"), L10n.tr("agps"), L10n.tr("ota"),
-            L10n.tr("jieli_ota"), L10n.tr("watchface"), L10n.tr("watchface_jieli"),
+            L10n.tr("notify"), L10n.tr("music"), L10n.tr("album"), L10n.tr("agps"), L10n.tr("offline_map"),
+            L10n.tr("ota"), L10n.tr("jieli_ota"), L10n.tr("watchface"), L10n.tr("watchface_jieli"),
+            L10n.tr("feature_watchface_studio"),
             L10n.tr("ai_section")
         ]
         for (i, t) in titles.enumerated() where i < actionButtons.count {
@@ -292,14 +282,14 @@ final class HomeViewController: UIViewController {
         let canUnbind = !busy && bound
         let canFeature = !busy && hasDevice && (bound || phase == .connected)
 
-        guard actionButtons.count >= 18 else { return }
+        guard actionButtons.count >= 20 else { return }
         actionButtons[0].isEnabled = !busy
         actionButtons[1].isEnabled = canBind
         actionButtons[2].isEnabled = canSync
         actionButtons[3].isEnabled = canSync
         actionButtons[4].isEnabled = canUnbind
         actionButtons[5].isEnabled = !busy && hasDevice
-        for i in 6..<18 { actionButtons[i].isEnabled = canFeature }
+        for i in 6..<20 { actionButtons[i].isEnabled = canFeature }
 
         if busy { statusSpinner.startAnimating() } else { statusSpinner.stopAnimating() }
     }
@@ -499,6 +489,10 @@ final class HomeViewController: UIViewController {
         guard requireConnectedFeature() else { return }
         navigationController?.pushViewController(AgpsUpdateViewController(), animated: true)
     }
+    @objc private func tapOfflineMap() {
+        guard requireConnectedFeature() else { return }
+        navigationController?.pushViewController(OfflineMapDownloadViewController(), animated: true)
+    }
     @objc private func tapOta() {
         guard requireConnectedFeature() else { return }
         navigationController?.pushViewController(OtaUpgradeViewController(), animated: true)
@@ -514,6 +508,10 @@ final class HomeViewController: UIViewController {
     @objc private func tapJieliWatchface() {
         guard requireConnectedFeature() else { return }
         navigationController?.pushViewController(JieliWatchfaceHostViewController(), animated: true)
+    }
+    @objc private func tapWatchfaceStudio() {
+        guard requireConnectedFeature() else { return }
+        navigationController?.pushViewController(WatchFaceStudioViewController(), animated: true)
     }
 
     /// Usage guide first, then AI DEMO (iOS AiSDK / Example HwMainVC).

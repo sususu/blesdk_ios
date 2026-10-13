@@ -1,0 +1,3 @@
+framework module SFDialPlateSDK {
+  header "SFDialPlateSDK-Swift.h"
+}

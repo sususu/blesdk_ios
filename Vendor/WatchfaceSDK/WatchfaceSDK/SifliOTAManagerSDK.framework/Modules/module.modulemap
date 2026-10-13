@@ -1,0 +1,11 @@
+framework module SifliOTAManagerSDK {
+  umbrella header "SifliOTAManagerSDK.h"
+  export *
+
+  module * { export * }
+}
+
+module SifliOTAManagerSDK.Swift {
+  header "SifliOTAManagerSDK-Swift.h"
+  requires objc
+}

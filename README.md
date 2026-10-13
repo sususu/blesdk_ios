@@ -1,6 +1,6 @@
 # BleSdkDemo (iOS)
 
-UIKit demo app for HuaWo wearable Bluetooth SDKs. It shows how to scan and connect a watch, bind/unbind, sync health data, configure goals and reminders, push music/album/AGPS packages over the Sifli channel, and run Sifli NAND firmware OTA.
+UIKit demo app for HuaWo wearable Bluetooth SDKs. It shows how to scan and connect a watch, bind/unbind, sync health data, configure goals and reminders, push music/album/AGPS/offline-map packages over the Sifli channel, and run Sifli NAND firmware OTA.
 
 **Requirements:** iOS 14+, Xcode with CocoaPods, a physical iPhone (Bluetooth LE features do not work on the Simulator).
 
@@ -29,7 +29,7 @@ Use **BleSdkDemo.xcworkspace** (not the `.xcodeproj`). Select your signing Team 
 
 SDK init happens once in `AppDelegate` via `BleRepository.shared.initSDK()` (HwBluetoothSDK, SifliWatchfaceSDK, Sifli OTA warm-up). Connection and reconnect events are surfaced to the home screen through `ConnectionEvent`.
 
-Exclusive file transfers (music, album, AGPS, OTA) share one lock so concurrent pushes are rejected.
+Exclusive file transfers (music, album, AGPS, offline map, OTA) share one lock so concurrent pushes are rejected.
 
 ---
 
@@ -136,6 +136,18 @@ Social-app notification switches and contact list APIs exposed on the Notify fea
 4. Push with `SifliWatchfaceSDK.syncZipFile` (`type: 3`, `byteAlign: true`)
 5. Show AGPS validity window from device GPS status when available
 
+### Offline map
+
+Screen: `OfflineMapDownloadViewController` (MapKit crop UI, aligned with Android `OfflineMapDownloadFragment` / HaWoFit `HwOfflineMapsVC`).
+
+1. Authorize — PiMap `auth/getAuthInfo` → `setDeviceMapAuthCode`
+2. Request package — `optionalMap/generateFile` for the crop bounds (max ≈ 49 km)
+3. Space check via `getOfflineMapAvailableStorage`
+4. `setDeviceMapRange` (WGS84) → download zip + MD5 verify
+5. Push with `SifliWatchfaceSDK.pushOfflineMap` → optional `setDeviceMapTheme` (light / dark)
+
+Cloud host: `https://map-global.iipii.net/` (same demo account as Android `OfflineMapApi`).
+
 ### Firmware OTA (Sifli NAND only)
 
 Screen: `OtaUpgradeViewController`. Push path: `SifliOtaPusher` → `SFOTAManager.startOTANand`.
@@ -182,7 +194,7 @@ Declared in `BleSdkDemo/Supporting/Info.plist`:
 |-----|-----|
 | `NSBluetoothAlwaysUsageDescription` / `NSBluetoothPeripheralUsageDescription` | Scan, connect, sync |
 | `NSPhotoLibraryUsageDescription` | Album image picker |
-| `NSLocationWhenInUseUsageDescription` | AGPS / location-related helpers |
+| `NSLocationWhenInUseUsageDescription` | Offline-map crop centering + AGPS / location helpers |
 | `UIBackgroundModes` → `bluetooth-central` | BLE central in background |
 | ATS exception for `starcourse.rx-networks.cn` | HTTP AGPS ephemeris download |
 
@@ -216,7 +228,7 @@ sdkdemo/
 ## Notes
 
 - Run on a **real device** with Bluetooth enabled and the watch nearby / already paired as needed.
-- Music / album / AGPS / OTA should not run at the same time (shared transfer lock).
+- Music / album / AGPS / offline map / OTA should not run at the same time (shared transfer lock).
 - After unbind, forget the device in iOS Bluetooth settings before rebinding if pairing sticks.
 - OTA uses the **test** upgrade host (`test.huawo-wear.com`). Point `OtaFirmwareApi` at another environment if needed.
 - Broader SDK API documentation: root `SDK_iOS.md`.

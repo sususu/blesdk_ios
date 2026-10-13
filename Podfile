@@ -15,9 +15,15 @@ target 'BleSdkDemo' do
   # Official SDK repos (same as AiSDK Example / production apps).
   # Zip + SSZipArchive are pulled transitively by WatchfaceSDK / AiSDK — do not vendor locally.
   pod 'AiSDK', :git => 'https://github.com/HWdan/HwAiSDK.git', :branch => 'main'
-  pod 'WatchfaceSDK', :git => 'https://github.com/HWdan/WatchfaceSDK.git', :branch => 'main'
+  # Local fork: public QJS low-level widgets + QjsAppLink/QjsArc (aligned with Android AAR).
+  # Upstream: https://github.com/HWdan/WatchfaceSDK.git — merge back when ready.
+  pod 'WatchfaceSDK', :path => 'Vendor/WatchfaceSDK'
   # Host-owned JieLi converter; injected into AiSDK at app startup.
   pod 'JLBmpConvertKit', :git => 'https://github.com/sususu/JLBmpConvertKit.git', :tag => '1.2.0'
+
+  # Video→GIF uses HaWoFit's vendored FFmpeg 2.8 (`Vendor/FFmpeg` + ffmpeg_main),
+  # not CocoaPods ffmpeg-kit. Same args as HWImageresizerViewController:
+  #   ffmpeg -ss -i -t -b:v 1M -g:v 20 -r 12 -fs 1MB -vf scale=W:H out.gif
 
   pod 'AFNetworking', '~> 4.0.1'
 end

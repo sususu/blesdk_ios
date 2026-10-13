@@ -34,7 +34,7 @@ DEPENDENCIES:
   - AiSDK (from `https://github.com/HWdan/HwAiSDK.git`, branch `main`)
   - HwBluetoothSDK (from `Vendor/HwBluetoothSDK`)
   - JLBmpConvertKit (from `https://github.com/sususu/JLBmpConvertKit.git`, tag `1.2.0`)
-  - WatchfaceSDK (from `https://github.com/HWdan/WatchfaceSDK.git`, branch `main`)
+  - WatchfaceSDK (from `Vendor/WatchfaceSDK`)
 
 SPEC REPOS:
   trunk:
@@ -53,8 +53,7 @@ EXTERNAL SOURCES:
     :git: https://github.com/sususu/JLBmpConvertKit.git
     :tag: 1.2.0
   WatchfaceSDK:
-    :branch: main
-    :git: https://github.com/HWdan/WatchfaceSDK.git
+    :path: Vendor/WatchfaceSDK
 
 CHECKOUT OPTIONS:
   AiSDK:
@@ -63,20 +62,17 @@ CHECKOUT OPTIONS:
   JLBmpConvertKit:
     :git: https://github.com/sususu/JLBmpConvertKit.git
     :tag: 1.2.0
-  WatchfaceSDK:
-    :commit: 4ddc2f1d7b007233306c2244752a7c5fa6c275b1
-    :git: https://github.com/HWdan/WatchfaceSDK.git
 
 SPEC CHECKSUMS:
   AFNetworking: 3bd23d814e976cd148d7d44c3ab78017b744cd58
-  AiSDK: 079f1a1505275a64581e887029984e76b060b242
+  AiSDK: 65c1cd31636e374f259e80fbeddd17474b2e29cd
   HwBluetoothSDK: 36869338a96693703dace73d10f40511e9c4c551
   JLBmpConvertKit: 864be69abecfd00fbbaeb2ba3e8ac57158b2215a
   Masonry: 678fab65091a9290e40e2832a55e7ab731aad201
   SSZipArchive: fe6a26b2a54d5a0890f2567b5cc6de5caa600aef
-  WatchfaceSDK: 2e7f53ac19c9b0256e6256b5d096a98bacba5f0c
+  WatchfaceSDK: c4ffae8ea9e708f0b6eb822256f4a8a89e1e4782
   Zip: b3fef584b147b6e582b2256a9815c897d60ddc67
 
-PODFILE CHECKSUM: 8015d1f29f61245331c9ff9c11ba211d16d32581
+PODFILE CHECKSUM: 9f940079733b0e09e89e01e1002068b82af43f74
 
 COCOAPODS: 1.16.2

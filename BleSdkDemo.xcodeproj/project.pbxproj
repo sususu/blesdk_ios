@@ -7,6 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		WFSF102WFSF102WFSF102 /* montserrat_bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = WFSF002WFSF002WFSF002 /* montserrat_bold.ttf */; };
+		WFSF101WFSF101WFSF101 /* roboto_bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = WFSF001WFSF001WFSF001 /* roboto_bold.ttf */; };
+		WFS20004WFS20004WFS20004 /* StudioStyledWidgets.swift in Sources */ = {isa = PBXBuildFile; fileRef = WFS10004WFS10004WFS10004 /* StudioStyledWidgets.swift */; };
+		WFS20003WFS20003WFS20003 /* StudioVideoToGif.swift in Sources */ = {isa = PBXBuildFile; fileRef = WFS10003WFS10003WFS10003 /* StudioVideoToGif.swift */; };
+		WFS20002WFS20002WFS20002 /* StudioLauncherType.swift in Sources */ = {isa = PBXBuildFile; fileRef = WFS10002WFS10002WFS10002 /* StudioLauncherType.swift */; };
+		WFS20001WFS20001WFS20001 /* WatchFaceStudioViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = WFS10001WFS10001WFS10001 /* WatchFaceStudioViewController.swift */; };
 		00E969A51CB6E42102A86C30 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E507F2715CCBFC3539CF51B0 /* SceneDelegate.swift */; };
 		0D0235AFA30893525BC31F47 /* BoundDeviceStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87533339C8C8D14D102294FB /* BoundDeviceStore.swift */; };
 		1C840E956D3B4D0D90A29D75 /* AiWatchfaceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC7FD9CDB3E24795B0A48F3C /* AiWatchfaceViewController.swift */; };
@@ -31,6 +37,8 @@
 		38428380DDDE4BC981DFE60F /* CustomWatchfaceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BF165DFAB649DF9A615D26 /* CustomWatchfaceViewController.swift */; };
 		4043D3E7EAE75DFCBFC01948 /* Pods_BleSdkDemo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BE8ECD6A805F604CDAF2F877 /* Pods_BleSdkDemo.framework */; };
 		44010A3A4D82EB2AFC52A23F /* AgpsUpdateViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F289D7F6270E8765A9AC88D /* AgpsUpdateViewController.swift */; };
+		0FF10001AFF10001AFF10001 /* OfflineMapApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FF10001BFF10001BFF10001 /* OfflineMapApi.swift */; };
+		0FF10002AFF10002AFF10002 /* OfflineMapDownloadViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FF10002BFF10002BFF10002 /* OfflineMapDownloadViewController.swift */; };
 		57AB498C14A031233E7137CE /* UnbindFlowViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6579266C6513A7C238F54CFD /* UnbindFlowViewController.swift */; };
 		6126B03BDE753C63C1475BD9 /* OtaFirmwareApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = D60674E7BC247DD7B39B41FD /* OtaFirmwareApi.swift */; };
 		61331A87A76AF27CCAE6BB3C /* FeatureViewControllers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EB3FAFDA08BFDBE6F331860 /* FeatureViewControllers.swift */; };
@@ -54,15 +62,57 @@
 		F9C185A8A6504072B4653A7B /* WatchfaceModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2B0346CC9C44E03A8C6153C /* WatchfaceModels.swift */; };
 		FA1FC6D717D864F8AE1B028B /* ScanConnectViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 282A2946747604440754D4FC /* ScanConnectViewController.swift */; };
 		FEEA3A09CC63A1BDAA031D6A /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 502C1CD344A9B5AA834FD48A /* Foundation.framework */; };
+
+		FFM20001FFM20001FFM20001 /* ffmpeg.c in Sources */ = {isa = PBXBuildFile; fileRef = FFM10001FFM10001FFM10001 /* ffmpeg.c */; };
+		FFM20002FFM20002FFM20002 /* ffmpeg_opt.c in Sources */ = {isa = PBXBuildFile; fileRef = FFM10002FFM10002FFM10002 /* ffmpeg_opt.c */; };
+		FFM20003FFM20003FFM20003 /* ffmpeg_filter.c in Sources */ = {isa = PBXBuildFile; fileRef = FFM10003FFM10003FFM10003 /* ffmpeg_filter.c */; };
+		FFM20004FFM20004FFM20004 /* cmdutils.c in Sources */ = {isa = PBXBuildFile; fileRef = FFM10004FFM10004FFM10004 /* cmdutils.c */; };
+		FFM20005FFM20005FFM20005 /* HaWoFFmpegBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = FFM10005FFM10005FFM10005 /* HaWoFFmpegBridge.m */; };
+		FFM20010FFM20010FFM20010 /* libavutil.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FFM10010FFM10010FFM10010 /* libavutil.a */; };
+		FFM20011FFM20011FFM20011 /* libavcodec.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FFM10011FFM10011FFM10011 /* libavcodec.a */; };
+		FFM20012FFM20012FFM20012 /* libavformat.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FFM10012FFM10012FFM10012 /* libavformat.a */; };
+		FFM20013FFM20013FFM20013 /* libavfilter.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FFM10013FFM10013FFM10013 /* libavfilter.a */; };
+		FFM20014FFM20014FFM20014 /* libavdevice.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FFM10014FFM10014FFM10014 /* libavdevice.a */; };
+		FFM20015FFM20015FFM20015 /* libswscale.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FFM10015FFM10015FFM10015 /* libswscale.a */; };
+		FFM20016FFM20016FFM20016 /* libswresample.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FFM10016FFM10016FFM10016 /* libswresample.a */; };
+		FFM20020FFM20020FFM20020 /* libbz2.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = FFM10020FFM10020FFM10020 /* libbz2.tbd */; };
+		FFM20021FFM20021FFM20021 /* libiconv.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = FFM10021FFM10021FFM10021 /* libiconv.tbd */; };
+		FFM20022FFM20022FFM20022 /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FFM10022FFM10022FFM10022 /* CoreMedia.framework */; };
+		FFM20023FFM20023FFM20023 /* VideoToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FFM10023FFM10023FFM10023 /* VideoToolbox.framework */; };
+		SVC20001SVC20001SVC20001 /* StudioVideoClipViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = SVC10001SVC10001SVC10001 /* StudioVideoClipViewController.swift */; };
+		HWC20001HWC20001HWC20001 /* JPImageresizerView.m in Sources */ = {isa = PBXBuildFile; fileRef = HWC10001HWC10001HWC10001 /* JPImageresizerView.m */; };
+		HWC20002HWC20002HWC20002 /* JPImageresizerSlider.m in Sources */ = {isa = PBXBuildFile; fileRef = HWC10002HWC10002HWC10002 /* JPImageresizerSlider.m */; };
+		HWC20003HWC20003HWC20003 /* JPImageresizerFrameView.m in Sources */ = {isa = PBXBuildFile; fileRef = HWC10003HWC10003HWC10003 /* JPImageresizerFrameView.m */; };
+		HWC20004HWC20004HWC20004 /* JPImageresizerResult.m in Sources */ = {isa = PBXBuildFile; fileRef = HWC10004HWC10004HWC10004 /* JPImageresizerResult.m */; };
+		HWC20005HWC20005HWC20005 /* JPImageresizerConfigure.m in Sources */ = {isa = PBXBuildFile; fileRef = HWC10005HWC10005HWC10005 /* JPImageresizerConfigure.m */; };
+		HWC20006HWC20006HWC20006 /* JPImageresizer+Extension.m in Sources */ = {isa = PBXBuildFile; fileRef = HWC10006HWC10006HWC10006 /* JPImageresizer+Extension.m */; };
+		HWC20007HWC20007HWC20007 /* JPImageresizerBlurView.m in Sources */ = {isa = PBXBuildFile; fileRef = HWC10007HWC10007HWC10007 /* JPImageresizerBlurView.m */; };
+		HWC20008HWC20008HWC20008 /* JPImageresizerVideoObject.m in Sources */ = {isa = PBXBuildFile; fileRef = HWC10008HWC10008HWC10008 /* JPImageresizerVideoObject.m */; };
+		HWC20009HWC20009HWC20009 /* JPImageresizerTool.m in Sources */ = {isa = PBXBuildFile; fileRef = HWC10009HWC10009HWC10009 /* JPImageresizerTool.m */; };
+		HWC20010HWC20010HWC20010 /* SAVideoRangeSlider.m in Sources */ = {isa = PBXBuildFile; fileRef = HWC10010HWC10010HWC10010 /* SAVideoRangeSlider.m */; };
+		HWC20011HWC20011HWC20011 /* SASliderLeft.m in Sources */ = {isa = PBXBuildFile; fileRef = HWC10011HWC10011HWC10011 /* SASliderLeft.m */; };
+		HWC20012HWC20012HWC20012 /* SAResizibleBubble.m in Sources */ = {isa = PBXBuildFile; fileRef = HWC10012HWC10012HWC10012 /* SAResizibleBubble.m */; };
+		HWC20013HWC20013HWC20013 /* SASliderRight.m in Sources */ = {isa = PBXBuildFile; fileRef = HWC10013HWC10013HWC10013 /* SASliderRight.m */; };
+		HWC20014HWC20014HWC20014 /* HWImageresizerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = HWC10014HWC10014HWC10014 /* HWImageresizerViewController.m */; };
+		HWC20015HWC20015HWC20015 /* HwVideoClipPreview.m in Sources */ = {isa = PBXBuildFile; fileRef = HWC10015HWC10015HWC10015 /* HwVideoClipPreview.m */; };
+		AGF20001AGF20001AGF20001 /* AnimatedGIF.swift in Sources */ = {isa = PBXBuildFile; fileRef = AGF10001AGF10001AGF10001 /* AnimatedGIF.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		WFSF002WFSF002WFSF002 /* montserrat_bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = montserrat_bold.ttf; path = BleSdkDemo/Resources/Fonts/montserrat_bold.ttf; sourceTree = "<group>"; };
+		WFSF001WFSF001WFSF001 /* roboto_bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = roboto_bold.ttf; path = BleSdkDemo/Resources/Fonts/roboto_bold.ttf; sourceTree = "<group>"; };
+		WFS10004WFS10004WFS10004 /* StudioStyledWidgets.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = StudioStyledWidgets.swift; path = BleSdkDemo/Sources/UI/Watchface/StudioStyledWidgets.swift; sourceTree = "<group>"; };
+		WFS10003WFS10003WFS10003 /* StudioVideoToGif.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = StudioVideoToGif.swift; path = BleSdkDemo/Sources/UI/Watchface/StudioVideoToGif.swift; sourceTree = "<group>"; };
+		WFS10002WFS10002WFS10002 /* StudioLauncherType.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = StudioLauncherType.swift; path = BleSdkDemo/Sources/UI/Watchface/StudioLauncherType.swift; sourceTree = "<group>"; };
+		WFS10001WFS10001WFS10001 /* WatchFaceStudioViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = WatchFaceStudioViewController.swift; path = BleSdkDemo/Sources/UI/Watchface/WatchFaceStudioViewController.swift; sourceTree = "<group>"; };
 		02A439A6EEAD381A87B7EC56 /* MusicTransferViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = MusicTransferViewController.swift; path = BleSdkDemo/Sources/UI/Features/MusicTransferViewController.swift; sourceTree = "<group>"; };
 		02A8DA414DFF28C5715D598F /* en */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		0E068E6BDBB8DB2E38460209 /* zh-Hans */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		138C97AD05BE1C7CF0DC1A51 /* FirmwareVersionUtils.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = FirmwareVersionUtils.swift; path = BleSdkDemo/Sources/Services/Ota/FirmwareVersionUtils.swift; sourceTree = "<group>"; };
 		1959C6454D524B7E8A7DAC01 /* WatchfaceHostViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = WatchfaceHostViewController.swift; path = BleSdkDemo/Sources/UI/Watchface/WatchfaceHostViewController.swift; sourceTree = "<group>"; };
 		1F289D7F6270E8765A9AC88D /* AgpsUpdateViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AgpsUpdateViewController.swift; path = BleSdkDemo/Sources/UI/Features/AgpsUpdateViewController.swift; sourceTree = "<group>"; };
+		0FF10001BFF10001BFF10001 /* OfflineMapApi.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = OfflineMapApi.swift; path = BleSdkDemo/Sources/Services/OfflineMapApi.swift; sourceTree = "<group>"; };
+		0FF10002BFF10002BFF10002 /* OfflineMapDownloadViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = OfflineMapDownloadViewController.swift; path = BleSdkDemo/Sources/UI/Features/OfflineMapDownloadViewController.swift; sourceTree = "<group>"; };
 		2350CCE1DD1241DA119C437D /* AlbumTransferViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AlbumTransferViewController.swift; path = BleSdkDemo/Sources/UI/Features/AlbumTransferViewController.swift; sourceTree = "<group>"; };
 		268CE53F9A6695DAD2B6F851 /* Pods-BleSdkDemo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BleSdkDemo.debug.xcconfig"; path = "Target Support Files/Pods-BleSdkDemo/Pods-BleSdkDemo.debug.xcconfig"; sourceTree = "<group>"; };
 		282A2946747604440754D4FC /* ScanConnectViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ScanConnectViewController.swift; path = BleSdkDemo/Sources/UI/Scan/ScanConnectViewController.swift; sourceTree = "<group>"; };
@@ -111,6 +161,41 @@
 		D641DF46CA811EC15937CA3B /* LocaleHelper.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = LocaleHelper.swift; path = BleSdkDemo/Sources/Services/LocaleHelper.swift; sourceTree = "<group>"; };
 		E507F2715CCBFC3539CF51B0 /* SceneDelegate.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SceneDelegate.swift; path = BleSdkDemo/Sources/SceneDelegate.swift; sourceTree = "<group>"; };
 		F0038507F7E74BF8AB4D6903 /* WatchfaceImageUtils.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = WatchfaceImageUtils.swift; path = BleSdkDemo/Sources/Services/Watchface/WatchfaceImageUtils.swift; sourceTree = "<group>"; };
+
+		FFM10001FFM10001FFM10001 /* ffmpeg.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = ffmpeg.c; path = Vendor/FFmpeg/tool/ffmpeg.c; sourceTree = SOURCE_ROOT; };
+		FFM10002FFM10002FFM10002 /* ffmpeg_opt.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = ffmpeg_opt.c; path = Vendor/FFmpeg/tool/ffmpeg_opt.c; sourceTree = SOURCE_ROOT; };
+		FFM10003FFM10003FFM10003 /* ffmpeg_filter.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = ffmpeg_filter.c; path = Vendor/FFmpeg/tool/ffmpeg_filter.c; sourceTree = SOURCE_ROOT; };
+		FFM10004FFM10004FFM10004 /* cmdutils.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = cmdutils.c; path = Vendor/FFmpeg/tool/cmdutils.c; sourceTree = SOURCE_ROOT; };
+		FFM10005FFM10005FFM10005 /* HaWoFFmpegBridge.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = HaWoFFmpegBridge.m; path = BleSdkDemo/Sources/Services/FFmpeg/HaWoFFmpegBridge.m; sourceTree = SOURCE_ROOT; };
+		FFM10006FFM10006FFM10006 /* HaWoFFmpegBridge.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = HaWoFFmpegBridge.h; path = BleSdkDemo/Sources/Services/FFmpeg/HaWoFFmpegBridge.h; sourceTree = SOURCE_ROOT; };
+		FFM10010FFM10010FFM10010 /* libavutil.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libavutil.a; path = Vendor/FFmpeg/lib/libavutil.a; sourceTree = SOURCE_ROOT; };
+		FFM10011FFM10011FFM10011 /* libavcodec.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libavcodec.a; path = Vendor/FFmpeg/lib/libavcodec.a; sourceTree = SOURCE_ROOT; };
+		FFM10012FFM10012FFM10012 /* libavformat.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libavformat.a; path = Vendor/FFmpeg/lib/libavformat.a; sourceTree = SOURCE_ROOT; };
+		FFM10013FFM10013FFM10013 /* libavfilter.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libavfilter.a; path = Vendor/FFmpeg/lib/libavfilter.a; sourceTree = SOURCE_ROOT; };
+		FFM10014FFM10014FFM10014 /* libavdevice.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libavdevice.a; path = Vendor/FFmpeg/lib/libavdevice.a; sourceTree = SOURCE_ROOT; };
+		FFM10015FFM10015FFM10015 /* libswscale.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libswscale.a; path = Vendor/FFmpeg/lib/libswscale.a; sourceTree = SOURCE_ROOT; };
+		FFM10016FFM10016FFM10016 /* libswresample.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libswresample.a; path = Vendor/FFmpeg/lib/libswresample.a; sourceTree = SOURCE_ROOT; };
+		FFM10020FFM10020FFM10020 /* libbz2.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libbz2.tbd; path = usr/lib/libbz2.tbd; sourceTree = SDKROOT; };
+		FFM10021FFM10021FFM10021 /* libiconv.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libiconv.tbd; path = usr/lib/libiconv.tbd; sourceTree = SDKROOT; };
+		FFM10022FFM10022FFM10022 /* CoreMedia.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMedia.framework; path = System/Library/Frameworks/CoreMedia.framework; sourceTree = SDKROOT; };
+		FFM10023FFM10023FFM10023 /* VideoToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = VideoToolbox.framework; path = System/Library/Frameworks/VideoToolbox.framework; sourceTree = SDKROOT; };
+		SVC10001SVC10001SVC10001 /* StudioVideoClipViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = StudioVideoClipViewController.swift; path = BleSdkDemo/Sources/UI/Watchface/StudioVideoClipViewController.swift; sourceTree = "<group>"; };
+		HWC10001HWC10001HWC10001 /* JPImageresizerView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = JPImageresizerView.m; path = Vendor/JPImageresizerView/JPImageresizerView.m; sourceTree = SOURCE_ROOT; };
+		HWC10002HWC10002HWC10002 /* JPImageresizerSlider.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = JPImageresizerSlider.m; path = Vendor/JPImageresizerView/JPImageresizerSlider.m; sourceTree = SOURCE_ROOT; };
+		HWC10003HWC10003HWC10003 /* JPImageresizerFrameView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = JPImageresizerFrameView.m; path = Vendor/JPImageresizerView/JPImageresizerFrameView.m; sourceTree = SOURCE_ROOT; };
+		HWC10004HWC10004HWC10004 /* JPImageresizerResult.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = JPImageresizerResult.m; path = Vendor/JPImageresizerView/JPImageresizerResult.m; sourceTree = SOURCE_ROOT; };
+		HWC10005HWC10005HWC10005 /* JPImageresizerConfigure.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = JPImageresizerConfigure.m; path = Vendor/JPImageresizerView/JPImageresizerConfigure.m; sourceTree = SOURCE_ROOT; };
+		HWC10006HWC10006HWC10006 /* JPImageresizer+Extension.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = "JPImageresizer+Extension.m"; path = "Vendor/JPImageresizerView/JPImageresizer+Extension.m"; sourceTree = SOURCE_ROOT; };
+		HWC10007HWC10007HWC10007 /* JPImageresizerBlurView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = JPImageresizerBlurView.m; path = Vendor/JPImageresizerView/JPImageresizerBlurView.m; sourceTree = SOURCE_ROOT; };
+		HWC10008HWC10008HWC10008 /* JPImageresizerVideoObject.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = JPImageresizerVideoObject.m; path = Vendor/JPImageresizerView/JPImageresizerVideoObject.m; sourceTree = SOURCE_ROOT; };
+		HWC10009HWC10009HWC10009 /* JPImageresizerTool.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = JPImageresizerTool.m; path = Vendor/JPImageresizerView/JPImageresizerTool.m; sourceTree = SOURCE_ROOT; };
+		HWC10010HWC10010HWC10010 /* SAVideoRangeSlider.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SAVideoRangeSlider.m; path = Vendor/SAVideoRangeSlider/SAVideoRangeSlider.m; sourceTree = SOURCE_ROOT; };
+		HWC10011HWC10011HWC10011 /* SASliderLeft.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SASliderLeft.m; path = Vendor/SAVideoRangeSlider/SASliderLeft.m; sourceTree = SOURCE_ROOT; };
+		HWC10012HWC10012HWC10012 /* SAResizibleBubble.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SAResizibleBubble.m; path = Vendor/SAVideoRangeSlider/SAResizibleBubble.m; sourceTree = SOURCE_ROOT; };
+		HWC10013HWC10013HWC10013 /* SASliderRight.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SASliderRight.m; path = Vendor/SAVideoRangeSlider/SASliderRight.m; sourceTree = SOURCE_ROOT; };
+		HWC10014HWC10014HWC10014 /* HWImageresizerViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = HWImageresizerViewController.m; path = BleSdkDemo/Sources/UI/Watchface/HaWoFitClip/HWImageresizerViewController.m; sourceTree = SOURCE_ROOT; };
+		HWC10015HWC10015HWC10015 /* HwVideoClipPreview.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = HwVideoClipPreview.m; path = BleSdkDemo/Sources/UI/Watchface/HaWoFitClip/HwVideoClipPreview.m; sourceTree = SOURCE_ROOT; };
+		AGF10001AGF10001AGF10001 /* AnimatedGIF.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AnimatedGIF.swift; path = BleSdkDemo/Sources/UI/Watchface/AnimatedGIF.swift; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -119,6 +204,17 @@
 			buildActionMask = 2147483647;
 			files = (
 				FEEA3A09CC63A1BDAA031D6A /* Foundation.framework in Frameworks */,
+				FFM20023FFM20023FFM20023 /* VideoToolbox.framework in Frameworks */,
+				FFM20022FFM20022FFM20022 /* CoreMedia.framework in Frameworks */,
+				FFM20021FFM20021FFM20021 /* libiconv.tbd in Frameworks */,
+				FFM20020FFM20020FFM20020 /* libbz2.tbd in Frameworks */,
+				FFM20010FFM20010FFM20010 /* libavutil.a in Frameworks */,
+				FFM20011FFM20011FFM20011 /* libavcodec.a in Frameworks */,
+				FFM20012FFM20012FFM20012 /* libavformat.a in Frameworks */,
+				FFM20013FFM20013FFM20013 /* libavfilter.a in Frameworks */,
+				FFM20014FFM20014FFM20014 /* libavdevice.a in Frameworks */,
+				FFM20015FFM20015FFM20015 /* libswscale.a in Frameworks */,
+				FFM20016FFM20016FFM20016 /* libswresample.a in Frameworks */,
 				4043D3E7EAE75DFCBFC01948 /* Pods_BleSdkDemo.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -177,11 +273,13 @@
 				3265F80EF513B9C44DAA853D /* Models.swift */,
 				E507F2715CCBFC3539CF51B0 /* SceneDelegate.swift */,
 				7866CD6110555D10C1B45FC7 /* AgpsXywBuilder.swift */,
+				0FF10001BFF10001BFF10001 /* OfflineMapApi.swift */,
 				2CE3ACBC85F1464CFBD24481 /* BleRepository.swift */,
 				87533339C8C8D14D102294FB /* BoundDeviceStore.swift */,
 				A5D8C7D3541C7418C8C259A3 /* BindFlowViewController.swift */,
 				CF4B2DF9A98E169FCD7FCF4A /* UIHelpers.swift */,
 				1F289D7F6270E8765A9AC88D /* AgpsUpdateViewController.swift */,
+				0FF10002BFF10002BFF10002 /* OfflineMapDownloadViewController.swift */,
 				8AF4D348D92923C24D180513 /* OtaModels.swift */,
 				B2B0346CC9C44E03A8C6153C /* WatchfaceModels.swift */,
 				32589A67000F44F0884DA9DF /* WatchfaceApi.swift */,
@@ -189,6 +287,14 @@
 				1959C6454D524B7E8A7DAC01 /* WatchfaceHostViewController.swift */,
 				49B7674D8BD54992BE75ACA4 /* OnlineWatchfaceViewController.swift */,
 				37BF165DFAB649DF9A615D26 /* CustomWatchfaceViewController.swift */,
+				WFS10001WFS10001WFS10001 /* WatchFaceStudioViewController.swift */,
+				WFSF002WFSF002WFSF002 /* montserrat_bold.ttf */,
+				WFSF001WFSF001WFSF001 /* roboto_bold.ttf */,
+				WFS10002WFS10002WFS10002 /* StudioLauncherType.swift */,
+				WFS10004WFS10004WFS10004 /* StudioStyledWidgets.swift */,
+				WFS10003WFS10003WFS10003 /* StudioVideoToGif.swift */,
+				AGF10001AGF10001AGF10001 /* AnimatedGIF.swift */,
+				SVC10001SVC10001SVC10001 /* StudioVideoClipViewController.swift */,
 				CC7FD9CDB3E24795B0A48F3C /* AiWatchfaceViewController.swift */,
 				138C97AD05BE1C7CF0DC1A51 /* FirmwareVersionUtils.swift */,
 				D60674E7BC247DD7B39B41FD /* OtaFirmwareApi.swift */,
@@ -215,6 +321,8 @@
 				CF973DBBA57A72AE5FA132F1 /* JieliWatchfaceImageEncoder.swift */,
 				282A2946747604440754D4FC /* ScanConnectViewController.swift */,
 				6579266C6513A7C238F54CFD /* UnbindFlowViewController.swift */,
+				FFM10030FFM10030FFM10030 /* FFmpeg */,
+				HWC30001HWC30001HWC30001 /* HaWoFitClip */,
 				54B5306B5EFC774661A5DB60 /* BleSdkDemo-Bridging-Header.h */,
 				54B5306B5EFC774661A5DB61 /* BleSdkDemo-Jieli-Bridging-Header.h */,
 				87FCCB64FDE7373D4B06F7CF /* Info.plist */,
@@ -248,6 +356,70 @@
 				502C1CD344A9B5AA834FD48A /* Foundation.framework */,
 			);
 			name = iOS;
+			sourceTree = "<group>";
+		};
+
+		FFM10030FFM10030FFM10030 /* FFmpeg */ = {
+			isa = PBXGroup;
+			children = (
+				FFM10032FFM10032FFM10032 /* tool */,
+				FFM10031FFM10031FFM10031 /* lib */,
+				FFM10006FFM10006FFM10006 /* HaWoFFmpegBridge.h */,
+				FFM10005FFM10005FFM10005 /* HaWoFFmpegBridge.m */,
+			);
+			name = FFmpeg;
+			sourceTree = "<group>";
+		};
+		FFM10032FFM10032FFM10032 /* tool */ = {
+			isa = PBXGroup;
+			children = (
+				FFM10001FFM10001FFM10001 /* ffmpeg.c */,
+				FFM10002FFM10002FFM10002 /* ffmpeg_opt.c */,
+				FFM10003FFM10003FFM10003 /* ffmpeg_filter.c */,
+				FFM10004FFM10004FFM10004 /* cmdutils.c */,
+			);
+			name = tool;
+			sourceTree = "<group>";
+		};
+		FFM10031FFM10031FFM10031 /* lib */ = {
+			isa = PBXGroup;
+			children = (
+				FFM10010FFM10010FFM10010 /* libavutil.a */,
+				FFM10011FFM10011FFM10011 /* libavcodec.a */,
+				FFM10012FFM10012FFM10012 /* libavformat.a */,
+				FFM10013FFM10013FFM10013 /* libavfilter.a */,
+				FFM10014FFM10014FFM10014 /* libavdevice.a */,
+				FFM10015FFM10015FFM10015 /* libswscale.a */,
+				FFM10016FFM10016FFM10016 /* libswresample.a */,
+				FFM10020FFM10020FFM10020 /* libbz2.tbd */,
+				FFM10021FFM10021FFM10021 /* libiconv.tbd */,
+				FFM10022FFM10022FFM10022 /* CoreMedia.framework */,
+				FFM10023FFM10023FFM10023 /* VideoToolbox.framework */,
+			);
+			name = lib;
+			sourceTree = "<group>";
+		};
+
+		HWC30001HWC30001HWC30001 /* HaWoFitClip */ = {
+			isa = PBXGroup;
+			children = (
+				HWC10001HWC10001HWC10001 /* JPImageresizerView.m */,
+				HWC10002HWC10002HWC10002 /* JPImageresizerSlider.m */,
+				HWC10003HWC10003HWC10003 /* JPImageresizerFrameView.m */,
+				HWC10004HWC10004HWC10004 /* JPImageresizerResult.m */,
+				HWC10005HWC10005HWC10005 /* JPImageresizerConfigure.m */,
+				HWC10006HWC10006HWC10006 /* JPImageresizer+Extension.m */,
+				HWC10007HWC10007HWC10007 /* JPImageresizerBlurView.m */,
+				HWC10008HWC10008HWC10008 /* JPImageresizerVideoObject.m */,
+				HWC10009HWC10009HWC10009 /* JPImageresizerTool.m */,
+				HWC10010HWC10010HWC10010 /* SAVideoRangeSlider.m */,
+				HWC10011HWC10011HWC10011 /* SASliderLeft.m */,
+				HWC10012HWC10012HWC10012 /* SAResizibleBubble.m */,
+				HWC10013HWC10013HWC10013 /* SASliderRight.m */,
+				HWC10014HWC10014HWC10014 /* HWImageresizerViewController.m */,
+				HWC10015HWC10015HWC10015 /* HwVideoClipPreview.m */,
+			);
+			name = HaWoFitClip;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -314,6 +486,8 @@
 			files = (
 				6B93AC57E3937E4122FF9AEB /* Assets.xcassets in Resources */,
 				A4DD2DB75BFD6090F4F24888 /* Localizable.strings in Resources */,
+				WFSF102WFSF102WFSF102 /* montserrat_bold.ttf in Resources */,
+				WFSF101WFSF101WFSF101 /* roboto_bold.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -397,6 +571,32 @@
 			files = (
 				1C840E956D3B4D0D90A29D75 /* AiWatchfaceViewController.swift in Sources */,
 				38428380DDDE4BC981DFE60F /* CustomWatchfaceViewController.swift in Sources */,
+				WFS20001WFS20001WFS20001 /* WatchFaceStudioViewController.swift in Sources */,
+				WFS20002WFS20002WFS20002 /* StudioLauncherType.swift in Sources */,
+				WFS20004WFS20004WFS20004 /* StudioStyledWidgets.swift in Sources */,
+				WFS20003WFS20003WFS20003 /* StudioVideoToGif.swift in Sources */,
+				AGF20001AGF20001AGF20001 /* AnimatedGIF.swift in Sources */,
+				HWC20001HWC20001HWC20001 /* JPImageresizerView.m in Sources */,
+				HWC20002HWC20002HWC20002 /* JPImageresizerSlider.m in Sources */,
+				HWC20003HWC20003HWC20003 /* JPImageresizerFrameView.m in Sources */,
+				HWC20004HWC20004HWC20004 /* JPImageresizerResult.m in Sources */,
+				HWC20005HWC20005HWC20005 /* JPImageresizerConfigure.m in Sources */,
+				HWC20006HWC20006HWC20006 /* JPImageresizer+Extension.m in Sources */,
+				HWC20007HWC20007HWC20007 /* JPImageresizerBlurView.m in Sources */,
+				HWC20008HWC20008HWC20008 /* JPImageresizerVideoObject.m in Sources */,
+				HWC20009HWC20009HWC20009 /* JPImageresizerTool.m in Sources */,
+				HWC20010HWC20010HWC20010 /* SAVideoRangeSlider.m in Sources */,
+				HWC20011HWC20011HWC20011 /* SASliderLeft.m in Sources */,
+				HWC20012HWC20012HWC20012 /* SAResizibleBubble.m in Sources */,
+				HWC20013HWC20013HWC20013 /* SASliderRight.m in Sources */,
+				HWC20014HWC20014HWC20014 /* HWImageresizerViewController.m in Sources */,
+				HWC20015HWC20015HWC20015 /* HwVideoClipPreview.m in Sources */,
+				SVC20001SVC20001SVC20001 /* StudioVideoClipViewController.swift in Sources */,
+				FFM20001FFM20001FFM20001 /* ffmpeg.c in Sources */,
+				FFM20002FFM20002FFM20002 /* ffmpeg_opt.c in Sources */,
+				FFM20003FFM20003FFM20003 /* ffmpeg_filter.c in Sources */,
+				FFM20004FFM20004FFM20004 /* cmdutils.c in Sources */,
+				FFM20005FFM20005FFM20005 /* HaWoFFmpegBridge.m in Sources */,
 				2C076A8A599942B99A769B92 /* OnlineWatchfaceViewController.swift in Sources */,
 				3483115E8E30437A8671904E /* WatchfaceHostViewController.swift in Sources */,
 				35566BA2277944D6B6A64CD9 /* WatchfaceImageUtils.swift in Sources */,
@@ -411,6 +611,8 @@
 				78CDE3DB7180C2C7D3A311C0 /* BindFlowViewController.swift in Sources */,
 				967F85E9ED40606E038B2AFE /* UIHelpers.swift in Sources */,
 				44010A3A4D82EB2AFC52A23F /* AgpsUpdateViewController.swift in Sources */,
+				0FF10001AFF10001AFF10001 /* OfflineMapApi.swift in Sources */,
+				0FF10002AFF10002AFF10002 /* OfflineMapDownloadViewController.swift in Sources */,
 				C4D261ED8D0B06BD6B09FF47 /* OtaModels.swift in Sources */,
 				F12485D8B37EA548E71A0DA0 /* FirmwareVersionUtils.swift in Sources */,
 				6126B03BDE753C63C1475BD9 /* OtaFirmwareApi.swift in Sources */,
@@ -524,9 +726,24 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MARKETING_VERSION = 1.0;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/Vendor/FFmpeg/include",
+					"$(SRCROOT)/Vendor/FFmpeg/tool",
+					"$(SRCROOT)/BleSdkDemo/Sources/Services/FFmpeg",
+					"$(SRCROOT)/Vendor/JPImageresizerView",
+					"$(SRCROOT)/Vendor/SAVideoRangeSlider",
+					"$(SRCROOT)/BleSdkDemo/Sources/UI/Watchface/HaWoFitClip",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/Vendor/FFmpeg/lib",
+				);
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-lz",
+					"-lbz2",
+					"-liconv",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.huawo.blesdkdemo;
 				SDKROOT = iphoneos;
@@ -552,9 +769,24 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MARKETING_VERSION = 1.0;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/Vendor/FFmpeg/include",
+					"$(SRCROOT)/Vendor/FFmpeg/tool",
+					"$(SRCROOT)/BleSdkDemo/Sources/Services/FFmpeg",
+					"$(SRCROOT)/Vendor/JPImageresizerView",
+					"$(SRCROOT)/Vendor/SAVideoRangeSlider",
+					"$(SRCROOT)/BleSdkDemo/Sources/UI/Watchface/HaWoFitClip",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/Vendor/FFmpeg/lib",
+				);
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-lz",
+					"-lbz2",
+					"-liconv",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.huawo.blesdkdemo;
 				SDKROOT = iphoneos;

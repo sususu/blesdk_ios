@@ -15,6 +15,10 @@ struct BleDeviceInfoModel {
     var battery: Int?
     var protocolVersion: Int?
     var displayingWatchfaceId: String?
+    /// Offline-map device UUID from firmware (`HwDeviceInfo.mapUUID`).
+    var mapUuid: String?
+    /// Whether the watch has already accepted a map auth code.
+    var mapAuthorized: Bool = false
 }
 
 struct BoundDeviceRecord: Codable {
@@ -25,6 +29,8 @@ struct BoundDeviceRecord: Codable {
     var firmwareVersion: String?
     var battery: Int?
     var protocolVersion: Int?
+    var mapUuid: String?
+    var mapAuthorized: Bool?
 }
 
 struct HealthDataCount {

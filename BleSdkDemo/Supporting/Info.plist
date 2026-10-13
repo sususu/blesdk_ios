@@ -27,13 +27,20 @@
 	<key>NSBluetoothPeripheralUsageDescription</key>
 	<string>需要蓝牙权限以扫描、连接并同步智能手表数据</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>用于 AGPS / 运动轨迹相关定位辅助</string>
+	<string>用于离线地图选区定位，以及 AGPS / 运动轨迹相关定位辅助</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Used for AI watchface voice input debugging</string>
+	<key>NSCameraUsageDescription</key>
+	<string>用于拍摄表盘背景图片</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>用于选择图片推送到手表相册</string>
+	<string>用于选择图片/视频作为表盘背景或推送到手表相册</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>用于保存相关媒体文件</string>
+	<key>UIAppFonts</key>
+	<array>
+		<string>Fonts/roboto_bold.ttf</string>
+		<string>Fonts/montserrat_bold.ttf</string>
+	</array>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSExceptionDomains</key>

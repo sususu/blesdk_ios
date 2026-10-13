@@ -1,0 +1,6 @@
+framework module eZIPSDK {
+  umbrella header "eZIPSDK.h"
+  export *
+
+  module * { export * }
+}

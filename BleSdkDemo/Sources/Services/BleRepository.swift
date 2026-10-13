@@ -68,7 +68,7 @@ final class BleRepository {
     /// High-level categories of exclusive file-transfer / DFU operations.
     /// Exclusive Sifli file-transfer kinds sharing one BLE lock (`beginTransfer`).
     /// `.watchface` covers Sifli online/custom push; `.jieliWatchface` uses JL multi-file transfer.
-    enum TransferKind { case music, album, agps, ota, jieliOta, watchface, jieliWatchface }
+    enum TransferKind { case music, album, agps, offlineMap, ota, jieliOta, watchface, jieliWatchface }
 
     private init() {}
 
@@ -175,6 +175,7 @@ final class BleRepository {
     ///   - name: Optional display name.
     ///   - info: Optional rich device info used to fill firmware / battery / protocol fields.
     func saveBoundDevice(mac: String, name: String?, info: BleDeviceInfoModel?) {
+        let existing = store.load()
         store.save(BoundDeviceRecord(
             macAddress: mac,
             name: name,
@@ -182,7 +183,9 @@ final class BleRepository {
             type: info?.type,
             firmwareVersion: info?.firmwareVersion,
             battery: info?.battery,
-            protocolVersion: info?.protocolVersion
+            protocolVersion: info?.protocolVersion,
+            mapUuid: info?.mapUuid ?? existing?.mapUuid,
+            mapAuthorized: info?.mapAuthorized ?? existing?.mapAuthorized
         ))
     }
 
@@ -498,6 +501,8 @@ final class BleRepository {
                 model.battery = Int(info.battery)
                 model.protocolVersion = Int(info.protocolVersion)
                 model.displayingWatchfaceId = info.displayingWatchfaceId
+                model.mapUuid = info.mapUUID
+                model.mapAuthorized = info.mapAuthorized
                 if let mac = model.mac, !mac.isEmpty {
                     self.sdk.updateMacAddressIfNeed(withMac: mac)
                 }
@@ -999,7 +1004,7 @@ final class BleRepository {
             sdk.otaV2Service?.stop()
         case .jieliWatchface:
             sdk.multipleFileTransferService?.stop()
-        case .music, .album, .agps, .watchface:
+        case .music, .album, .agps, .offlineMap, .watchface:
             SifliWatchfaceSDK.getInstance().stop()
         case .none:
             SifliWatchfaceSDK.getInstance().stop()
@@ -1371,6 +1376,133 @@ final class BleRepository {
                 }
             }
         )
+    }
+
+    // MARK: - Offline map
+    //
+    // Flow (Android OfflineMapDownloadViewModel + HaWoFit HwOfflineMapsVC):
+    //   authorize (cloud authCode → setDeviceMapAuthCode) →
+    //   request package (PiMap generateFile) → space check →
+    //   setDeviceMapRange → download zip + MD5 →
+    //   SifliWatchfaceSDK.pushOfflineMap → setDeviceMapTheme
+
+    /// Reads offline-map free storage on the watch (KB).
+    func getOfflineMapAvailableStorageKb(completion: @escaping (Result<Int, Error>) -> Void) {
+        sdk.getOfflineMapAvailableStorage { value, error in
+            DispatchQueue.main.async {
+                if let error = error { completion(.failure(error)) }
+                else { completion(.success(Int(value))) }
+            }
+        }
+    }
+
+    /// Writes PiMap auth code to the device (`setDeviceMapAuthCode:uuid:callback:`).
+    func setDeviceMapAuthCode(uuid: String, authCode: String, completion: @escaping (Result<Void, Error>) -> Void) {
+        sdk.setDeviceMapAuthCode(authCode, uuid: uuid) { ok, error in
+            DispatchQueue.main.async { Self.boolResult(ok, error, completion) }
+        }
+    }
+
+    /// Tells the watch the WGS84 crop range for the offline map tile pack.
+    func setDeviceMapRange(
+        centerLat: Double,
+        centerLon: Double,
+        maxLon: Double,
+        minLon: Double,
+        maxLat: Double,
+        minLat: Double,
+        completion: @escaping (Result<Void, Error>) -> Void
+    ) {
+        sdk.setDeviceMapRangeWithLongitude(
+            centerLon,
+            latitude: centerLat,
+            maxLongitude: maxLon,
+            minLongitude: minLon,
+            maxLatitude: maxLat,
+            minLatitude: minLat
+        ) { ok, error in
+            DispatchQueue.main.async { Self.boolResult(ok, error, completion) }
+        }
+    }
+
+    /// Sets map theme after a successful install (`HwMapThemeLight` / `HwMapThemeDark`).
+    func setDeviceMapTheme(light: Bool, completion: @escaping (Result<Void, Error>) -> Void) {
+        let theme: HwMapTheme = light ? .light : .dark
+        sdk.setDeviceMapTheme(theme) { ok, error in
+            DispatchQueue.main.async { Self.boolResult(ok, error, completion) }
+        }
+    }
+
+    /// Downloads [info] zip, verifies MD5, then pushes via `SifliWatchfaceSDK.pushOfflineMap`
+    /// (same BLE path as HaWoFit; iOS has no classic-BT SPP fallback in this demo).
+    func pushOfflineMap(
+        info: PiMapInfo,
+        onDownloadProgress: @escaping (Float) -> Void,
+        onInstallProgress: @escaping (Int) -> Void,
+        completion: @escaping (Result<Void, Error>) -> Void
+    ) {
+        if let err = beginTransfer(.offlineMap) { completion(.failure(err)); return }
+        guard let uuid = connectedUUID() else {
+            endTransfer()
+            completion(.failure(SdkError(code: -1, message: "no connected uuid")))
+            return
+        }
+        DispatchQueue.global(qos: .userInitiated).async {
+            do {
+                let zip = try OfflineMapApi.downloadToCache(urlString: info.downloadUrl) { p in
+                    DispatchQueue.main.async { onDownloadProgress(p) }
+                }
+                let md5 = try OfflineMapApi.md5Of(fileURL: zip)
+                guard md5.caseInsensitiveCompare(info.md5) == .orderedSame else {
+                    DispatchQueue.main.async {
+                        self.endTransfer()
+                        completion(.failure(SdkError(code: 997, message: "MD5 mismatch")))
+                    }
+                    return
+                }
+                DispatchQueue.main.async {
+                    SifliWatchfaceSDK.getInstance().pushOfflineMap(
+                        devIdentifier: uuid,
+                        mapZipFilePath: zip,
+                        compressCallback: { ok in
+                            if !ok {
+                                DispatchQueue.main.async {
+                                    SifliWatchfaceSDK.getInstance().stop()
+                                    self.endTransfer()
+                                    completion(.failure(SdkError(code: -1, message: "map zip compress fail")))
+                                }
+                            }
+                        },
+                        progressCallback: { p in
+                            DispatchQueue.main.async { onInstallProgress(p) }
+                        },
+                        finishCallback: { [weak self] ok, errInfo, errType, _ in
+                            DispatchQueue.main.async {
+                                SifliWatchfaceSDK.getInstance().stop()
+                                self?.endTransfer()
+                                if ok { completion(.success(())) }
+                                else {
+                                    completion(.failure(SdkError(
+                                        code: errType,
+                                        message: errInfo ?? "offline map push fail"
+                                    )))
+                                }
+                            }
+                        }
+                    )
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    self.endTransfer()
+                    completion(.failure(error))
+                }
+            }
+        }
+    }
+
+    /// Cancels an in-flight offline-map push (Sifli `stop`).
+    func cancelOfflineMapTransfer() {
+        cancelTransfer()
     }
 
     // MARK: - Sifli OTA (firmware DFU)

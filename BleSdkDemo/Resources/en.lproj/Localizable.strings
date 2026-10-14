@@ -133,6 +133,7 @@
 
 /* Scan */
 "scan_title" = "Scan & Connect";
+"scan_name_placeholder" = "Search by device name";
 "start_scan" = "Start Scan";
 "stop_scan" = "Stop Scan";
 "connecting" = "Connecting";

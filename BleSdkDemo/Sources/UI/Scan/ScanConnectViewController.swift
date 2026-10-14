@@ -5,7 +5,9 @@ final class ScanConnectViewController: UIViewController {
     var onConnected: ((BleDeviceItem) -> Void)?
 
     private var devices: [BleDeviceItem] = []
+    private var filteredDevices: [BleDeviceItem] = []
     private var rawDevices: [String: HwBluetoothDevice] = [:]
+    private let searchBar = UISearchBar()
     private let table = UITableView(frame: .zero, style: .insetGrouped)
     private let scanButton = UIHelpers.makeButton("", primary: true)
     private var scanning = false
@@ -14,17 +16,28 @@ final class ScanConnectViewController: UIViewController {
         super.viewDidLoad()
         title = L10n.tr("scan_title")
         view.backgroundColor = .systemBackground
+        searchBar.placeholder = L10n.tr("scan_name_placeholder")
+        searchBar.searchBarStyle = .minimal
+        searchBar.autocapitalizationType = .none
+        searchBar.autocorrectionType = .no
+        searchBar.delegate = self
+        searchBar.translatesAutoresizingMaskIntoConstraints = false
         scanButton.setTitle(L10n.tr("start_scan"), for: .normal)
         scanButton.addTarget(self, action: #selector(toggleScan), for: .touchUpInside)
         scanButton.translatesAutoresizingMaskIntoConstraints = false
         table.translatesAutoresizingMaskIntoConstraints = false
         table.dataSource = self
         table.delegate = self
+        table.keyboardDismissMode = .onDrag
         table.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
+        view.addSubview(searchBar)
         view.addSubview(scanButton)
         view.addSubview(table)
         NSLayoutConstraint.activate([
-            scanButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 12),
+            searchBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 4),
+            searchBar.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 8),
+            searchBar.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -8),
+            scanButton.topAnchor.constraint(equalTo: searchBar.bottomAnchor, constant: 8),
             scanButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             scanButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
             table.topAnchor.constraint(equalTo: scanButton.bottomAnchor, constant: 12),
@@ -33,6 +46,14 @@ final class ScanConnectViewController: UIViewController {
             table.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
         startScan()
+    }
+
+    private func updateFilteredDevices() {
+        let query = (searchBar.text ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+        filteredDevices = query.isEmpty ? devices : devices.filter {
+            $0.name?.localizedCaseInsensitiveContains(query) == true
+        }
+        table.reloadData()
     }
 
     @objc private func toggleScan() {
@@ -49,11 +70,11 @@ final class ScanConnectViewController: UIViewController {
         scanning = true
         devices.removeAll()
         rawDevices.removeAll()
-        table.reloadData()
+        updateFilteredDevices()
         scanButton.setTitle(L10n.tr("stop_scan"), for: .normal)
         repo.scan(timeout: 12, onUpdate: { [weak self] list in
             self?.devices = list
-            self?.table.reloadData()
+            self?.updateFilteredDevices()
         }, onFinish: { [weak self] in
             self?.scanning = false
             self?.scanButton.setTitle(L10n.tr("start_scan"), for: .normal)
@@ -115,10 +136,10 @@ final class ScanConnectViewController: UIViewController {
 }
 
 extension ScanConnectViewController: UITableViewDataSource, UITableViewDelegate {
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int { devices.count }
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int { filteredDevices.count }
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
-        let d = devices[indexPath.row]
+        let d = filteredDevices[indexPath.row]
         cell.textLabel?.numberOfLines = 0
         cell.textLabel?.text = "\(d.name ?? L10n.tr("unknown"))\n\(d.macAddress.isEmpty ? (d.uuid ?? "-") : d.macAddress)  RSSI=\(d.rssi ?? 0)"
         cell.accessoryType = .disclosureIndicator
@@ -126,6 +147,17 @@ extension ScanConnectViewController: UITableViewDataSource, UITableViewDelegate 
     }
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        connect(devices[indexPath.row])
+        searchBar.resignFirstResponder()
+        connect(filteredDevices[indexPath.row])
+    }
+}
+
+extension ScanConnectViewController: UISearchBarDelegate {
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        updateFilteredDevices()
+    }
+
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        searchBar.resignFirstResponder()
     }
 }

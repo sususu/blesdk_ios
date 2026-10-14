@@ -133,6 +133,7 @@
 
 /* Scan */
 "scan_title" = "扫描连接";
+"scan_name_placeholder" = "输入设备名称（模糊搜索）";
 "start_scan" = "开始扫描";
 "stop_scan" = "停止扫描";
 "connecting" = "连接中";

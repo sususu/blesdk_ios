@@ -13,6 +13,7 @@
 		22A434D7817C3ABFCE164DA2 /* LocaleHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = D641DF46CA811EC15937CA3B /* LocaleHelper.swift */; };
 		22C33A9279D5EA3A3CBD2212 /* HomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF973DBBA57A72AE5FA132E6 /* HomeViewController.swift */; };
 		22C33A9279D5EA3A3CBD2213 /* JieliHealthSyncViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF973DBBA57A72AE5FA132E7 /* JieliHealthSyncViewController.swift */; };
+		22C33A9279D5EA3A3CBD2220 /* JieliManualMeasureViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF973DBBA57A72AE5FA132F4 /* JieliManualMeasureViewController.swift */; };
 		22C33A9279D5EA3A3CBD2214 /* JieliHealthRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF973DBBA57A72AE5FA132E8 /* JieliHealthRepository.swift */; };
 		22C33A9279D5EA3A3CBD2215 /* JieliAlarmRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF973DBBA57A72AE5FA132E9 /* JieliAlarmRepository.swift */; };
 		22C33A9279D5EA3A3CBD2216 /* JieliAlarmReminderViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF973DBBA57A72AE5FA132EA /* JieliAlarmReminderViewController.swift */; };
@@ -96,6 +97,7 @@
 		CF4B2DF9A98E169FCD7FCF4A /* UIHelpers.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = UIHelpers.swift; path = BleSdkDemo/Sources/UI/Common/UIHelpers.swift; sourceTree = "<group>"; };
 		CF973DBBA57A72AE5FA132E6 /* HomeViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = HomeViewController.swift; path = BleSdkDemo/Sources/UI/Home/HomeViewController.swift; sourceTree = "<group>"; };
 		CF973DBBA57A72AE5FA132E7 /* JieliHealthSyncViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = JieliHealthSyncViewController.swift; path = BleSdkDemo/Sources/UI/Jieli/JieliHealthSyncViewController.swift; sourceTree = "<group>"; };
+		CF973DBBA57A72AE5FA132F4 /* JieliManualMeasureViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = JieliManualMeasureViewController.swift; path = BleSdkDemo/Sources/UI/Jieli/JieliManualMeasureViewController.swift; sourceTree = "<group>"; };
 		CF973DBBA57A72AE5FA132E8 /* JieliHealthRepository.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = JieliHealthRepository.swift; path = BleSdkDemo/Sources/Services/Jieli/JieliHealthRepository.swift; sourceTree = "<group>"; };
 		CF973DBBA57A72AE5FA132E9 /* JieliAlarmRepository.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = JieliAlarmRepository.swift; path = BleSdkDemo/Sources/Services/Jieli/JieliAlarmRepository.swift; sourceTree = "<group>"; };
 		CF973DBBA57A72AE5FA132EA /* JieliAlarmReminderViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = JieliAlarmReminderViewController.swift; path = BleSdkDemo/Sources/UI/Jieli/JieliAlarmReminderViewController.swift; sourceTree = "<group>"; };
@@ -203,6 +205,7 @@
 				A1F10003A1F10003A1F10003 /* AiDemoViewController.swift */,
 				A1F10004A1F10004A1F10004 /* AiDemoBridge.swift */,
 				CF973DBBA57A72AE5FA132E7 /* JieliHealthSyncViewController.swift */,
+				CF973DBBA57A72AE5FA132F4 /* JieliManualMeasureViewController.swift */,
 				CF973DBBA57A72AE5FA132E8 /* JieliHealthRepository.swift */,
 				CF973DBBA57A72AE5FA132E9 /* JieliAlarmRepository.swift */,
 				CF973DBBA57A72AE5FA132EA /* JieliAlarmReminderViewController.swift */,
@@ -425,6 +428,7 @@
 				A1B10003A1B10003A1B10003 /* AiDemoViewController.swift in Sources */,
 				A1B10004A1B10004A1B10004 /* AiDemoBridge.swift in Sources */,
 				22C33A9279D5EA3A3CBD2213 /* JieliHealthSyncViewController.swift in Sources */,
+				22C33A9279D5EA3A3CBD2220 /* JieliManualMeasureViewController.swift in Sources */,
 				22C33A9279D5EA3A3CBD2214 /* JieliHealthRepository.swift in Sources */,
 				22C33A9279D5EA3A3CBD2215 /* JieliAlarmRepository.swift in Sources */,
 				22C33A9279D5EA3A3CBD2216 /* JieliAlarmReminderViewController.swift in Sources */,

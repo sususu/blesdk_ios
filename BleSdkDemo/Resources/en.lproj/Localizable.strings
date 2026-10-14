@@ -492,3 +492,29 @@
 "ai_err_aflash_version" = "AFlash version mismatch";
 "ai_err_aflash_config" = "AFlash config error";
 "ai_err_aflash_auth" = "AFlash user not authorized";
+
+/* Jieli manual measurement */
+"jieli_manual_measure" = "Manual Measurement (Jieli)";
+"jieli_measure_hr" = "Heart Rate";
+"jieli_measure_hrv" = "Heart Rate Variability (HRV)";
+"jieli_measure_spo2" = "Blood Oxygen";
+"jieli_measure_stress" = "Stress";
+"jieli_measure_skin" = "Skin Temperature";
+"jieli_measure_rpm" = "Respiratory Rate";
+"jieli_measure_rpm_unit" = "breaths/min";
+"jieli_measure_type" = "Select Measurement Type";
+"jieli_measure_tip" = "Wear the device snugly and keep still. Stop measuring before changing type. Leaving this page or entering the background stops measurement.";
+"jieli_measure_ready" = "Tap Start to measure";
+"jieli_measure_start" = "Start / Measure Again";
+"jieli_measure_starting" = "Starting measurement…";
+"jieli_measure_running" = "Measuring, up to 60 seconds…";
+"jieli_measure_stop" = "Stop Measurement";
+"jieli_measure_stopping" = "Stopping…";
+"jieli_measure_stopped" = "Measurement stopped";
+"jieli_measure_finished" = "Measurement complete";
+"jieli_measure_no_result" = "Measurement ended without valid data. Check the fit and try again.";
+"jieli_measure_timeout" = "60-second limit reached. Measurement stopped.";
+"jieli_measure_not_worn" = "The device reports improper wear. Adjust it snugly against your skin.";
+"jieli_measure_rejected" = "The device did not confirm measurement start";
+"jieli_measure_stop_failed" = "Stop was not confirmed. Tap Stop again.";
+"jieli_measure_background" = "Measurement stopped when entering the background";

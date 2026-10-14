@@ -164,6 +164,11 @@ final class HomeViewController: UIViewController {
         ai.addTarget(self, action: #selector(tapAi), for: .touchUpInside)
         content.addArrangedSubview(ai)
         actionButtons.append(ai)
+
+        let measure = UIHelpers.makeButton("")
+        measure.addTarget(self, action: #selector(tapJieliMeasure), for: .touchUpInside)
+        content.addArrangedSubview(measure)
+        actionButtons.append(measure)
         _ = featureActions
     }
 
@@ -200,7 +205,7 @@ final class HomeViewController: UIViewController {
             L10n.tr("goals"), L10n.tr("alarms"), L10n.tr("jieli_alarms"),
             L10n.tr("notify"), L10n.tr("music"), L10n.tr("album"), L10n.tr("agps"), L10n.tr("ota"),
             L10n.tr("jieli_ota"), L10n.tr("watchface"), L10n.tr("watchface_jieli"),
-            L10n.tr("ai_section")
+            L10n.tr("ai_section"), L10n.tr("jieli_manual_measure")
         ]
         for (i, t) in titles.enumerated() where i < actionButtons.count {
             actionButtons[i].setTitle(t, for: .normal)
@@ -299,7 +304,7 @@ final class HomeViewController: UIViewController {
         actionButtons[3].isEnabled = canSync
         actionButtons[4].isEnabled = canUnbind
         actionButtons[5].isEnabled = !busy && hasDevice
-        for i in 6..<18 { actionButtons[i].isEnabled = canFeature }
+        for i in 6..<actionButtons.count { actionButtons[i].isEnabled = canFeature }
 
         if busy { statusSpinner.startAnimating() } else { statusSpinner.stopAnimating() }
     }
@@ -420,6 +425,11 @@ final class HomeViewController: UIViewController {
             appendLog(L10n.tr("error_no_device_to_sync"))
             refreshUI()
         }
+    }
+
+    @objc private func tapJieliMeasure() {
+        guard requireConnectedFeature() else { return }
+        navigationController?.pushViewController(JieliManualMeasureViewController(), animated: true)
     }
 
     @objc private func tapJieliSync() {

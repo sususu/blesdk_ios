@@ -492,3 +492,29 @@
 "ai_err_aflash_version" = "艾闪版本不匹配";
 "ai_err_aflash_config" = "艾闪配置错误";
 "ai_err_aflash_auth" = "艾闪用户未验证";
+
+/* Jieli manual measurement */
+"jieli_manual_measure" = "手动测量（杰里）";
+"jieli_measure_hr" = "心率";
+"jieli_measure_hrv" = "心率变异性（HRV）";
+"jieli_measure_spo2" = "血氧";
+"jieli_measure_stress" = "压力";
+"jieli_measure_skin" = "皮肤温度";
+"jieli_measure_rpm" = "呼吸频率";
+"jieli_measure_rpm_unit" = "次/分钟";
+"jieli_measure_type" = "选择测量类型";
+"jieli_measure_tip" = "请佩戴好设备并保持静止。测量期间不可切换类型；退出页面或进入后台会停止测量。";
+"jieli_measure_ready" = "点击开始测量";
+"jieli_measure_start" = "开始测量 / 重新测量";
+"jieli_measure_starting" = "正在启动测量…";
+"jieli_measure_running" = "测量中，最长 60 秒…";
+"jieli_measure_stop" = "停止测量";
+"jieli_measure_stopping" = "正在停止…";
+"jieli_measure_stopped" = "测量已停止";
+"jieli_measure_finished" = "测量完成";
+"jieli_measure_no_result" = "测量结束，未收到有效数据，请检查佩戴后重试";
+"jieli_measure_timeout" = "已达 60 秒，测量已停止";
+"jieli_measure_not_worn" = "设备提示佩戴不正确，请贴合皮肤佩戴";
+"jieli_measure_rejected" = "设备未确认开始测量";
+"jieli_measure_stop_failed" = "未确认停止，请再次点击停止测量";
+"jieli_measure_background" = "进入后台，测量已停止";

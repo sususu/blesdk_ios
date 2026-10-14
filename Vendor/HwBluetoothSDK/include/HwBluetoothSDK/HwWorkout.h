@@ -1,1 +1,1 @@
-/Users/sujiang/Projects/sdkdemo/Vendor/HwBluetoothSDK/HwBluetoothSDK.framework/Headers/HwWorkout.h
+../../HwBluetoothSDK.framework/Headers/HwWorkout.h

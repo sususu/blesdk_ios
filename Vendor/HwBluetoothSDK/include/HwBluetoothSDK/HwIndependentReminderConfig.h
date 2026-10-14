@@ -1,1 +1,1 @@
-/Users/sujiang/Projects/sdkdemo/Vendor/HwBluetoothSDK/HwBluetoothSDK.framework/Headers/HwIndependentReminderConfig.h
+../../HwBluetoothSDK.framework/Headers/HwIndependentReminderConfig.h

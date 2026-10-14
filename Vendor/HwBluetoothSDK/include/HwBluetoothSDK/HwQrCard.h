@@ -1,1 +1,1 @@
-/Users/sujiang/Projects/sdkdemo/Vendor/HwBluetoothSDK/HwBluetoothSDK.framework/Headers/HwQrCard.h
+../../HwBluetoothSDK.framework/Headers/HwQrCard.h

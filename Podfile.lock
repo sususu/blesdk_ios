@@ -19,7 +19,7 @@ PODS:
     - HwBluetoothSDK
     - SSZipArchive
     - WatchfaceSDK
-  - HwBluetoothSDK (3.2.7)
+  - HwBluetoothSDK (3.2.17)
   - JLBmpConvertKit (1.2.0)
   - Masonry (1.1.0)
   - SSZipArchive (2.4.3)
@@ -70,7 +70,7 @@ CHECKOUT OPTIONS:
 SPEC CHECKSUMS:
   AFNetworking: 3bd23d814e976cd148d7d44c3ab78017b744cd58
   AiSDK: 079f1a1505275a64581e887029984e76b060b242
-  HwBluetoothSDK: 36869338a96693703dace73d10f40511e9c4c551
+  HwBluetoothSDK: 093abbfdd585d7be6c069d4ee1b1886ed9901353
   JLBmpConvertKit: 864be69abecfd00fbbaeb2ba3e8ac57158b2215a
   Masonry: 678fab65091a9290e40e2832a55e7ab731aad201
   SSZipArchive: fe6a26b2a54d5a0890f2567b5cc6de5caa600aef

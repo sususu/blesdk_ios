@@ -1,0 +1,1 @@
+../../HwBluetoothSDK.framework/Headers/HwMultipleFileTransferService.h

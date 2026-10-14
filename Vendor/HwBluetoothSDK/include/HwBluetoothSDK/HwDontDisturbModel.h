@@ -1,1 +1,1 @@
-/Users/sujiang/Projects/sdkdemo/Vendor/HwBluetoothSDK/HwBluetoothSDK.framework/Headers/HwDontDisturbModel.h
+../../HwBluetoothSDK.framework/Headers/HwDontDisturbModel.h

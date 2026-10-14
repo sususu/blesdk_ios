@@ -1,1 +1,1 @@
-/Users/sujiang/Projects/sdkdemo/Vendor/HwBluetoothSDK/HwBluetoothSDK.framework/Headers/HwJLWatchFaceConfigModel.h
+../../HwBluetoothSDK.framework/Headers/HwJLWatchFaceConfigModel.h

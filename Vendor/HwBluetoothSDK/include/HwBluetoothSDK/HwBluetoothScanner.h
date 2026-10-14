@@ -1,1 +1,1 @@
-/Users/sujiang/Projects/sdkdemo/Vendor/HwBluetoothSDK/HwBluetoothSDK.framework/Headers/HwBluetoothScanner.h
+../../HwBluetoothSDK.framework/Headers/HwBluetoothScanner.h

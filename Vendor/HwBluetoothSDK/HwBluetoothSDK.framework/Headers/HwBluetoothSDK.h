@@ -46,7 +46,10 @@
 #import "HwBluetoothDeviceRequestManager.h"
 #import "HwBluetoothDeviceRequestManager+DrinkWaterRecords.h"
 
-#define HwBluetoothSDK_Version @"3.2.10"
+#import "HwMonitorDataType.h"
+#import "HwManufacturerAdvertiseInfo.h"
+
+#define HwBluetoothSDK_Version @"3.2.17"
 
 typedef NS_ENUM(NSInteger, HWPlatformType) {
     HWPlatformTypeSifli = 0,
@@ -54,6 +57,45 @@ typedef NS_ENUM(NSInteger, HWPlatformType) {
     HWPlatformTypeJieLi,
 };
 
+/**
+ 3.2.18:
+ 1. Reminder notify callback now reports extra payload (E0 type 0x1C);
+ 2. Add alarm reminder type (0x19).
+ */
+/**
+ 3.2.17:
+ 1. Add getVibrationSettings / setVibrationSettings (key 0x63, TLV 0x14).
+ */
+/**
+ 3.2.16:
+ 1. Parse feature-switch bitmask as uint32 (bit31 / LowBatteryReminder 0x1F no longer fails signed shift).
+ */
+/**
+ 3.2.15:
+ 1. Add reminder notify listeners (E0 type 0x1C, aligned with Android ReminderNotify).
+ */
+/**
+ 3.2.14:
+ 1. Add stopFindingDevice (control 0x36);
+ 2. Add low-battery reminder feature switch (0x1F);
+ 3. Realtime skin temperature callback now reports float (E0 type 0x19, 4-byte LE IEEE754).
+ */
+/**
+ 3.2.13:
+ 1. Workout type recognition callback now reports cate (E0 type 0x1B);
+ 2. Parse Huawo manufacturer advertise (product type / model / charging / battery).
+ */
+/**
+ 3.2.12:
+ 1. Add error code 86 (breath training busy);
+ 2. Add workout type recognition listeners (aligned with Android).
+ */
+/**
+ 3.2.11:
+ 1. Add skin temperature / respiratory rate auto-detect interval APIs;
+ 2. Add start/stop monitoring by data type;
+ 3. Add not-worn / monitor-stop / realtime HRV / RPM / skin temperature listeners.
+ */
 /**
  3.2.10:
  1. Add new language enum values;
@@ -537,6 +579,7 @@ Start to bind with watch
  Find watch
  */
 - (void) findDeviceWithCallback:(HwBoolCallback _Nullable)callback;
+- (void) stopFindingDeviceWithCallback:(HwBoolCallback _Nullable)callback;
 
 #pragma mark - World clock
 - (void) setWorldClockCities:(NSArray<HwWorldClockCity *> *_Nonnull)cities
@@ -656,6 +699,9 @@ Start to bind with watch
                            callback:(HwBoolCallback _Nullable)callback;
 - (void) getCurrentWatchfaceIndexWithCallback:(HwBCIntegerCallback _Nonnull)callback;
 
+- (void) addTimedMeasureListener:(HwTimedMeasureCallback _Nonnull)callback;
+- (void) removeTimedMeasureListener:(HwTimedMeasureCallback _Nonnull)callback;
+
 - (void) addHeartrateValueChangedListener:(HwIntValueChangedCallback _Nonnull)callback;
 - (void) removeHeartrateValueChangedListener:(HwIntValueChangedCallback _Nonnull)callback;
 - (void) removeAllHeartrateValueChangedListeners;
@@ -672,6 +718,14 @@ Start to bind with watch
 - (void) removeWorkoutStateUpdatedCallback:(HwWorkoutStateUpdatedCallback _Nonnull)callback;
 - (void) removeAllWorkoutStateUpdatedCallbacks;
 
+- (void) addWorkoutTypeRecognitionCallback:(HwWorkoutTypeRecognitionCallback _Nonnull)callback;
+- (void) removeWorkoutTypeRecognitionCallback:(HwWorkoutTypeRecognitionCallback _Nonnull)callback;
+- (void) removeAllWorkoutTypeRecognitionCallbacks;
+
+- (void) addReminderNotifyCallback:(HwReminderNotifyCallback _Nonnull)callback;
+- (void) removeReminderNotifyCallback:(HwReminderNotifyCallback _Nonnull)callback;
+- (void) removeAllReminderNotifyCallbacks;
+
 - (void) addSpO2StateUpdatedCallback:(HwSpO2StateUpdatedCallback _Nonnull)callback;
 - (void) removeSpO2StateUpdatedCallback:(HwSpO2StateUpdatedCallback _Nonnull)callback;
 - (void) removeAllSpO2StateUpdatedCallbacks;
@@ -684,6 +738,48 @@ Start to bind with watch
  Stop watch SpO2 monitoring
  */
 - (void) stopSpO2MonitoringWithCallback:(HwBoolCallback _Nullable)callback;
+
+/*! @brief
+ Start a one-shot health measurement [开始即时测量]
+ @param type measurement type，aligned with Android DataType
+ @param callback callback
+ */
+- (void) startMonitoringWithType:(HwMonitorDataType)type callback:(HwBoolCallback _Nullable)callback;
+
+/*! @brief
+ Stop a one-shot health measurement [停止即时测量]
+ */
+- (void) stopMonitoringWithType:(HwMonitorDataType)type callback:(HwBoolCallback _Nullable)callback;
+
+/*! @brief
+ 获取设备震动开关与强度 [get vibration on/off and intensity]
+ */
+- (void) getVibrationSettingsWithCallback:(HwVibrationSettingsCallback _Nonnull)callback;
+
+/*! @brief
+ 设置设备震动开关与强度 [set vibration on/off and intensity]
+ */
+- (void) setVibrationSettings:(HwVibrationSettings *_Nonnull)settings callback:(HwBoolCallback _Nullable)callback;
+
+- (void) addNotProperlyWornCallback:(HwNotProperlyWornCallback _Nonnull)callback;
+- (void) removeNotProperlyWornCallback:(HwNotProperlyWornCallback _Nonnull)callback;
+- (void) removeAllNotProperlyWornCallbacks;
+
+- (void) addMonitorStateChangedCallback:(HwMonitorStateChangedCallback _Nonnull)callback;
+- (void) removeMonitorStateChangedCallback:(HwMonitorStateChangedCallback _Nonnull)callback;
+- (void) removeAllMonitorStateChangedCallbacks;
+
+- (void) addRealtimeHRVUpdateListener:(HwIntValueChangedCallback _Nonnull)callback;
+- (void) removeRealtimeHRVUpdateListener:(HwIntValueChangedCallback _Nonnull)callback;
+- (void) removeAllRealtimeHRVUpdateListeners;
+
+- (void) addRealtimeRPMUpdateListener:(HwIntValueChangedCallback _Nonnull)callback;
+- (void) removeRealtimeRPMUpdateListener:(HwIntValueChangedCallback _Nonnull)callback;
+- (void) removeAllRealtimeRPMUpdateListeners;
+
+- (void) addRealtimeSkinTemperatureUpdateListener:(HwFloatValueChangedCallback _Nonnull)callback;
+- (void) removeRealtimeSkinTemperatureUpdateListener:(HwFloatValueChangedCallback _Nonnull)callback;
+- (void) removeAllRealtimeSkinTemperatureUpdateListeners;
 
 
 #pragma mark - 自定义表盘 [custom watch face]
@@ -964,6 +1060,9 @@ Start to bind with watch
 - (void) getVO2maxsWithCallback:(HwVO2maxsCallback _Nonnull)callback;
 - (void) delVO2maxsWithCallback:(HwBoolCallback _Nullable)callback;
 
+- (void) getStandingDatasWithCallback:(HwStandingDatasCallback _Nonnull)callback;
+- (void) delStandingDatasWithCallback:(HwBoolCallback _Nullable)callback;
+
 /*! @brief
  Get the number of health data in the watch,
  including: number of activity data, number of heart rate data, number of sleep data, number of blood oxygen data, number of pressure data
@@ -1148,6 +1247,28 @@ typedef void (^HwHeartrateAlarmCallback)(HwHeartrateAlarm *_Nullable hrAlarm, NS
 - (void) getAutoDetectStressSpanWithCallback:(HwBCIntegerCallback _Nullable)callback;
 
 /*! @brief
+ Set skin temperature auto-detect interval in minutes [设置肤温自动检测间隔，单位分钟]
+ @param interval >0 on, 0 off. App 侧开=5、关=0
+ */
+- (void) setSkinTemperatureMonitorInterval:(int)interval callback:(HwBoolCallback _Nullable)callback;
+
+/*! @brief
+ Get skin temperature auto-detect interval in minutes [获取肤温自动检测间隔]
+ */
+- (void) getSkinTemperatureMonitorIntervalWithCallback:(HwBCIntegerCallback _Nullable)callback;
+
+/*! @brief
+ Set respiratory rate auto-detect interval in minutes [设置呼吸频率自动检测间隔，单位分钟]
+ @param interval >0 on, 0 off. App 侧开=5、关=0
+ */
+- (void) setRespiratoryRateMonitorInterval:(int)interval callback:(HwBoolCallback _Nullable)callback;
+
+/*! @brief
+ Get respiratory rate auto-detect interval in minutes [获取呼吸频率自动检测间隔]
+ */
+- (void) getRespiratoryRateMonitorIntervalWithCallback:(HwBCIntegerCallback _Nullable)callback;
+
+/*! @brief
  Get automatic stress monitoring switch
  @param callback callback
  
@@ -1166,6 +1287,9 @@ typedef void (^HwHeartrateAlarmCallback)(HwHeartrateAlarm *_Nullable hrAlarm, NS
 - (void) getSpO2MonitorEnableWithCallback:(HwBoolCallback _Nullable)callback;
 - (void) setSpO2MonitorEnable:(BOOL)on
                      callback:(HwBoolCallback _Nonnull)callback;
+- (void) getLowBatteryReminderSwitchWithCallback:(HwBoolCallback _Nullable)callback;
+- (void) setLowBatteryReminderSwitch:(BOOL)on
+                            callback:(HwBoolCallback _Nullable)callback;
 - (void) getAODEnableWithCallback:(HwBoolCallback _Nonnull)callback;
 - (void) setAODEnable:(BOOL)on
              callback:(HwBoolCallback _Nonnull)callback;
@@ -1617,6 +1741,9 @@ typedef void (^HwBtConnectionStateCallback)(BOOL connected);
 - (void) addGenerateAiMeetingRequestListener:(HwGenerateAiMeetingRequestCallback _Nonnull)callback;
 - (void) removeGenerateAiMeetingRequestListener:(HwGenerateAiMeetingRequestCallback _Nonnull)callback;
 - (void) removeAllGenerateAiMeetingRequestListeners;
+
+// 请求设备上传健康分析数据，由ai sdk负责监听处理
+- (void)requestHealthAnalysisDataWithCallback:(HwBoolCallback _Nullable)callback;
 
 - (void) addGenerateAiHealthAnalysisRequestListener:(HwGenerateAiHealthAnalysisRequestCallback _Nonnull)callback;
 - (void) removeGenerateAiHealthAnalysisRequestListener:(HwGenerateAiHealthAnalysisRequestCallback _Nonnull)callback;

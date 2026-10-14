@@ -1,1 +1,1 @@
-/Users/sujiang/Projects/sdkdemo/Vendor/HwBluetoothSDK/HwBluetoothSDK.framework/Headers/HwGoalValue.h
+../../HwBluetoothSDK.framework/Headers/HwGoalValue.h

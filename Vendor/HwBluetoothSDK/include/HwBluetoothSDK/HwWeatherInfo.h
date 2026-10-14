@@ -1,1 +1,1 @@
-/Users/sujiang/Projects/sdkdemo/Vendor/HwBluetoothSDK/HwBluetoothSDK.framework/Headers/HwWeatherInfo.h
+../../HwBluetoothSDK.framework/Headers/HwWeatherInfo.h

@@ -111,6 +111,9 @@
 - (void) removeGenerateAiMeetingRequestListener:(HwGenerateAiMeetingRequestCallback _Nonnull)callback;
 - (void) removeAllGenerateAiMeetingRequestListeners;
 
+// 请求设备上传健康分析数据，由ai sdk负责监听处理
+- (void)requestHealthAnalysisDataWithCallback:(HwBoolCallback _Nullable)callback;
+
 - (void) addGenerateAiHealthAnalysisRequestListener:(HwGenerateAiHealthAnalysisRequestCallback _Nonnull)callback;
 - (void) removeGenerateAiHealthAnalysisRequestListener:(HwGenerateAiHealthAnalysisRequestCallback _Nonnull)callback;
 - (void) removeAllGenerateAiHealthAnalysisRequestListeners;

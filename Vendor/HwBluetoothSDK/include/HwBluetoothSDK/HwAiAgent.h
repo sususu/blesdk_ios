@@ -1,1 +1,1 @@
-/Users/sujiang/Projects/sdkdemo/Vendor/HwBluetoothSDK/HwBluetoothSDK.framework/Headers/HwAiAgent.h
+../../HwBluetoothSDK.framework/Headers/HwAiAgent.h

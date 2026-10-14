@@ -1,1 +1,1 @@
-/Users/sujiang/Projects/sdkdemo/Vendor/HwBluetoothSDK/HwBluetoothSDK.framework/Headers/HwScheduleReminder.h
+../../HwBluetoothSDK.framework/Headers/HwScheduleReminder.h

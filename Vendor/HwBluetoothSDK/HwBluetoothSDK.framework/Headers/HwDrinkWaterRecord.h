@@ -13,6 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic, assign) NSInteger recordId;
 @property(nonatomic, assign) HwDrinkWaterType drinkType;
 @property(nonatomic, assign) NSInteger amount;
+@property(nonatomic, assign) NSTimeInterval time;
 
 + (NSArray<HwDrinkWaterRecord *> *)recordsFromData:(NSData *)data;
 + (NSData *)valueUnitBytesForRecord:(HwDrinkWaterRecord *)record;

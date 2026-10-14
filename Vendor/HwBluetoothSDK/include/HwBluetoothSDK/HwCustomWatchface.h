@@ -1,1 +1,1 @@
-/Users/sujiang/Projects/sdkdemo/Vendor/HwBluetoothSDK/HwBluetoothSDK.framework/Headers/HwCustomWatchface.h
+../../HwBluetoothSDK.framework/Headers/HwCustomWatchface.h

@@ -1,1 +1,1 @@
-/Users/sujiang/Projects/sdkdemo/Vendor/HwBluetoothSDK/HwBluetoothSDK.framework/Headers/HwActivity.h
+../../HwBluetoothSDK.framework/Headers/HwActivity.h

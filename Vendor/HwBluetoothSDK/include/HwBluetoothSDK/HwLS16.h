@@ -1,1 +1,1 @@
-/Users/sujiang/Projects/sdkdemo/Vendor/HwBluetoothSDK/HwBluetoothSDK.framework/Headers/HwLS16.h
+../../HwBluetoothSDK.framework/Headers/HwLS16.h

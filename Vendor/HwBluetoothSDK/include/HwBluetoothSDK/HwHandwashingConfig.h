@@ -1,1 +1,1 @@
-/Users/sujiang/Projects/sdkdemo/Vendor/HwBluetoothSDK/HwBluetoothSDK.framework/Headers/HwHandwashingConfig.h
+../../HwBluetoothSDK.framework/Headers/HwHandwashingConfig.h

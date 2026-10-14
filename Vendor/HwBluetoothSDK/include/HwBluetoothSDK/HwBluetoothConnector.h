@@ -1,1 +1,1 @@
-/Users/sujiang/Projects/sdkdemo/Vendor/HwBluetoothSDK/HwBluetoothSDK.framework/Headers/HwBluetoothConnector.h
+../../HwBluetoothSDK.framework/Headers/HwBluetoothConnector.h

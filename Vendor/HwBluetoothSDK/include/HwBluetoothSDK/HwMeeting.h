@@ -1,1 +1,1 @@
-/Users/sujiang/Projects/sdkdemo/Vendor/HwBluetoothSDK/HwBluetoothSDK.framework/Headers/HwMeeting.h
+../../HwBluetoothSDK.framework/Headers/HwMeeting.h

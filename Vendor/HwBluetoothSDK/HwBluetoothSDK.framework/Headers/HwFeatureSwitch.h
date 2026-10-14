@@ -42,7 +42,8 @@ typedef NS_ENUM(NSInteger, HwFeatureSwitchType) {
     HwFeatureSwitchTypeMonitorBloodPressure = 0x1A, /*血压检测开关 [Monitor Blood Pressure switch] */
     HwFeatureSwitchTypeMovementNotify = 0x1B, /*机芯表盘勿扰开关 [Movement Watch Notify switch] */
     HwFeatureSwitchTypeAlwaysOnDisplay = 0x1C, /* 息屏显示 */
-    HwFeatureSwitchTypeSpO2Switch = 0x1D
+    HwFeatureSwitchTypeSpO2Switch = 0x1D,
+    HwFeatureSwitchTypeLowBatteryReminder = 0x1F /* 低电量提醒开关 [low battery reminder] */
 };
 
 @interface HwFeatureSwitch : NSObject

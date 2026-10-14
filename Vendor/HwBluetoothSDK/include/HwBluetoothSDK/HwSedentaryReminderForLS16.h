@@ -1,1 +1,1 @@
-/Users/sujiang/Projects/sdkdemo/Vendor/HwBluetoothSDK/HwBluetoothSDK.framework/Headers/HwSedentaryReminderForLS16.h
+../../HwBluetoothSDK.framework/Headers/HwSedentaryReminderForLS16.h

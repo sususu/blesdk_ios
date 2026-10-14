@@ -1,1 +1,1 @@
-/Users/sujiang/Projects/sdkdemo/Vendor/HwBluetoothSDK/HwBluetoothSDK.framework/Headers/HwLocalizeTimeZone.h
+../../HwBluetoothSDK.framework/Headers/HwLocalizeTimeZone.h

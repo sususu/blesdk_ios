@@ -1,1 +1,1 @@
-/Users/sujiang/Projects/sdkdemo/Vendor/HwBluetoothSDK/HwBluetoothSDK.framework/Headers/HwSocialApp.h
+../../HwBluetoothSDK.framework/Headers/HwSocialApp.h

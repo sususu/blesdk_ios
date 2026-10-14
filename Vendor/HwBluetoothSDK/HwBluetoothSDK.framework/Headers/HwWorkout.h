@@ -506,8 +506,8 @@ typedef NS_ENUM(NSInteger, HwWorkoutType)
 @property(nonatomic, assign) NSUInteger actionRate;
 @property(nonatomic, assign) NSUInteger maxConsecutiveActionCount;
 @property(nonatomic, assign) NSUInteger interruptActionCount;
-@property(nonatomic, assign) NSUInteger actualDuration1;
-@property(nonatomic, assign) NSUInteger actualDuration2;
+@property(nonatomic, assign) double actualDuration1; // 秒，拉桨时间保留小数
+@property(nonatomic, assign) double actualDuration2; // 秒，回桨时间保留小数
 @property(nonatomic, assign) NSUInteger actualDuration3;
 @property(nonatomic, assign) NSUInteger aerobicTrainingEffect;
 @property(nonatomic, assign) NSUInteger anaerobicTrainingEffect;

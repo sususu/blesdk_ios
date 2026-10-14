@@ -1,1 +1,1 @@
-/Users/sujiang/Projects/sdkdemo/Vendor/HwBluetoothSDK/HwBluetoothSDK.framework/Headers/HwBluetoothCenter+Sport.h
+../../HwBluetoothSDK.framework/Headers/HwBluetoothCenter+Sport.h

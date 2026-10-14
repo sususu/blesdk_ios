@@ -84,6 +84,19 @@ extern NSString *HwBluetoothDeviceReadyNotification;
 @property(nonatomic, copy) NSString *macAddress;
 @property(nonatomic, copy) NSString *uuid;
 
+/** 华沃厂商标识，默认 0；协议 0x5057 */
+@property(nonatomic, assign, readonly) NSInteger manufacturerId;
+/** 产品类型：0x01 无屏手环，0x02 运动手表；解析不到为 0 */
+@property(nonatomic, assign, readonly) NSInteger productType;
+/** 产品型号；解析不到为 0 */
+@property(nonatomic, assign, readonly) NSInteger productModel;
+/** 厂商广播中的充电状态；解析不到为 NO */
+@property(nonatomic, assign, readonly) BOOL charging;
+/** 厂商广播电量 0~100；解析不到为 0 */
+@property(nonatomic, assign, readonly) NSInteger batteryLevel;
+/** 是否解析到有效的华沃厂商广播 */
+@property(nonatomic, assign, readonly) BOOL hasManufacturerAdvertise;
+
 // 如果peripheral的名字为null。返回也为nil
 + (HwBluetoothDevice *) deviceWithPeripheral:(CBPeripheral *)peripheral
                                         rssi:(NSNumber *)rssi
@@ -106,6 +119,10 @@ extern NSString *HwBluetoothDeviceReadyNotification;
 - (void) updateWithPeripheral:(CBPeripheral *)peripheral
                          rssi:(NSNumber *)rssi
             advertisementData:(NSDictionary<NSString *, id> *)advertisementData;
+
+/// 多次扫描回调合并广播。新包没有厂商数据时保留旧的，避免充电状态被第一次空包盖掉。
+- (void) mergeAdvertisementData:(NSDictionary<NSString *, id> *)advertisementData
+                           rssi:(NSNumber *)rssi;
 
 - (void) updateMac:(NSString *)mac
               rssi:(NSNumber *)rssi;

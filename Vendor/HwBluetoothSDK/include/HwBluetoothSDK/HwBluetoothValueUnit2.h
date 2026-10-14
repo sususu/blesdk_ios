@@ -1,1 +1,1 @@
-/Users/sujiang/Projects/sdkdemo/Vendor/HwBluetoothSDK/HwBluetoothSDK.framework/Headers/HwBluetoothValueUnit2.h
+../../HwBluetoothSDK.framework/Headers/HwBluetoothValueUnit2.h

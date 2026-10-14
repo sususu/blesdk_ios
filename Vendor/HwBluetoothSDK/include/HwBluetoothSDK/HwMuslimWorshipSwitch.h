@@ -1,1 +1,1 @@
-/Users/sujiang/Projects/sdkdemo/Vendor/HwBluetoothSDK/HwBluetoothSDK.framework/Headers/HwMuslimWorshipSwitch.h
+../../HwBluetoothSDK.framework/Headers/HwMuslimWorshipSwitch.h

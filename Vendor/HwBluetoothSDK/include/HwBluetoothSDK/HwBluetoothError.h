@@ -1,1 +1,1 @@
-/Users/sujiang/Projects/sdkdemo/Vendor/HwBluetoothSDK/HwBluetoothSDK.framework/Headers/HwBluetoothError.h
+../../HwBluetoothSDK.framework/Headers/HwBluetoothError.h

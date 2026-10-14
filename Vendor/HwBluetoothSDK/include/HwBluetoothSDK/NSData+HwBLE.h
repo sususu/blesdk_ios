@@ -1,1 +1,1 @@
-/Users/sujiang/Projects/sdkdemo/Vendor/HwBluetoothSDK/HwBluetoothSDK.framework/Headers/NSData+HwBLE.h
+../../HwBluetoothSDK.framework/Headers/NSData+HwBLE.h

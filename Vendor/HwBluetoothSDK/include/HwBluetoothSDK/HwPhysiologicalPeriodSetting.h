@@ -1,1 +1,1 @@
-/Users/sujiang/Projects/sdkdemo/Vendor/HwBluetoothSDK/HwBluetoothSDK.framework/Headers/HwPhysiologicalPeriodSetting.h
+../../HwBluetoothSDK.framework/Headers/HwPhysiologicalPeriodSetting.h

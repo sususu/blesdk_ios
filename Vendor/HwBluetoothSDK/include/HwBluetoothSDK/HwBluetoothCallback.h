@@ -1,1 +1,1 @@
-/Users/sujiang/Projects/sdkdemo/Vendor/HwBluetoothSDK/HwBluetoothSDK.framework/Headers/HwBluetoothCallback.h
+../../HwBluetoothSDK.framework/Headers/HwBluetoothCallback.h

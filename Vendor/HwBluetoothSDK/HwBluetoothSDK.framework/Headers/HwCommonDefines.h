@@ -19,6 +19,7 @@
 @class HwPAI;
 @class HwVO2max;
 @class HwBodyState;
+@class HwStanding;
 /**
  扫描设备，发现设备的回调，
  如果NSError不为空，说明扫描设备出现错误
@@ -58,6 +59,7 @@ typedef void (^HwDevicePasscodeCallback)(BOOL b, NSError *error, NSString *passc
 typedef void (^HwPAIsCallback)(NSArray<HwPAI *> * _Nullable paiArr, NSError *_Nullable error);
 typedef void (^HwVO2maxsCallback)(NSArray<HwVO2max *> * _Nullable vo2maxArr, NSError *_Nullable error);
 typedef void (^HwBodyStateCallback)(HwBodyState * _Nullable bodyState, NSError *_Nullable error);
+typedef void (^HwStandingDatasCallback)(NSArray<HwStanding *> * _Nullable standingDatas, NSError *_Nullable error);
 /**
  完成初始化
  扫描完成服务和特征之后

@@ -1,1 +1,1 @@
-/Users/sujiang/Projects/sdkdemo/Vendor/HwBluetoothSDK/HwBluetoothSDK.framework/Headers/HwHeartrateFatigue.h
+../../HwBluetoothSDK.framework/Headers/HwHeartrateFatigue.h

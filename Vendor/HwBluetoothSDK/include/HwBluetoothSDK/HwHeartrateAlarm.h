@@ -1,1 +1,1 @@
-/Users/sujiang/Projects/sdkdemo/Vendor/HwBluetoothSDK/HwBluetoothSDK.framework/Headers/HwHeartrateAlarm.h
+../../HwBluetoothSDK.framework/Headers/HwHeartrateAlarm.h

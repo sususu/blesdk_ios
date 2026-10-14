@@ -1,1 +1,1 @@
-/Users/sujiang/Projects/sdkdemo/Vendor/HwBluetoothSDK/HwBluetoothSDK.framework/Headers/HwMultipleFileTransferModel.h
+../../HwBluetoothSDK.framework/Headers/HwMultipleFileTransferModel.h

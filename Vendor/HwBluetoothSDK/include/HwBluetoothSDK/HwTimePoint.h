@@ -1,1 +1,1 @@
-/Users/sujiang/Projects/sdkdemo/Vendor/HwBluetoothSDK/HwBluetoothSDK.framework/Headers/HwTimePoint.h
+../../HwBluetoothSDK.framework/Headers/HwTimePoint.h

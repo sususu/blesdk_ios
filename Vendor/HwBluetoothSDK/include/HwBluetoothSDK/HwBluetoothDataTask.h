@@ -1,1 +1,1 @@
-/Users/sujiang/Projects/sdkdemo/Vendor/HwBluetoothSDK/HwBluetoothSDK.framework/Headers/HwBluetoothDataTask.h
+../../HwBluetoothSDK.framework/Headers/HwBluetoothDataTask.h

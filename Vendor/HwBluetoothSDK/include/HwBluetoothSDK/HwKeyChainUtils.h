@@ -1,1 +1,1 @@
-/Users/sujiang/Projects/sdkdemo/Vendor/HwBluetoothSDK/HwBluetoothSDK.framework/Headers/HwKeyChainUtils.h
+../../HwBluetoothSDK.framework/Headers/HwKeyChainUtils.h

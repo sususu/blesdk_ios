@@ -49,6 +49,12 @@
 "jieli_sport_detail_value" = "卡路里：%d  时长：%d 分钟  平均心率：%d bpm\n时间：%@";
 "jieli_get_stress" = "读取压力数据";
 "jieli_get_blood_oxygen" = "读取血氧数据";
+"jieli_get_skin_temperature" = "读取皮肤温度";
+"jieli_get_breaths" = "读取呼吸频率";
+"jieli_skin_temperature_value" = "皮肤温度：%.1f ℃";
+"jieli_breaths_value" = "呼吸频率：%d 次/分钟";
+"jieli_delete_skin_temperature" = "删除皮肤温度";
+"jieli_delete_breaths" = "删除呼吸频率";
 "jieli_get_sport_detail" = "读取运动明细";
 "jieli_get_workouts" = "读取 Workout 数据";
 "jieli_workout_value" = "类型：%d  步数：%d  距离：%d 米";

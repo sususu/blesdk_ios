@@ -49,6 +49,12 @@
 "jieli_sport_detail_value" = "Calories: %d  Duration: %d min  Avg HR: %d bpm\nTime: %@";
 "jieli_get_stress" = "Read Stress Data";
 "jieli_get_blood_oxygen" = "Read Blood Oxygen Data";
+"jieli_get_skin_temperature" = "Read Skin Temperature Data";
+"jieli_get_breaths" = "Read Respiratory Rate Data";
+"jieli_skin_temperature_value" = "Skin temperature: %.1f °C";
+"jieli_breaths_value" = "Respiratory rate: %d breaths/min";
+"jieli_delete_skin_temperature" = "Delete Skin Temperature Data";
+"jieli_delete_breaths" = "Delete Respiratory Rate Data";
 "jieli_get_sport_detail" = "Read Sport Details";
 "jieli_get_workouts" = "Read Workout Data";
 "jieli_workout_value" = "Type: %d  Steps: %d  Distance: %d m";

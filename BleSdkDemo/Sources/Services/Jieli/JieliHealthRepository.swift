@@ -34,6 +34,18 @@ final class JieliHealthRepository {
         }
     }
 
+    func getSkinTemperature(completion: @escaping (Result<[Any], Error>) -> Void) {
+        center.getSkinTemperatureBigData { list, error in
+            Self.complete(list, error: error, completion: completion)
+        }
+    }
+
+    func getBreaths(completion: @escaping (Result<[Any], Error>) -> Void) {
+        center.getBreathsBigData { list, error in
+            Self.complete(list, error: error, completion: completion)
+        }
+    }
+
     func getSportDetail(completion: @escaping (Result<[Any], Error>) -> Void) {
         center.getSportDetailBigData { list, error in
             Self.complete(list, error: error, completion: completion)
@@ -66,6 +78,18 @@ final class JieliHealthRepository {
 
     func deleteBloodOxygen(completion: @escaping (Result<Void, Error>) -> Void) {
         center.deleteBloodOxygen { success, error in
+            Self.completeDelete(success, error: error, completion: completion)
+        }
+    }
+
+    func deleteSkinTemperature(completion: @escaping (Result<Void, Error>) -> Void) {
+        center.delSkinTemperatureBigData { success, error in
+            Self.completeDelete(success, error: error, completion: completion)
+        }
+    }
+
+    func deleteBreaths(completion: @escaping (Result<Void, Error>) -> Void) {
+        center.delBreathsBigData { success, error in
             Self.completeDelete(success, error: error, completion: completion)
         }
     }

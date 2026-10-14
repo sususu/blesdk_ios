@@ -20,12 +20,16 @@ final class JieliHealthSyncViewController: UIViewController {
         ActionItem(titleKey: "jieli_get_heart_rate", action: { [weak self] in self?.getHeartRate() }),
         ActionItem(titleKey: "jieli_get_stress", action: { [weak self] in self?.getStress() }),
         ActionItem(titleKey: "jieli_get_blood_oxygen", action: { [weak self] in self?.getBloodOxygen() }),
+        ActionItem(titleKey: "jieli_get_breaths", action: { [weak self] in self?.getBreaths() }),
+        ActionItem(titleKey: "jieli_get_skin_temperature", action: { [weak self] in self?.getSkinTemperature() }),
         ActionItem(titleKey: "jieli_get_sport_detail", action: { [weak self] in self?.getSportDetail() }),
         ActionItem(titleKey: "jieli_get_workouts", action: { [weak self] in self?.getWorkouts() }),
         ActionItem(titleKey: "jieli_delete_sleep", action: { [weak self] in self?.confirmDelete(titleKey: "jieli_delete_sleep", operation: self?.repo.deleteSleep) }),
         ActionItem(titleKey: "jieli_delete_heart_rate", action: { [weak self] in self?.confirmDelete(titleKey: "jieli_delete_heart_rate", operation: self?.repo.deleteHeartRate) }),
         ActionItem(titleKey: "jieli_delete_stress", action: { [weak self] in self?.confirmDelete(titleKey: "jieli_delete_stress", operation: self?.repo.deleteStress) }),
         ActionItem(titleKey: "jieli_delete_blood_oxygen", action: { [weak self] in self?.confirmDelete(titleKey: "jieli_delete_blood_oxygen", operation: self?.repo.deleteBloodOxygen) }),
+        ActionItem(titleKey: "jieli_delete_breaths", action: { [weak self] in self?.confirmDelete(titleKey: "jieli_delete_breaths", operation: self?.repo.deleteBreaths) }),
+        ActionItem(titleKey: "jieli_delete_skin_temperature", action: { [weak self] in self?.confirmDelete(titleKey: "jieli_delete_skin_temperature", operation: self?.repo.deleteSkinTemperature) }),
         ActionItem(titleKey: "jieli_delete_sport_detail", action: { [weak self] in self?.confirmDelete(titleKey: "jieli_delete_sport_detail", operation: self?.repo.deleteSportDetail) }),
         ActionItem(titleKey: "jieli_delete_workouts", action: { [weak self] in self?.confirmDelete(titleKey: "jieli_delete_workouts", operation: self?.repo.deleteWorkouts) })
     ]
@@ -175,6 +179,44 @@ final class JieliHealthSyncViewController: UIViewController {
         )
     }
 
+    private func getSkinTemperature() {
+        request(
+            title: L10n.tr("jieli_get_skin_temperature"),
+            operation: repo.getSkinTemperature,
+            map: { [weak self] list in
+                guard let self = self else { return [] }
+                return list.compactMap { $0 as? HwTemperature }
+                    .sorted { $0.time > $1.time }
+                    .enumerated().map { offset, item in
+                        ResultRow(
+                            index: offset + 1,
+                            title: L10n.tr("jieli_skin_temperature_value", Double(item.temperature)),
+                            detail: L10n.tr("jieli_data_time", self.formatTime(item.time))
+                        )
+                    }
+            }
+        )
+    }
+
+    private func getBreaths() {
+        request(
+            title: L10n.tr("jieli_get_breaths"),
+            operation: repo.getBreaths,
+            map: { [weak self] list in
+                guard let self = self else { return [] }
+                return list.compactMap { $0 as? HwBreaths }
+                    .sorted { $0.time > $1.time }
+                    .enumerated().map { offset, item in
+                        ResultRow(
+                            index: offset + 1,
+                            title: L10n.tr("jieli_breaths_value", Int(item.rpmVal)),
+                            detail: L10n.tr("jieli_data_time", self.formatTime(item.time))
+                        )
+                    }
+            }
+        )
+    }
+
     private func getSportDetail() {
         request(
             title: L10n.tr("jieli_get_sport_detail"),
@@ -310,6 +352,7 @@ final class JieliHealthSyncViewController: UIViewController {
     }
 
     private func formatTime(_ timestamp: TimeInterval) -> String {
+        // BigData skin temperature and respiratory rate timestamps are seconds.
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
         return formatter.string(from: Date(timeIntervalSince1970: timestamp))

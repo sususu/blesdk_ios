@@ -518,3 +518,26 @@
 "jieli_measure_rejected" = "设备未确认开始测量";
 "jieli_measure_stop_failed" = "未确认停止，请再次点击停止测量";
 "jieli_measure_background" = "进入后台，测量已停止";
+
+/* Jieli reminder settings */
+"jieli_low_battery" = "低电量提醒";
+"jieli_vibration" = "震动开关／强度";
+"jieli_auto_workout" = "自动识别锻炼";
+"jieli_auto_workout_note" = "控制 App 的锻炼识别提示。首页和本页收到设备识别事件时弹出提示。";
+"jieli_current_setting" = "当前设置：%@";
+"jieli_vibration_current" = "震动：%@，强度：%d";
+"jieli_vibration_weak" = "弱（33）";
+"jieli_vibration_medium" = "中（66）";
+"jieli_vibration_strong" = "强（99）";
+"jieli_settings_reading" = "正在读取设备设置…";
+"jieli_settings_saving" = "正在保存设备设置…";
+"jieli_settings_empty" = "设备未返回震动设置";
+"jieli_vibration_invalid" = "震动强度应在 0～100 之间";
+"jieli_detect_walking" = "设备识别到步行";
+"jieli_detect_running" = "设备识别到跑步";
+"jieli_detect_cycling" = "设备识别到骑行";
+"jieli_detect_elliptical" = "设备识别到椭圆机锻炼";
+"jieli_detect_rowing" = "设备识别到划船机锻炼";
+"jieli_detect_ignore" = "忽略";
+"jieli_detect_not_today" = "今天不再提示";
+"jieli_detect_disable" = "关闭自动识别提示";

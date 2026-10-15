@@ -5,6 +5,7 @@ import UIKit
 /// Bind / sync / unbind entry points live in the Actions section below and present
 /// `BindFlowViewController` / `UnbindFlowViewController` or call `syncHealthData`.
 final class HomeViewController: UIViewController {
+    private var recognitionCallback: HwWorkoutTypeRecognitionCallback?
     private let repo = BleRepository.shared
 
     private var phase: DevicePhase = .idle
@@ -32,9 +33,40 @@ final class HomeViewController: UIViewController {
         setupUI()
         applyLocalizedChrome()
         bootstrap()
+        let recognition: HwWorkoutTypeRecognitionCallback = { [weak self] category in
+            DispatchQueue.main.async { self?.showWorkoutRecognition(Int(category)) }
+        }
+        recognitionCallback = recognition
+        HwBluetoothSDK.sharedInstance().addWorkoutTypeRecognitionCallback(recognition)
         repo.addConnectionHandler { [weak self] event in
             self?.handleConnection(event)
         }
+    }
+
+    deinit {
+        if let recognitionCallback {
+            HwBluetoothSDK.sharedInstance().removeWorkoutTypeRecognitionCallback(recognitionCallback)
+        }
+    }
+
+    private func showWorkoutRecognition(_ category: Int) {
+        let settings = JieliAlarmRepository.shared
+        guard settings.canPromptWorkout, repo.isConnected(), !busy,
+              UIApplication.shared.applicationState == .active,
+              let key = JieliAlarmRepository.workoutTitleKey(category),
+              let top = navigationController?.topViewController,
+              (top === self || top is JieliAlarmReminderViewController),
+              top.presentedViewController == nil, top.viewIfLoaded?.window != nil else { return }
+        appendLog(L10n.tr(key))
+        let alert = UIAlertController(title: L10n.tr("jieli_auto_workout"), message: L10n.tr(key), preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: L10n.tr("jieli_detect_ignore"), style: .cancel))
+        alert.addAction(UIAlertAction(title: L10n.tr("jieli_detect_not_today"), style: .default) { _ in
+            settings.muteWorkoutToday()
+        })
+        alert.addAction(UIAlertAction(title: L10n.tr("jieli_detect_disable"), style: .destructive) { _ in
+            settings.autoDetectWorkouts = false
+        })
+        top.present(alert, animated: true)
     }
 
     private func setupUI() {

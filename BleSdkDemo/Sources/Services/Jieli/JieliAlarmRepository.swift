@@ -24,6 +24,77 @@ final class JieliAlarmRepository {
 
     private init() {}
 
+    private let sdk = HwBluetoothSDK.sharedInstance()
+    private let workoutEnabledKey = "blesdkdemo.workout.recognition.enabled"
+    private let workoutMutedKey = "blesdkdemo.workout.recognition.mutedDate"
+
+    // As in hawofit, recognition notifications are controlled locally, not on the device.
+    var autoDetectWorkouts: Bool {
+        get { UserDefaults.standard.object(forKey: workoutEnabledKey) as? Bool ?? true }
+        set { UserDefaults.standard.set(newValue, forKey: workoutEnabledKey) }
+    }
+
+    var canPromptWorkout: Bool {
+        guard autoDetectWorkouts else { return false }
+        guard let muted = UserDefaults.standard.object(forKey: workoutMutedKey) as? Date else { return true }
+        return !Calendar.current.isDateInToday(muted)
+    }
+
+    func muteWorkoutToday() { UserDefaults.standard.set(Date(), forKey: workoutMutedKey) }
+
+    func resetWorkoutPreferences() {
+        UserDefaults.standard.removeObject(forKey: workoutEnabledKey)
+        UserDefaults.standard.removeObject(forKey: workoutMutedKey)
+    }
+
+    static func workoutTitleKey(_ category: Int) -> String? {
+        switch category {
+        case 1: return "jieli_detect_walking"
+        case 2: return "jieli_detect_running"
+        case 3: return "jieli_detect_cycling"
+        case 4: return "jieli_detect_elliptical"
+        case 5: return "jieli_detect_rowing"
+        default: return nil
+        }
+    }
+
+    func getLowBatteryReminder(completion: @escaping (Result<Bool, Error>) -> Void) {
+        sdk.getLowBatteryReminderSwitch { on, error in
+            Self.finish(error.map { .failure($0) } ?? .success(on), completion: completion)
+        }
+    }
+
+    func setLowBatteryReminder(_ on: Bool, completion: @escaping (Result<Void, Error>) -> Void) {
+        sdk.setLowBatteryReminderSwitch(on) { success, error in
+            Self.finishBoolean(success, error: error, completion: completion)
+        }
+    }
+
+    func getVibration(completion: @escaping (Result<HwVibrationSettings, Error>) -> Void) {
+        sdk.getVibrationSettings { settings, error in
+            if let error {
+                Self.finish(.failure(error), completion: completion)
+            } else if let settings {
+                Self.finish(.success(settings), completion: completion)
+            } else {
+                Self.finish(.failure(SdkError(code: -1, message: L10n.tr("jieli_settings_empty"))), completion: completion)
+            }
+        }
+    }
+
+    func setVibration(on: Bool, intensity: Int, completion: @escaping (Result<Void, Error>) -> Void) {
+        guard (0...100).contains(intensity) else {
+            Self.finish(.failure(SdkError(code: -1, message: L10n.tr("jieli_vibration_invalid"))), completion: completion)
+            return
+        }
+        let settings = HwVibrationSettings()
+        settings.isOn = on
+        settings.intensity = intensity
+        sdk.setVibrationSettings(settings) { success, error in
+            Self.finishBoolean(success, error: error, completion: completion)
+        }
+    }
+
     // MARK: - Read
 
     /// Queries the device count first, then fetches exactly that many alarms.

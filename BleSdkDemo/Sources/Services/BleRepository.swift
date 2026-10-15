@@ -187,7 +187,10 @@ final class BleRepository {
     }
 
     /// Clears the locally persisted bound-device record (typically after unbind).
-    func clearBoundDevice() { store.clear() }
+    func clearBoundDevice() {
+        store.clear()
+        JieliAlarmRepository.shared.resetWorkoutPreferences()
+    }
 
     // MARK: - Scan / Connect
 

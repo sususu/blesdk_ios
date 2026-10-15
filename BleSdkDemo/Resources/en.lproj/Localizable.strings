@@ -518,3 +518,26 @@
 "jieli_measure_rejected" = "The device did not confirm measurement start";
 "jieli_measure_stop_failed" = "Stop was not confirmed. Tap Stop again.";
 "jieli_measure_background" = "Measurement stopped when entering the background";
+
+/* Jieli reminder settings */
+"jieli_low_battery" = "Low Battery Reminder";
+"jieli_vibration" = "Vibration / Intensity";
+"jieli_auto_workout" = "Auto-detect Workouts";
+"jieli_auto_workout_note" = "Controls workout recognition prompts in the app. Prompts appear on Home and this page when the device reports a recognized workout.";
+"jieli_current_setting" = "Current setting: %@";
+"jieli_vibration_current" = "Vibration: %@, intensity: %d";
+"jieli_vibration_weak" = "Weak (33)";
+"jieli_vibration_medium" = "Medium (66)";
+"jieli_vibration_strong" = "Strong (99)";
+"jieli_settings_reading" = "Reading device settings…";
+"jieli_settings_saving" = "Saving device settings…";
+"jieli_settings_empty" = "The device returned no vibration settings";
+"jieli_vibration_invalid" = "Vibration intensity must be between 0 and 100";
+"jieli_detect_walking" = "Walking detected by the device";
+"jieli_detect_running" = "Running detected by the device";
+"jieli_detect_cycling" = "Cycling detected by the device";
+"jieli_detect_elliptical" = "Elliptical training detected by the device";
+"jieli_detect_rowing" = "Rowing machine workout detected by the device";
+"jieli_detect_ignore" = "Ignore";
+"jieli_detect_not_today" = "Not Today";
+"jieli_detect_disable" = "Disable Recognition Prompts";

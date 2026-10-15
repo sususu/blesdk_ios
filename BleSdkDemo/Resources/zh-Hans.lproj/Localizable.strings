@@ -541,3 +541,9 @@
 "jieli_detect_ignore" = "忽略";
 "jieli_detect_not_today" = "今天不再提示";
 "jieli_detect_disable" = "关闭自动识别提示";
+
+/* Jieli auto monitoring */
+"jieli_auto_monitor" = "自动监测（杰里）";
+"jieli_monitor_every" = "已开启，每 %d 分钟检测一次";
+"jieli_monitor_invalid_interval" = "设备返回的检测间隔无效";
+"jieli_monitor_note" = "开关读取设备实际设置；读取失败的项目可点击右上角刷新重试。开启心率检测为每 5 分钟一次，皮肤温度与呼吸频率为每 60 分钟一次。保存失败会恢复原状态。";

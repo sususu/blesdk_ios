@@ -541,3 +541,9 @@
 "jieli_detect_ignore" = "Ignore";
 "jieli_detect_not_today" = "Not Today";
 "jieli_detect_disable" = "Disable Recognition Prompts";
+
+/* Jieli auto monitoring */
+"jieli_auto_monitor" = "Auto Monitoring (Jieli)";
+"jieli_monitor_every" = "On, every %d minutes";
+"jieli_monitor_invalid_interval" = "The device returned an invalid monitoring interval";
+"jieli_monitor_note" = "Switches show device settings. Tap Refresh to retry failed reads. Enabling heart rate uses a 5-minute interval; skin temperature and respiratory rate use 60 minutes. Failed saves restore the previous state.";

@@ -201,6 +201,11 @@ final class HomeViewController: UIViewController {
         measure.addTarget(self, action: #selector(tapJieliMeasure), for: .touchUpInside)
         content.addArrangedSubview(measure)
         actionButtons.append(measure)
+
+        let monitor = UIHelpers.makeButton("")
+        monitor.addTarget(self, action: #selector(tapJieliAutoMonitor), for: .touchUpInside)
+        content.addArrangedSubview(monitor)
+        actionButtons.append(monitor)
         _ = featureActions
     }
 
@@ -237,7 +242,7 @@ final class HomeViewController: UIViewController {
             L10n.tr("goals"), L10n.tr("alarms"), L10n.tr("jieli_alarms"),
             L10n.tr("notify"), L10n.tr("music"), L10n.tr("album"), L10n.tr("agps"), L10n.tr("ota"),
             L10n.tr("jieli_ota"), L10n.tr("watchface"), L10n.tr("watchface_jieli"),
-            L10n.tr("ai_section"), L10n.tr("jieli_manual_measure")
+            L10n.tr("ai_section"), L10n.tr("jieli_manual_measure"), L10n.tr("jieli_auto_monitor")
         ]
         for (i, t) in titles.enumerated() where i < actionButtons.count {
             actionButtons[i].setTitle(t, for: .normal)
@@ -457,6 +462,11 @@ final class HomeViewController: UIViewController {
             appendLog(L10n.tr("error_no_device_to_sync"))
             refreshUI()
         }
+    }
+
+    @objc private func tapJieliAutoMonitor() {
+        guard requireConnectedFeature() else { return }
+        navigationController?.pushViewController(JieliAutoMonitorViewController(), animated: true)
     }
 
     @objc private func tapJieliMeasure() {

@@ -547,3 +547,25 @@
 "jieli_monitor_every" = "已开启，每 %d 分钟检测一次";
 "jieli_monitor_invalid_interval" = "设备返回的检测间隔无效";
 "jieli_monitor_note" = "开关读取设备实际设置；读取失败的项目可点击右上角刷新重试。开启心率检测为每 5 分钟一次，皮肤温度与呼吸频率为每 60 分钟一次。保存失败会恢复原状态。";
+
+/* AI analysis */
+"ai_analysis_section" = "AI 分析";
+"ai_analysis_exercise" = "运动健康分析";
+"ai_analysis_insight" = "AI 洞察";
+"ai_analysis_body" = "身体状态";
+"ai_analysis_sleep_day" = "AI 睡眠（天）";
+"ai_analysis_sleep_week" = "AI 睡眠（周）";
+"ai_analysis_sleep_month" = "AI 睡眠（月）";
+"ai_analysis_mock_note" = "使用模拟健康数据调用真实 AI 服务。结果用于接口演示。需要已连接且具备 AI 授权的设备；OAS 渠道参数仅用于当前页面，不保存。";
+"ai_analysis_input" = "查看模拟输入";
+"ai_analysis_generate" = "生成 AI 分析";
+"ai_analysis_generating" = "正在请求真实 AI 分析…";
+"ai_analysis_need_channel" = "请填写 OAS Channel ID 和 App Key";
+"ai_analysis_need_device" = "无法获取真实设备 ID";
+"ai_analysis_timeout" = "AI 请求超时，请重试";
+"ai_analysis_empty" = "AI 返回结果为空";
+"ai_analysis_cancelled" = "已退出分析页面";
+"ai_analysis_reminder" = "提醒类别：%d";
+"ai_analysis_mock_exercise" = "最近 7 天：每日约 7000～8200 步，心率 55/140/72 bpm，血氧 95/99/97%，压力 20/55/32，睡眠 475 分钟。模拟基础资料：30 岁、175 cm、70 kg。";
+"ai_analysis_mock_insight" = "最近 7 天：步数 8200/7600/9100/6300/8500/7200/8800；活动 55/45/62/35/58/42/60 分钟，并包含热量、心情、心率、HRV、压力及睡眠。目标 8000 步／60 分钟／350 kcal。所有每日数组按从近到远排列。";
+"ai_analysis_mock_body" = "当天：8200 步、活动 55 分钟、360 kcal；6 小时段心率／静息心率／HRV／压力；睡眠 475 分钟（浅睡 250、深睡 110），睡眠评分 88。";

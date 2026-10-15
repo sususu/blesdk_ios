@@ -47,6 +47,13 @@ final class AiHostViewController: UIViewController {
         content.addArrangedSubview(demo)
         actionButtons.append(demo)
 
+        content.addArrangedSubview(UIHelpers.makeLabel(L10n.tr("ai_analysis_section"), style: .headline))
+        for kind in AiAnalysisViewController.Kind.allCases {
+            let button = UIHelpers.makeButton(L10n.tr(kind.titleKey))
+            button.tag = kind.rawValue
+            button.addTarget(self, action: #selector(tapAnalysis(_:)), for: .touchUpInside)
+            content.addArrangedSubview(button)
+        }
         applyLocalizedChrome()
     }
 
@@ -60,6 +67,11 @@ final class AiHostViewController: UIViewController {
         for (i, t) in titles.enumerated() where i < actionButtons.count {
             actionButtons[i].setTitle(t, for: .normal)
         }
+    }
+
+    @objc private func tapAnalysis(_ sender: UIButton) {
+        guard let kind = AiAnalysisViewController.Kind(rawValue: sender.tag) else { return }
+        navigationController?.pushViewController(AiAnalysisViewController(kind: kind), animated: true)
     }
 
     @objc private func tapGuide() {

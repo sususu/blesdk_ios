@@ -13,8 +13,6 @@
 		22A434D7817C3ABFCE164DA2 /* LocaleHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = D641DF46CA811EC15937CA3B /* LocaleHelper.swift */; };
 		22C33A9279D5EA3A3CBD2212 /* HomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF973DBBA57A72AE5FA132E6 /* HomeViewController.swift */; };
 		22C33A9279D5EA3A3CBD2213 /* JieliHealthSyncViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF973DBBA57A72AE5FA132E7 /* JieliHealthSyncViewController.swift */; };
-		22C33A9279D5EA3A3CBD2220 /* JieliManualMeasureViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF973DBBA57A72AE5FA132F4 /* JieliManualMeasureViewController.swift */; };
-		22C33A9279D5EA3A3CBD2221 /* JieliAutoMonitorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF973DBBA57A72AE5FA132F5 /* JieliAutoMonitorViewController.swift */; };
 		22C33A9279D5EA3A3CBD2214 /* JieliHealthRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF973DBBA57A72AE5FA132E8 /* JieliHealthRepository.swift */; };
 		22C33A9279D5EA3A3CBD2215 /* JieliAlarmRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF973DBBA57A72AE5FA132E9 /* JieliAlarmRepository.swift */; };
 		22C33A9279D5EA3A3CBD2216 /* JieliAlarmReminderViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF973DBBA57A72AE5FA132EA /* JieliAlarmReminderViewController.swift */; };
@@ -25,6 +23,9 @@
 		22C33A9279D5EA3A3CBD221B /* JieliAiWatchfaceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF973DBBA57A72AE5FA132EF /* JieliAiWatchfaceViewController.swift */; };
 		22C33A9279D5EA3A3CBD221C /* JieliCustomWatchfaceModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF973DBBA57A72AE5FA132F0 /* JieliCustomWatchfaceModels.swift */; };
 		22C33A9279D5EA3A3CBD221D /* JieliWatchfaceImageEncoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF973DBBA57A72AE5FA132F1 /* JieliWatchfaceImageEncoder.swift */; };
+		22C33A9279D5EA3A3CBD2220 /* JieliManualMeasureViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF973DBBA57A72AE5FA132F4 /* JieliManualMeasureViewController.swift */; };
+		22C33A9279D5EA3A3CBD2221 /* JieliAutoMonitorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF973DBBA57A72AE5FA132F5 /* JieliAutoMonitorViewController.swift */; };
+		22C33A9279D5EA3A3CBD2222 /* AiAnalysisViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF973DBBA57A72AE5FA132F6 /* AiAnalysisViewController.swift */; };
 		255E38BE21C4B69BBA9FF1CA /* SifliOtaPusher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E717FEEB44E3BA3EE0B389B /* SifliOtaPusher.swift */; };
 		2ABB1804C393B97C83F072C5 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD34F1A20A84C7AACA9F5217 /* AppDelegate.swift */; };
 		2C076A8A599942B99A769B92 /* OnlineWatchfaceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49B7674D8BD54992BE75ACA4 /* OnlineWatchfaceViewController.swift */; };
@@ -98,8 +99,6 @@
 		CF4B2DF9A98E169FCD7FCF4A /* UIHelpers.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = UIHelpers.swift; path = BleSdkDemo/Sources/UI/Common/UIHelpers.swift; sourceTree = "<group>"; };
 		CF973DBBA57A72AE5FA132E6 /* HomeViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = HomeViewController.swift; path = BleSdkDemo/Sources/UI/Home/HomeViewController.swift; sourceTree = "<group>"; };
 		CF973DBBA57A72AE5FA132E7 /* JieliHealthSyncViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = JieliHealthSyncViewController.swift; path = BleSdkDemo/Sources/UI/Jieli/JieliHealthSyncViewController.swift; sourceTree = "<group>"; };
-		CF973DBBA57A72AE5FA132F4 /* JieliManualMeasureViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = JieliManualMeasureViewController.swift; path = BleSdkDemo/Sources/UI/Jieli/JieliManualMeasureViewController.swift; sourceTree = "<group>"; };
-		CF973DBBA57A72AE5FA132F5 /* JieliAutoMonitorViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = JieliAutoMonitorViewController.swift; path = BleSdkDemo/Sources/UI/Jieli/JieliAutoMonitorViewController.swift; sourceTree = "<group>"; };
 		CF973DBBA57A72AE5FA132E8 /* JieliHealthRepository.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = JieliHealthRepository.swift; path = BleSdkDemo/Sources/Services/Jieli/JieliHealthRepository.swift; sourceTree = "<group>"; };
 		CF973DBBA57A72AE5FA132E9 /* JieliAlarmRepository.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = JieliAlarmRepository.swift; path = BleSdkDemo/Sources/Services/Jieli/JieliAlarmRepository.swift; sourceTree = "<group>"; };
 		CF973DBBA57A72AE5FA132EA /* JieliAlarmReminderViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = JieliAlarmReminderViewController.swift; path = BleSdkDemo/Sources/UI/Jieli/JieliAlarmReminderViewController.swift; sourceTree = "<group>"; };
@@ -110,6 +109,9 @@
 		CF973DBBA57A72AE5FA132EF /* JieliAiWatchfaceViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = JieliAiWatchfaceViewController.swift; path = BleSdkDemo/Sources/UI/Jieli/JieliAiWatchfaceViewController.swift; sourceTree = "<group>"; };
 		CF973DBBA57A72AE5FA132F0 /* JieliCustomWatchfaceModels.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = JieliCustomWatchfaceModels.swift; path = BleSdkDemo/Sources/Models/JieliCustomWatchfaceModels.swift; sourceTree = "<group>"; };
 		CF973DBBA57A72AE5FA132F1 /* JieliWatchfaceImageEncoder.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = JieliWatchfaceImageEncoder.swift; path = BleSdkDemo/Sources/Services/Jieli/JieliWatchfaceImageEncoder.swift; sourceTree = "<group>"; };
+		CF973DBBA57A72AE5FA132F4 /* JieliManualMeasureViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = JieliManualMeasureViewController.swift; path = BleSdkDemo/Sources/UI/Jieli/JieliManualMeasureViewController.swift; sourceTree = "<group>"; };
+		CF973DBBA57A72AE5FA132F5 /* JieliAutoMonitorViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = JieliAutoMonitorViewController.swift; path = BleSdkDemo/Sources/UI/Jieli/JieliAutoMonitorViewController.swift; sourceTree = "<group>"; };
+		CF973DBBA57A72AE5FA132F6 /* AiAnalysisViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AiAnalysisViewController.swift; path = BleSdkDemo/Sources/UI/AI/AiAnalysisViewController.swift; sourceTree = "<group>"; };
 		D4A3290874E6684FE560CA97 /* Assets.xcassets */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder.assetcatalog; name = Assets.xcassets; path = BleSdkDemo/Resources/Assets.xcassets; sourceTree = "<group>"; };
 		D60674E7BC247DD7B39B41FD /* OtaFirmwareApi.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = OtaFirmwareApi.swift; path = BleSdkDemo/Sources/Services/Ota/OtaFirmwareApi.swift; sourceTree = "<group>"; };
 		D641DF46CA811EC15937CA3B /* LocaleHelper.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = LocaleHelper.swift; path = BleSdkDemo/Sources/Services/LocaleHelper.swift; sourceTree = "<group>"; };
@@ -209,6 +211,7 @@
 				CF973DBBA57A72AE5FA132E7 /* JieliHealthSyncViewController.swift */,
 				CF973DBBA57A72AE5FA132F4 /* JieliManualMeasureViewController.swift */,
 				CF973DBBA57A72AE5FA132F5 /* JieliAutoMonitorViewController.swift */,
+				CF973DBBA57A72AE5FA132F6 /* AiAnalysisViewController.swift */,
 				CF973DBBA57A72AE5FA132E8 /* JieliHealthRepository.swift */,
 				CF973DBBA57A72AE5FA132E9 /* JieliAlarmRepository.swift */,
 				CF973DBBA57A72AE5FA132EA /* JieliAlarmReminderViewController.swift */,
@@ -356,6 +359,10 @@
 				"${BUILT_PRODUCTS_DIR}/SSZipArchive/SSZipArchive.framework",
 				"${BUILT_PRODUCTS_DIR}/WatchfaceSDK/WatchfaceSDK.framework",
 				"${BUILT_PRODUCTS_DIR}/Zip/Zip.framework",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/AiSDK/OAContracts.framework/OAContracts",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/AiSDK/OACore.framework/OACore",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/AiSDK/OAOpus.framework/OAOpus",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/AiSDK/OAS.framework/OAS",
 				"${PODS_XCFRAMEWORKS_BUILD_DIR}/JLBmpConvertKit/JLBmpConvertKit.framework/JLBmpConvertKit",
 			);
 			name = "[CP] Embed Pods Frameworks";
@@ -365,6 +372,10 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SSZipArchive.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/WatchfaceSDK.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Zip.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/OAContracts.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/OACore.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/OAOpus.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/OAS.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/JLBmpConvertKit.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -433,6 +444,7 @@
 				22C33A9279D5EA3A3CBD2213 /* JieliHealthSyncViewController.swift in Sources */,
 				22C33A9279D5EA3A3CBD2220 /* JieliManualMeasureViewController.swift in Sources */,
 				22C33A9279D5EA3A3CBD2221 /* JieliAutoMonitorViewController.swift in Sources */,
+				22C33A9279D5EA3A3CBD2222 /* AiAnalysisViewController.swift in Sources */,
 				22C33A9279D5EA3A3CBD2214 /* JieliHealthRepository.swift in Sources */,
 				22C33A9279D5EA3A3CBD2215 /* JieliAlarmRepository.swift in Sources */,
 				22C33A9279D5EA3A3CBD2216 /* JieliAlarmReminderViewController.swift in Sources */,

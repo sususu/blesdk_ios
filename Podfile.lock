@@ -58,7 +58,7 @@ EXTERNAL SOURCES:
 
 CHECKOUT OPTIONS:
   AiSDK:
-    :commit: 84dd406402b2ed952643e3e2250aaa9be30895bb
+    :commit: 373e3903206e489242f7b811d75405dabb94affc
     :git: https://github.com/HWdan/HwAiSDK.git
   JLBmpConvertKit:
     :git: https://github.com/sususu/JLBmpConvertKit.git
@@ -69,7 +69,7 @@ CHECKOUT OPTIONS:
 
 SPEC CHECKSUMS:
   AFNetworking: 3bd23d814e976cd148d7d44c3ab78017b744cd58
-  AiSDK: 079f1a1505275a64581e887029984e76b060b242
+  AiSDK: 2641da5a5909025357e641d37185398e8fc34260
   HwBluetoothSDK: 093abbfdd585d7be6c069d4ee1b1886ed9901353
   JLBmpConvertKit: 864be69abecfd00fbbaeb2ba3e8ac57158b2215a
   Masonry: 678fab65091a9290e40e2832a55e7ab731aad201

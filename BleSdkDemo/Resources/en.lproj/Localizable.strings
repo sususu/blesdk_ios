@@ -547,3 +547,25 @@
 "jieli_monitor_every" = "On, every %d minutes";
 "jieli_monitor_invalid_interval" = "The device returned an invalid monitoring interval";
 "jieli_monitor_note" = "Switches show device settings. Tap Refresh to retry failed reads. Enabling heart rate uses a 5-minute interval; skin temperature and respiratory rate use 60 minutes. Failed saves restore the previous state.";
+
+/* AI analysis */
+"ai_analysis_section" = "AI Analysis";
+"ai_analysis_exercise" = "Exercise & Health Analysis";
+"ai_analysis_insight" = "AI Insights";
+"ai_analysis_body" = "Body Status";
+"ai_analysis_sleep_day" = "AI Sleep (Day)";
+"ai_analysis_sleep_week" = "AI Sleep (Week)";
+"ai_analysis_sleep_month" = "AI Sleep (Month)";
+"ai_analysis_mock_note" = "Mock health measurements are sent to real AI services for integration testing. Requires a connected, AI-authorized device. OAS credentials are used only on this page and are not saved.";
+"ai_analysis_input" = "View Mock Input";
+"ai_analysis_generate" = "Generate AI Analysis";
+"ai_analysis_generating" = "Requesting AI analysis…";
+"ai_analysis_need_channel" = "Enter OAS Channel ID and App Key";
+"ai_analysis_need_device" = "Could not obtain a real device ID";
+"ai_analysis_timeout" = "AI request timed out. Please retry.";
+"ai_analysis_empty" = "AI returned an empty report";
+"ai_analysis_cancelled" = "Left the analysis page";
+"ai_analysis_reminder" = "Reminder category: %d";
+"ai_analysis_mock_exercise" = "Last 7 days: about 7000–8200 steps/day, HR 55/140/72 bpm, SpO2 95/99/97%, stress 20/55/32, sleep 475 min. Mock profile: age 30, 175 cm, 70 kg.";
+"ai_analysis_mock_insight" = "Last 7 days: steps 8200/7600/9100/6300/8500/7200/8800; activity 55/45/62/35/58/42/60 min, plus calories, mood, HR, HRV, stress and sleep. Goals: 8000 steps / 60 min / 350 kcal. Daily arrays are newest first.";
+"ai_analysis_mock_body" = "Today: 8200 steps, 55 activity min, 360 kcal; 6 hourly HR/resting HR/HRV/stress samples; 475 sleep min (250 light, 110 deep), sleep score 88.";

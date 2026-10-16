@@ -9,6 +9,7 @@ final class HomeViewController: UIViewController {
     private var device: BleDeviceItem?
     private var bound = false
     private var busy = false
+    var isPerformingOperation: Bool { busy }
     private var logs: [String] = []
     private var syncSummary = ""
     private var manualDisconnect = false
@@ -30,6 +31,7 @@ final class HomeViewController: UIViewController {
         setupUI()
         applyLocalizedChrome()
         bootstrap()
+        NotificationCenter.default.addObserver(self, selector: #selector(reminderUpdated(_:)), name: .jieliRemindersChanged, object: JieliReminderNotifyManager.shared)
         let recognition: HwWorkoutTypeRecognitionCallback = { [weak self] category in
             DispatchQueue.main.async { self?.showWorkoutRecognition(Int(category)) }
         }
@@ -41,6 +43,7 @@ final class HomeViewController: UIViewController {
     }
 
     deinit {
+        NotificationCenter.default.removeObserver(self)
         if let recognitionCallback {
             HwBluetoothSDK.sharedInstance().removeWorkoutTypeRecognitionCallback(recognitionCallback)
         }
@@ -138,6 +141,7 @@ final class HomeViewController: UIViewController {
         daily.addArrangedSubview(UIHelpers.makeGrid([
             makeAction("alarms", action: #selector(tapAlarms)),
             makeAction("jieli_alarms", action: #selector(tapJieliAlarms)),
+            makeAction("jieli_reminder_notify", action: #selector(tapReminderNotify)),
             makeAction("notify", action: #selector(tapNotify))
         ]))
 
@@ -300,7 +304,7 @@ final class HomeViewController: UIViewController {
 
         for (key, button) in actionButtons {
             switch key {
-            case "scan_connect": button.isEnabled = !busy
+            case "scan_connect", "jieli_reminder_notify": button.isEnabled = !busy
             case "bind_watch": button.isEnabled = canBind
             case "sync_data", "jieli_sync_data": button.isEnabled = canSync
             case "unbind_watch": button.isEnabled = canUnbind
@@ -497,6 +501,18 @@ final class HomeViewController: UIViewController {
         guard requireConnectedFeature() else { return }
         navigationController?.pushViewController(AlarmsViewController(), animated: true)
     }
+    @objc private func tapReminderNotify() {
+        navigationController?.pushViewController(JieliReminderNotifyViewController(), animated: true)
+    }
+
+    @objc private func reminderUpdated(_ note: Notification) {
+        if let text = note.userInfo?["log"] as? String { appendLog(text) }
+        if let count = note.userInfo?["goalCount"] as? Int, !busy {
+            syncSummary = L10n.tr("jl_notify_goal_synced", count)
+            refreshUI()
+        }
+    }
+
     @objc private func tapJieliAlarms() {
         guard requireConnectedFeature() else { return }
         navigationController?.pushViewController(JieliAlarmReminderViewController(), animated: true)

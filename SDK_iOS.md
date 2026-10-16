@@ -1328,6 +1328,36 @@ Demo 入口：**首页 → 提醒与日常 → 闹钟／提醒（杰理）**。
 
 ---
 
+### 11.6 杰理设备提醒监听
+
+与通知开关下发（§12）不同，此功能接收手表主动上报的提醒。SDK 的 `HwReminderNotifyCallback` 参数为 `HwReminderNotifyType` 和可空的 `NSData`；完整枚举见 `HwBluetoothDeviceRequestManager.h`。
+
+```objc
+HwReminderNotifyCallback reminderCallback = ^(HwReminderNotifyType type, NSData *data) {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        // 检查当前绑定/连接设备，再更新 UI；不要在这里同步执行耗时工作。
+    });
+};
+// 将 reminderCallback 保存在组件属性中，供停止监听时移除。
+[[HwBluetoothSDK sharedInstance] addReminderNotifyCallback:reminderCallback];
+```
+
+停止监听或解绑时，用保存的同一份 Block 移除；不要移除其他模块的回调：
+
+```objc
+[[HwBluetoothSDK sharedInstance] removeReminderNotifyCallback:reminderCallback];
+```
+
+Demo 入口：**首页 → 提醒与日常 → 提醒监听（杰理）**。实现见 [JieliReminderNotifyManager.swift](BleSdkDemo/Sources/Services/Jieli/JieliReminderNotifyManager.swift) 和 [事件模型](BleSdkDemo/Sources/Models/JieliReminderEvent.swift)。
+
+- 对齐 hawofit 的 19 类事件：饮水、洗手、低电、久坐、四项每日目标、易孕期、生理期、闹钟和八类自定义提醒。SDK 中其他类型暂不展示，与参考实现保持一致。
+- 闹钟载荷为两个字节的小时、分钟；检查长度及 `0...23` / `0...59` 范围，缺失或无效时回退到接收时刻，以系统时间格式显示。
+- 同类型、同载荷在两秒内去重，使用单调时钟；通知授权不影响事件记录、前台弹窗及目标数据读取。
+- Demo 由客户手动开启，不判断无屏或机型。监听绑定到当前设备；停止、解绑或换设备时移除自己的回调、清理自己的待显示弹窗和通知，忽略旧异步结果。后台本地通知依赖 App 实际收到 BLE 事件，不保证被系统终止后仍能接收。
+- 每日步数／距离／热量／活动时长目标达成后，0.5 秒内事件合并；若正在使用其他功能、传输或后台，则等待，最长 180 秒。活动读取使用 `getSportDetailBigDataWithCallback:`，30 秒未完成则显示超时；**只读，不调用删除接口**。成功后更新 Demo 首页和监听页摘要。生产 App 应自行落库并刷新业务页面。
+
+---
+
 ## 12. 通知 / 通讯录
 
 ### 12.1 通知开关

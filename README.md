@@ -54,11 +54,20 @@ open BleSdkDemo.xcworkspace
 | --- | --- | --- |
 | 设备连接 | 扫描连接、绑定、断开、解绑 | [扫描连接](BleSdkDemo/Sources/UI/Scan/ScanConnectViewController.swift)、[绑定流程](BleSdkDemo/Sources/UI/Bind/BindFlowViewController.swift)、[解绑流程](BleSdkDemo/Sources/UI/Unbind/UnbindFlowViewController.swift) |
 | 健康数据 | 通用同步、杰理同步、手动测量、自动监测、目标 | [通用业务封装](BleSdkDemo/Sources/Services/BleRepository.swift)、[杰理数据同步](BleSdkDemo/Sources/UI/Jieli/JieliHealthSyncViewController.swift)、[手动测量](BleSdkDemo/Sources/UI/Jieli/JieliManualMeasureViewController.swift)、[自动监测](BleSdkDemo/Sources/UI/Jieli/JieliAutoMonitorViewController.swift) |
-| 提醒与日常 | 闹钟、杰理闹钟与提醒、通知与通讯录 | [目标／闹钟／通知示例](BleSdkDemo/Sources/UI/Features/FeatureViewControllers.swift)、[杰理提醒设置](BleSdkDemo/Sources/UI/Jieli/JieliAlarmReminderViewController.swift) |
+| 提醒与日常 | 闹钟、杰理闹钟与提醒、提醒监听（杰理）、通知与通讯录 | [目标／闹钟／通知示例](BleSdkDemo/Sources/UI/Features/FeatureViewControllers.swift)、[杰理提醒设置](BleSdkDemo/Sources/UI/Jieli/JieliAlarmReminderViewController.swift)、[提醒监听](BleSdkDemo/Sources/UI/Jieli/JieliReminderNotifyViewController.swift) |
 | 表盘、媒体与 AI | 思澈／杰理表盘、音乐推送、相册推送、AI | [思澈表盘](BleSdkDemo/Sources/UI/Watchface/WatchfaceHostViewController.swift)、[杰理表盘](BleSdkDemo/Sources/UI/Jieli/JieliWatchfaceHostViewController.swift)、[音乐](BleSdkDemo/Sources/UI/Features/MusicTransferViewController.swift)、[相册](BleSdkDemo/Sources/UI/Features/AlbumTransferViewController.swift)、[AI 入口](BleSdkDemo/Sources/UI/AI/AiHostViewController.swift) |
 | 升级与维护 | AGPS、思澈 OTA、杰理 OTA | [AGPS](BleSdkDemo/Sources/UI/Features/AgpsUpdateViewController.swift)、[思澈 OTA](BleSdkDemo/Sources/UI/Features/OtaUpgradeViewController.swift)、[杰理 OTA](BleSdkDemo/Sources/UI/Jieli/JieliOtaUpgradeViewController.swift) |
 
 表盘页包含 **自定义、在线、AI** 三个页签。当前音乐、相册和 AGPS 演示入口走思澈通道。首页右上角可切换中文、English 或跟随系统。
+
+### 提醒监听（杰理）
+
+进入 **首页 → 提醒与日常 → 提醒监听（杰理）**，连接并绑定所购设备后点击 **开始监听**。由手表触发饮水、低电、闹钟等提醒后，本页会记录时间、提醒文案、类型及原始数据。
+
+- 前台弹出提醒；后台收到设备事件时，在系统通知权限允许的情况下发送本地通知。拒绝通知权限仍可使用前台提醒和记录。
+- 离开页面继续监听；点击 **停止监听**、解绑或切换设备后停止。本次 App 启动内有效，重启后需重新开启。
+- 与 hawofit `ReminderNotifyManager` 一致展示 19 类事件，相同类型和数据两秒内去重。Demo 不判断无屏或机型，由客户选择对应设备。
+- 每日目标达成后等待设备空闲读取活动数据，并更新首页摘要，**不删除设备记录**。
 
 ## 3. Demo 源码参考
 

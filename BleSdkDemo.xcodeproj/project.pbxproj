@@ -57,6 +57,9 @@
 		F9C185A8A6504072B4653A7B /* WatchfaceModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2B0346CC9C44E03A8C6153C /* WatchfaceModels.swift */; };
 		FA1FC6D717D864F8AE1B028B /* ScanConnectViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 282A2946747604440754D4FC /* ScanConnectViewController.swift */; };
 		FEEA3A09CC63A1BDAA031D6A /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 502C1CD344A9B5AA834FD48A /* Foundation.framework */; };
+		A2B10001A2B10001A2B10001 /* JieliReminderEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2F10001A2F10001A2F10001 /* JieliReminderEvent.swift */; };
+		A2B10002A2B10002A2B10002 /* JieliReminderNotifyManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2F10002A2F10002A2F10002 /* JieliReminderNotifyManager.swift */; };
+		A2B10003A2B10003A2B10003 /* JieliReminderNotifyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2F10003A2F10003A2F10003 /* JieliReminderNotifyViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -117,6 +120,9 @@
 		D641DF46CA811EC15937CA3B /* LocaleHelper.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = LocaleHelper.swift; path = BleSdkDemo/Sources/Services/LocaleHelper.swift; sourceTree = "<group>"; };
 		E507F2715CCBFC3539CF51B0 /* SceneDelegate.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SceneDelegate.swift; path = BleSdkDemo/Sources/SceneDelegate.swift; sourceTree = "<group>"; };
 		F0038507F7E74BF8AB4D6903 /* WatchfaceImageUtils.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = WatchfaceImageUtils.swift; path = BleSdkDemo/Sources/Services/Watchface/WatchfaceImageUtils.swift; sourceTree = "<group>"; };
+		A2F10001A2F10001A2F10001 /* JieliReminderEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = JieliReminderEvent.swift; path = BleSdkDemo/Sources/Models/JieliReminderEvent.swift; sourceTree = "<group>"; };
+		A2F10002A2F10002A2F10002 /* JieliReminderNotifyManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = JieliReminderNotifyManager.swift; path = BleSdkDemo/Sources/Services/Jieli/JieliReminderNotifyManager.swift; sourceTree = "<group>"; };
+		A2F10003A2F10003A2F10003 /* JieliReminderNotifyViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = JieliReminderNotifyViewController.swift; path = BleSdkDemo/Sources/UI/Jieli/JieliReminderNotifyViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -208,6 +214,9 @@
 				A1F10002A1F10002A1F10002 /* AiGuideViewController.swift */,
 				A1F10003A1F10003A1F10003 /* AiDemoViewController.swift */,
 				A1F10004A1F10004A1F10004 /* AiDemoBridge.swift */,
+				A2F10001A2F10001A2F10001 /* JieliReminderEvent.swift */,
+				A2F10002A2F10002A2F10002 /* JieliReminderNotifyManager.swift */,
+				A2F10003A2F10003A2F10003 /* JieliReminderNotifyViewController.swift */,
 				CF973DBBA57A72AE5FA132E7 /* JieliHealthSyncViewController.swift */,
 				CF973DBBA57A72AE5FA132F4 /* JieliManualMeasureViewController.swift */,
 				CF973DBBA57A72AE5FA132F5 /* JieliAutoMonitorViewController.swift */,
@@ -441,6 +450,9 @@
 				A1B10002A1B10002A1B10002 /* AiGuideViewController.swift in Sources */,
 				A1B10003A1B10003A1B10003 /* AiDemoViewController.swift in Sources */,
 				A1B10004A1B10004A1B10004 /* AiDemoBridge.swift in Sources */,
+				A2B10001A2B10001A2B10001 /* JieliReminderEvent.swift in Sources */,
+				A2B10002A2B10002A2B10002 /* JieliReminderNotifyManager.swift in Sources */,
+				A2B10003A2B10003A2B10003 /* JieliReminderNotifyViewController.swift in Sources */,
 				22C33A9279D5EA3A3CBD2213 /* JieliHealthSyncViewController.swift in Sources */,
 				22C33A9279D5EA3A3CBD2220 /* JieliManualMeasureViewController.swift in Sources */,
 				22C33A9279D5EA3A3CBD2221 /* JieliAutoMonitorViewController.swift in Sources */,

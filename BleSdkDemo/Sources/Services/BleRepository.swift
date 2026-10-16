@@ -140,6 +140,7 @@ final class BleRepository {
     /// Tears down the Bluetooth SDK if it was initialized.
     /// Uses `destroySDK` when available, otherwise falls back to `destroy` (Swift/ObjC naming variance).
     func destroy() {
+        JieliReminderNotifyManager.shared.stop()
         if initialized {
             // ObjC destroySDK; some Swift overlays map this as destroy().
             if sdk.responds(to: NSSelectorFromString("destroySDK")) {
@@ -184,11 +185,14 @@ final class BleRepository {
             battery: info?.battery,
             protocolVersion: info?.protocolVersion
         ))
+        JieliReminderNotifyManager.shared.syncWithBindState()
     }
 
     /// Clears the locally persisted bound-device record (typically after unbind).
     func clearBoundDevice() {
         store.clear()
+        JieliReminderNotifyManager.shared.stop()
+        JieliReminderNotifyManager.shared.clearHistory()
         JieliAlarmRepository.shared.resetWorkoutPreferences()
     }
 

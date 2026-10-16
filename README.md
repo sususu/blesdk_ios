@@ -1,241 +1,108 @@
-# BleSdkDemo (iOS)
+# BLE Demo · iOS 使用指南
 
-UIKit demo app for HuaWo wearable Bluetooth SDKs. It shows how to scan and connect a watch, bind/unbind, sync health data, configure goals and reminders, push music/album/AGPS packages over the Sifli channel, and run Sifli NAND firmware OTA.
+本项目是 `HwBluetoothSDK` 的 iOS 接入示例，包含设备连接与绑定、健康数据、提醒、表盘、媒体推送、固件升级和 AI 功能。本文介绍 Demo 的安装、运行、功能操作和调试方法。SDK 在客户 App 中的集成与接口用法，请阅读 [SDK_iOS.md](SDK_iOS.md)。
 
-**Requirements:** iOS 14+, Xcode with CocoaPods, a physical iPhone (Bluetooth LE features do not work on the Simulator).
+- **首次使用 Demo**：从下面的「运行 Demo」开始。
+- **接入 SDK、查接口和参数**：阅读 [SDK 使用文档](SDK_iOS.md)。
+- **安卓对齐界面**：打开 [BLE Demo UI 对照稿](<docs/BLE Demo UI 对照稿.html>)，可离线查看。
 
----
+## 1. 运行 Demo
 
-## Open the project
+### 准备
+
+- Mac、Xcode、CocoaPods。
+- 一台 **iOS 14.0 或以上的真机 iPhone**；蓝牙功能请使用真机验证。
+- 与本 SDK 配套的手表或手环，确认设备方案和固件版本。
+- 安装依赖需要访问 Podfile 中的 Git 仓库；在线表盘、OTA 检查和 AI 等功能还需要网络。
+
+### 安装与启动
+
+在仓库根目录执行：
 
 ```bash
-cd /path/to/sdkdemo
 pod install
 open BleSdkDemo.xcworkspace
 ```
 
-Use **BleSdkDemo.xcworkspace** (not the `.xcodeproj`). Select your signing Team for device builds.
+在 Xcode 中完成以下设置：
 
----
+1. 打开 **BleSdkDemo.xcworkspace**，选择 **BleSdkDemo** Scheme。
+2. 在 Target → **Signing & Capabilities** 中选择自己的 Team，按需修改 Bundle Identifier。
+3. 选择已连接的 iPhone，运行 App，允许蓝牙访问并打开手机蓝牙。
 
-## Architecture
+请保留仓库中的 `Podfile.lock`，首次安装使用 `pod install`。工程已配置依赖所需的路径和构建设置，不需要手动拖入额外的 Zip、SSZipArchive 等库。
 
-| Layer | Role |
-|-------|------|
-| `BleSdkDemo/Sources/UI/` | Feature screens (scan, bind, home, music, album, AGPS, OTA, …) |
-| `BleRepository` | Facade over `HwBluetoothSDK` + `SifliWatchfaceSDK` / `SFOTAManager` |
-| `BoundDeviceStore` | Persists the last bound device (MAC, name, firmware metadata) |
-| `Vendor/` | Local pod: `HwBluetoothSDK` (prebuilt static `.a`) |
+### 第一次验证：连接 → 绑定 → 读取
 
-SDK init happens once in `AppDelegate` via `BleRepository.shared.initSDK()` (HwBluetoothSDK, SifliWatchfaceSDK, Sifli OTA warm-up). Connection and reconnect events are surfaced to the home screen through `ConnectionEvent`.
+| 步骤 | Demo 操作 | 验证结果 |
+| --- | --- | --- |
+| 连接 | 首页 → **设备连接 → 扫描连接**，按名称找到自己的设备并点击 | 返回首页，显示连接状态和设备信息 |
+| 绑定 | 首页 → **设备连接 → 绑定**，在手表上确认（如设备要求） | 绑定步骤完成，首页显示已绑定 |
+| 读取 | 按设备方案选择下面的入口 | 显示设备返回的数据，或正常的空数据结果 |
 
-Exclusive file transfers (music, album, AGPS, OTA) share one lock so concurrent pushes are rejected.
+- **杰理设备**：首页 → **健康数据 → 同步数据（杰理）**，先选择一项读取；也可进入 **手动测量（杰理）**，选择心率后开始测量。
+- **使用通用接口的设备**：首页 → **健康数据 → 目标 Goals → 获取目标**，验证业务接口可正常返回。
+- 返回首页，点击 **展开运行日志** 查看连接或同步过程；子页面有日志时，也可在页面内展开查看。
 
----
+**注意「同步数据」的演示策略**：首页不带“杰理”后缀的 **同步数据**，在成功读取非空的活动、心率、睡眠数据后，会调用删除接口清理相应设备端数据。首次验证建议先使用上面的读取入口；正式接入时应在数据可靠保存后，再决定是否删除设备端记录。杰理同步页的读取与删除是独立操作，删除需要确认。
 
-## Dependencies (`Podfile`)
+## 2. 在 Demo 中找到需要的功能
 
-| Pod | Source | Purpose |
-|-----|--------|---------|
-| `HwBluetoothSDK` | `Vendor/HwBluetoothSDK` | Scan, connect, bind, health, goals, alarms, notify, contacts |
-| `WatchfaceSDK` | [HWdan/WatchfaceSDK](https://github.com/HWdan/WatchfaceSDK.git) `main` | Sifli music / album / AGPS / watchface push + OTA frameworks |
-| `AiSDK` | [HWdan/HwAiSDK](https://github.com/HWdan/HwAiSDK.git) `main` | AI watchface pipeline (AFlash + Sifli install) |
-| `AFNetworking` | CocoaPods | AiSDK HTTP dependency |
-| `Zip` / `SSZipArchive` | Transitive (WatchfaceSDK) | Zip packaging — do not vendor locally |
-| `JLBmpConvertKit` | [sususu/JLBmpConvertKit](https://github.com/sususu/JLBmpConvertKit.git) `1.2.0` | Host-owned JieLi image converter injected into AiSDK |
+首页按场景分为五组。功能是否支持由设备方案、机型和固件决定；带 **“杰理”** 的入口使用杰理相关接口，思澈与杰理的传输、表盘和 OTA 入口应按实际设备选择。
 
-BleSdkDemo uses **dynamic** `use_frameworks!` (same as AiSDK Example) so Zip and SSZipArchive keep separate minizip symbols.
+| 首页分类 | 功能入口 | 从哪里看实现 |
+| --- | --- | --- |
+| 设备连接 | 扫描连接、绑定、断开、解绑 | [扫描连接](BleSdkDemo/Sources/UI/Scan/ScanConnectViewController.swift)、[绑定流程](BleSdkDemo/Sources/UI/Bind/BindFlowViewController.swift)、[解绑流程](BleSdkDemo/Sources/UI/Unbind/UnbindFlowViewController.swift) |
+| 健康数据 | 通用同步、杰理同步、手动测量、自动监测、目标 | [通用业务封装](BleSdkDemo/Sources/Services/BleRepository.swift)、[杰理数据同步](BleSdkDemo/Sources/UI/Jieli/JieliHealthSyncViewController.swift)、[手动测量](BleSdkDemo/Sources/UI/Jieli/JieliManualMeasureViewController.swift)、[自动监测](BleSdkDemo/Sources/UI/Jieli/JieliAutoMonitorViewController.swift) |
+| 提醒与日常 | 闹钟、杰理闹钟与提醒、通知与通讯录 | [目标／闹钟／通知示例](BleSdkDemo/Sources/UI/Features/FeatureViewControllers.swift)、[杰理提醒设置](BleSdkDemo/Sources/UI/Jieli/JieliAlarmReminderViewController.swift) |
+| 表盘、媒体与 AI | 思澈／杰理表盘、音乐推送、相册推送、AI | [思澈表盘](BleSdkDemo/Sources/UI/Watchface/WatchfaceHostViewController.swift)、[杰理表盘](BleSdkDemo/Sources/UI/Jieli/JieliWatchfaceHostViewController.swift)、[音乐](BleSdkDemo/Sources/UI/Features/MusicTransferViewController.swift)、[相册](BleSdkDemo/Sources/UI/Features/AlbumTransferViewController.swift)、[AI 入口](BleSdkDemo/Sources/UI/AI/AiHostViewController.swift) |
+| 升级与维护 | AGPS、思澈 OTA、杰理 OTA | [AGPS](BleSdkDemo/Sources/UI/Features/AgpsUpdateViewController.swift)、[思澈 OTA](BleSdkDemo/Sources/UI/Features/OtaUpgradeViewController.swift)、[杰理 OTA](BleSdkDemo/Sources/UI/Jieli/JieliOtaUpgradeViewController.swift) |
 
-```ruby
-pod 'AiSDK', :git => 'https://github.com/HWdan/HwAiSDK.git', :branch => 'main'
-pod 'WatchfaceSDK', :git => 'https://github.com/HWdan/WatchfaceSDK.git', :branch => 'main'
-pod 'JLBmpConvertKit', :git => 'https://github.com/sususu/JLBmpConvertKit.git', :tag => '1.2.0'
-```
+表盘页包含 **自定义、在线、AI** 三个页签。当前音乐、相册和 AGPS 演示入口走思澈通道。首页右上角可切换中文、English 或跟随系统。
 
----
+## 3. Demo 源码参考
 
-## Features
+启动入口是 [AppDelegate.swift](BleSdkDemo/Sources/AppDelegate.swift) 中的 `BleRepository.shared.initSDK()`；该方法统一完成蓝牙、传输 SDK 初始化及杰理 AI 图片转换器注入。依赖和构建设置见 [Podfile](Podfile)，权限配置见 [Info.plist](BleSdkDemo/Supporting/Info.plist)。
 
-### Scan & connect
+| Demo 模块 | 实现位置 |
+| --- | --- |
+| 初始化、扫描、连接、回调、重连和通用业务 | [BleRepository.swift](BleSdkDemo/Sources/Services/BleRepository.swift) |
+| 用户选择扫描结果、连接结果处理 | [ScanConnectViewController.swift](BleSdkDemo/Sources/UI/Scan/ScanConnectViewController.swift) |
+| 完整绑定顺序及失败处理 | [BindFlowViewController.swift](BleSdkDemo/Sources/UI/Bind/BindFlowViewController.swift) |
+| 本地绑定记录 | [BoundDeviceStore.swift](BleSdkDemo/Sources/Services/BoundDeviceStore.swift) |
+| 完整解绑流程 | [UnbindFlowViewController.swift](BleSdkDemo/Sources/UI/Unbind/UnbindFlowViewController.swift) |
+| 杰理文件传输／OTA | `HwBluetoothSDK.multipleFileTransferService` / `otaV2Service`；调用示例见 [BleRepository.swift](BleSdkDemo/Sources/Services/BleRepository.swift) |
+| 杰理健康数据封装 | [JieliHealthRepository.swift](BleSdkDemo/Sources/Services/Jieli/JieliHealthRepository.swift) |
 
-- Scan nearby BLE devices (timeout, RSSI-sorted list); filter by device name with case-insensitive substring matching.
-- Connect from a scan result or by MAC (`connectWithDevice` / `connectWithMac`).
-- Manual disconnect disables auto-reconnect.
+`BleRepository` 是 Demo 的业务封装，并非 SDK 对外类；它同时引用表盘、OTA 和 AI 相关代码。接入自己的 App 时，所需依赖、权限、初始化步骤和 API 调用方式统一查阅 [SDK 使用文档](SDK_iOS.md)。
 
-### Bind
+## 4. 使用 Demo 验证客户设备时的配置
 
-Step UI driven by `BindFlowViewController`:
+| 项目 | 替换位置与说明 |
+| --- | --- |
+| 用户资料、目标、提醒等示例值 | [BleRepository.swift](BleSdkDemo/Sources/Services/BleRepository.swift) 及对应页面；改为 App 的真实用户配置 |
+| OTA 服务 | [OtaFirmwareApi.swift](BleSdkDemo/Sources/Services/Ota/OtaFirmwareApi.swift) 中的 `baseURL`、`fileBaseURL`、`customerCode`；当前指向测试环境 |
+| 在线表盘服务 | [WatchfaceApi.swift](BleSdkDemo/Sources/Services/Watchface/WatchfaceApi.swift) 中的服务地址、客户标识和产品类型匹配逻辑 |
+| 相册及表盘尺寸 | 使用实际设备屏幕和缩略图参数；相册 Demo 默认尺寸为 `466 × 466`，不能通用于所有设备 |
+| AI 授权与渠道配置 | [AiAnalysisViewController.swift](BleSdkDemo/Sources/UI/AI/AiAnalysisViewController.swift)；替换为自己的配置，可用 `AI_OAS_CHANNEL_ID` / `AI_OAS_APP_KEY` 环境变量覆盖 |
+| AI 分析输入 | 同一文件的 `AiAnalysisMock`；Demo 使用模拟健康数据调用真实 AI 服务，接入时替换为真实数据，设备需具备相应授权 |
 
-1. `startBindDevice` (confirm on the watch)
-2. `setDeviceTime` / `setUserInfo` / metric units / language
-3. `getDeviceInfo`
-4. `endBind`
-5. Pairing query (`getPairState` / `requestDeviceToPair` when needed)
+表盘、音乐、相册、AGPS 和 OTA 应串行执行；Demo 已共用传输锁。使用自己的封装时也应避免传输任务相互占用蓝牙通道。
 
-On success the app stores a `BoundDeviceRecord` and turns on auto-reconnect.
+## 5. 常见问题
 
-### Unbind
+| 现象 | 先检查 |
+| --- | --- |
+| 编译提示模块或头文件缺失 | 是否执行 `pod install`、打开 `.xcworkspace`，以及是否保留 `Vendor/HwBluetoothSDK` 和 Podfile 的构建配置 |
+| 扫描不到设备 | 真机蓝牙和 App 蓝牙权限是否开启；设备是否在附近、可被发现，是否已被其他 App／手机连接 |
+| 已连接但业务接口失败 | 是否完成绑定；当前机型／固件是否支持该接口；是否选错了思澈／杰理入口；查看错误和运行日志 |
+| 读取结果为空 | 手表可能尚未产生记录，或此前已被同步删除；佩戴设备产生数据后重试 |
+| 手动断开后不再自动连接 | 这是 Demo 的预期行为；手动断开会关闭自动重连，可重新扫描连接 |
+| 解绑后再次绑定异常 | 到 iPhone **设置 → 蓝牙 → 对应设备 → 忽略此设备** 后重试；iOS 无公开 API 自动清除系统配对 |
+| 后台断开后没有持续重连 | 已绑定且开启自动重连时，Demo 在前台执行重连；回到前台或蓝牙恢复可用后再尝试 |
+| OTA／在线表盘无可用资源 | 确认服务器环境、客户配置、产品类型与设备固件匹配；测试服务不代表客户机型已有对应资源 |
+| AI 请求失败 | 检查网络、设备 ID、AI 授权与自己的渠道配置，并查看页面错误；AI 分析并非本地模拟返回 |
 
-`UnbindFlowViewController`:
+需要排查时，请同时提供 **SDK 版本（首页左上角）、iPhone/iOS 版本、设备型号与固件版本、复现步骤和错误日志**。
 
-1. `unbindDevice`
-2. Disconnect
-3. `removeConnectionCache`
-4. Clear local bound record and disable auto-reconnect
-
-iOS has no system `removeBond` API. After unbind, the demo prompts the user to **Settings → Bluetooth → Forget This Device**.
-
-### Auto-reconnect
-
-Enabled after a successful bind; disabled on manual disconnect or unbind.
-
-- On disconnect (foreground + Bluetooth on): reconnect immediately, then retry every **0.5 s** on failure (per-attempt connect timeout **13 s**).
-- No reconnect loop while the app is in the background.
-- Reconnect again when returning to foreground or when Bluetooth becomes available.
-- Prefer `getLastConnectedDevice()` when available; otherwise reconnect by stored MAC.
-
-### Health sync
-
-1. Query on-device counts (`getActivityNum` / related APIs)
-2. Pull activities, heart rates, and sleeps
-3. Delete each non-empty category from the device after a successful pull
-4. Show a summary (counts + step sum) on the home log
-
-### Jieli health, monitoring and reminder settings
-
-- **Sync Data (Jieli)** reads skin temperature (`HwTemperature`, °C) and respiratory rate (`HwBreaths`, breaths/min), with timestamped results and separate confirmed deletion. Their BigData timestamps are seconds.
-- **Manual Measurement (Jieli)** supports heart rate, HRV, SpO2, stress, skin temperature and respiratory rate. Types use a two-column grid; measuring locks type selection. The page handles improper wear, stop/retry, a 60-second limit, disconnect and leaving/background cleanup.
-- **Auto Monitoring (Jieli)** reads and writes six independent switches. Enabling heart rate uses 5 minutes; skin temperature and respiratory rate use 60 minutes; disabling uses 0. Other types use their switch APIs. Failed reads can be retried; failed writes restore the previous state.
-- **Alarms / Reminders (Jieli)** adds low-battery reminders, vibration off/weak/medium/strong (33/66/99), and the local auto-detect workout prompt preference. Recognition prompts appear on Home and this settings page; they do not start workout recording.
-
-See [SDK integration reference](SDK_iOS.md) sections 9.5–9.6 and 11.5 for APIs and units.
-
-### AI analysis with mock health inputs
-
-Open **Home → AI** for six reports: exercise/health analysis, AI insights, body status, and sleep day/week/month. The measurements are mocked; reports use the **real AiSDK/cloud services** and require a connected, AI-authorized device.
-
-Channel ID and App Key default to the hawofit configuration, are visible and editable, and can be overridden with `AI_OAS_CHANNEL_ID` / `AI_OAS_APP_KEY`. Page edits are not persisted. Current AiSDK bundles OAS xcframeworks; the host does not need a separate OAS pod or private specs source.
-
-The page supports input preview, retry, a 90-second timeout and stale-result protection. Day/week/month sleep inputs cover 1 day / the last 7 days / the current month through today. Cloud behavior still needs verification on an authorized physical device.
-
-Read [AiSDK integration and report schemas](SDK_iOS.md#23-aisdk-与-app-主动分析), or open **AI → Integration Guide** in the app. `AiAnalysisMock` is the replacement point for real health data.
-
-### Goals
-
-Read goals; write a fixed demo set (steps, calories, distance, sleep, duration).
-
-### Alarms & reminders
-
-- Alarm list / add demo weekday alarm / delete all
-- Demo sedentary, drink-water, and hand-wash reminders
-
-### Notifications & contacts
-
-Social-app notification switches and contact list APIs exposed on the Notify feature screen.
-
-### Music (Sifli)
-
-1. Query music storage
-2. Pick MP3 files
-3. Stage under a temp tree `…/selectTemp/music/mp3/`
-4. Push with `SifliWatchfaceSDK.setMusicFiles`
-5. Progress UI, cancel via transfer lock / `stop()`
-
-### Album (Sifli)
-
-1. Query album slot IDs
-2. Pick photos; center-crop / resize (editable width × height, default **466×466**)
-3. Push with `SifliWatchfaceSDK.setPictures` (`QjsAlbumModel`s named by slot)
-
-### AGPS
-
-1. Download five `.pgl` ephemeris files
-2. Append a 16-byte trailer per file
-3. Zip as `music/gps/agps/…`
-4. Push with `SifliWatchfaceSDK.syncZipFile` (`type: 3`, `byteAlign: true`)
-5. Show AGPS validity window from device GPS status when available
-
-### Firmware OTA (Sifli NAND only)
-
-Screen: `OtaUpgradeViewController`. Push path: `SifliOtaPusher` → `SFOTAManager.startOTANand`.
-
-1. **Refresh** — device MAC / firmware / product type / device id  
-2. **Check update** — `POST https://test.huawo-wear.com/api/v1/devices/upgrades`  
-3. **Start** — battery ≥ 30% (soft if query fails), upgrade status `none` when available  
-4. Download & unzip the platform package; map bins (`hcpu` / `lcpu` / `patch*` / `ctrl` / `diff_ctrl` / `outdyn` / `outroot`)  
-5. Diff packages also download the resource / picture package  
-6. DFU over BLE (`tryResume: true`); progress roughly **0–40%** prepare, **40–100%** push  
-
-For full packages, `resourcePath` is omitted (`nil`). An empty `file://` URL must not be passed (it fails immediately with `LoadResourceZipFailed`). Before DFU, the demo stops the Watchface transfer channel and waits until the OTA BLE core is `poweredOn`.
-
-JL / Realtek OTA paths are not implemented in this demo.
-
-### Watchface (Sifli)
-
-Screen: `WatchfaceHostViewController` with three tabs.
-
-| Tab | Behavior |
-|-----|----------|
-| **Online** | `GET …/api/v1/products/{deviceType}/watchfaces` → install: check installed names → switch if match, else download+MD5 → `setOnlineWatchface` (`type=5`, `byteAlign=false`) |
-| **Custom** | Build `SlifiCustomWatchface` (bg / thumbnail / Time+widgets) → `setCustomWatchface` |
-| **AI** | `AiSDK` lifecycle (`startWorking` + `AiDeviceInfo`); generation runs on the watch; App shows result/preview/install progress |
-
-During install, back navigation and tab switching are locked.
-
----
-
-## Localization
-
-- `BleSdkDemo/Resources/en.lproj/Localizable.strings`
-- `BleSdkDemo/Resources/zh-Hans.lproj/Localizable.strings`
-
-Language can be switched from the home navigation bar (System / 中文 / English) via `LocaleHelper`.
-
----
-
-## Permissions & capabilities
-
-Declared in `BleSdkDemo/Supporting/Info.plist`:
-
-| Key | Use |
-|-----|-----|
-| `NSBluetoothAlwaysUsageDescription` / `NSBluetoothPeripheralUsageDescription` | Scan, connect, sync |
-| `NSPhotoLibraryUsageDescription` | Album image picker |
-| `NSLocationWhenInUseUsageDescription` | AGPS / location-related helpers |
-| `UIBackgroundModes` → `bluetooth-central` | BLE central in background |
-| ATS exception for `starcourse.rx-networks.cn` | HTTP AGPS ephemeris download |
-
----
-
-## Project layout
-
-```
-sdkdemo/
-├── BleSdkDemo.xcworkspace          # Open this
-├── BleSdkDemo.xcodeproj
-├── Podfile / Podfile.lock
-├── README.md
-├── SDK_iOS.md                      # HwBluetoothSDK reference
-├── BleSdkDemo/
-│   ├── Sources/
-│   │   ├── AppDelegate.swift
-│   │   ├── SceneDelegate.swift
-│   │   ├── Models/
-│   │   ├── Services/               # BleRepository, AGPS builder, OTA, locale
-│   │   └── UI/                     # Home, Scan, Bind, Unbind, Features
-│   ├── Resources/                  # en / zh-Hans strings
-│   └── Supporting/                 # Info.plist, bridging header
-├── Vendor/
-│   └── HwBluetoothSDK/             # Prebuilt static Bluetooth SDK
-└── Pods/                           # Generated by CocoaPods (AiSDK, WatchfaceSDK, Zip, …)
-```
-
----
-
-## Notes
-
-- Run on a **real device** with Bluetooth enabled and the watch nearby / already paired as needed.
-- Music / album / AGPS / OTA should not run at the same time (shared transfer lock).
-- After unbind, forget the device in iOS Bluetooth settings before rebinding if pairing sticks.
-- OTA uses the **test** upgrade host (`test.huawo-wear.com`). Point `OtaFirmwareApi` at another environment if needed.
-- Broader SDK API documentation: root `SDK_iOS.md`.
+完整 API、协议分支与数据单位请继续查阅 [SDK_iOS.md](SDK_iOS.md)。

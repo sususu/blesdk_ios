@@ -30,7 +30,7 @@ final class MusicTransferViewController: UIViewController, UIDocumentPickerDeleg
     override func viewDidLoad() {
         super.viewDidLoad()
         title = L10n.tr("music")
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = .systemGroupedBackground
         statusLabel.text = L10n.tr("feature_ready")
         let refresh = UIHelpers.makeButton(L10n.tr("music_query_storage"))
         let pick = UIHelpers.makeButton(L10n.tr("music_pick_files"))
@@ -43,22 +43,16 @@ final class MusicTransferViewController: UIViewController, UIDocumentPickerDeleg
         progress.translatesAutoresizingMaskIntoConstraints = false
         logView.font = .monospacedSystemFont(ofSize: 12, weight: .regular)
         logView.isEditable = false
-        logView.backgroundColor = .secondarySystemBackground
+        logView.backgroundColor = .secondarySystemGroupedBackground
         logView.layer.cornerRadius = 8
+        logView.heightAnchor.constraint(equalToConstant: 180).isActive = true
         let stack = UIStackView(arrangedSubviews: [
-            statusLabel, storageLabel, refresh, pick, push, cancel, progress, logView
+            UIHelpers.makeCard([statusLabel, storageLabel], title: L10n.tr("ui_status")),
+            UIHelpers.makeCard([UIHelpers.makeGrid([refresh, pick, push, cancel])], title: L10n.tr("ui_actions")),
+            UIHelpers.makeCard([progress], title: L10n.tr("ui_results")),
+            UIHelpers.makeLogSection(logView)
         ])
-        stack.axis = .vertical
-        stack.spacing = 10
-        stack.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(stack)
-        NSLayoutConstraint.activate([
-            stack.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16),
-            stack.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            stack.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-            stack.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16),
-            logView.heightAnchor.constraint(greaterThanOrEqualToConstant: 180)
-        ])
+        UIHelpers.installScrollableContent(stack, in: view)
         // Prefetch storage so the user sees capacity before picking files.
         refreshStorage()
     }

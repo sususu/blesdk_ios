@@ -23,7 +23,21 @@
 "step_failed" = "✕ Failed";
 "step_skipped" = "– Skipped";
 
+/* Feature layout */
+"ui_status" = "Status";
+"ui_actions" = "Actions";
+"ui_parameters" = "Parameters";
+"ui_preview" = "Preview";
+"ui_results" = "Results";
+
 /* Home */
+"home_connection" = "Device Connection";
+"home_health" = "Health Data";
+"home_daily" = "Reminders & Daily Use";
+"home_media" = "Watchfaces, Media & AI";
+"home_maintenance" = "Updates & Maintenance";
+"home_show_logs" = "Show Activity Logs";
+"home_hide_logs" = "Hide Activity Logs";
 "scan_connect" = "Scan & Connect";
 "bind_watch" = "Bind";
 "sync_data" = "Sync Data";

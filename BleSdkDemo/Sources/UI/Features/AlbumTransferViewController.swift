@@ -35,7 +35,7 @@ final class AlbumTransferViewController: UIViewController, PHPickerViewControlle
     override func viewDidLoad() {
         super.viewDidLoad()
         title = L10n.tr("album")
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = .systemGroupedBackground
         statusLabel.text = L10n.tr("feature_ready")
         infoLabel.text = L10n.tr("album_none_selected")
 
@@ -64,24 +64,19 @@ final class AlbumTransferViewController: UIViewController, PHPickerViewControlle
         cancel.addTarget(self, action: #selector(cancelTransfer), for: .touchUpInside)
         logView.font = .monospacedSystemFont(ofSize: 12, weight: .regular)
         logView.isEditable = false
-        logView.backgroundColor = .secondarySystemBackground
+        logView.backgroundColor = .secondarySystemGroupedBackground
         logView.layer.cornerRadius = 8
+        logView.heightAnchor.constraint(equalToConstant: 180).isActive = true
         let stack = UIStackView(arrangedSubviews: [
-            statusLabel, infoLabel, sizeTitle, sizeRow, ids, pick, push, cancel, progress, logView
+            UIHelpers.makeCard([statusLabel, infoLabel], title: L10n.tr("ui_status")),
+            UIHelpers.makeCard([sizeTitle, sizeRow], title: L10n.tr("ui_parameters")),
+            UIHelpers.makeCard([UIHelpers.makeGrid([ids, pick, push, cancel])], title: L10n.tr("ui_actions")),
+            UIHelpers.makeCard([progress], title: L10n.tr("ui_results")),
+            UIHelpers.makeLogSection(logView)
         ])
-        stack.axis = .vertical
-        stack.spacing = 10
-        stack.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(stack)
-        NSLayoutConstraint.activate([
-            stack.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16),
-            stack.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            stack.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-            stack.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16),
-            logView.heightAnchor.constraint(greaterThanOrEqualToConstant: 180),
-            widthField.heightAnchor.constraint(equalToConstant: 40),
-            heightField.heightAnchor.constraint(equalToConstant: 40)
-        ])
+        UIHelpers.installScrollableContent(stack, in: view)
+        widthField.heightAnchor.constraint(equalToConstant: 44).isActive = true
+        heightField.heightAnchor.constraint(equalToConstant: 44).isActive = true
 
         // Dismiss the number pad when tapping outside the size fields.
         let tap = UITapGestureRecognizer(target: self, action: #selector(endEditingTap))

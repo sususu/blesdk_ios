@@ -23,12 +23,26 @@
 "step_failed" = "✕ 失败";
 "step_skipped" = "– 跳过";
 
+/* Feature layout */
+"ui_status" = "设备状态";
+"ui_actions" = "功能操作";
+"ui_parameters" = "参数设置";
+"ui_preview" = "预览";
+"ui_results" = "执行结果";
+
 /* Home */
+"home_connection" = "设备连接";
+"home_health" = "健康数据";
+"home_daily" = "提醒与日常";
+"home_media" = "表盘、媒体与 AI";
+"home_maintenance" = "升级与维护";
+"home_show_logs" = "展开运行日志";
+"home_hide_logs" = "收起运行日志";
 "scan_connect" = "扫描连接";
 "bind_watch" = "绑定";
 "sync_data" = "同步数据";
-"jieli_sync_data" = "同步数据（杰里）";
-"jieli_select_data" = "请选择要读取的杰里数据，结果会显示在下方列表。";
+"jieli_sync_data" = "同步数据（杰理）";
+"jieli_select_data" = "请选择要读取的杰理数据，结果会显示在下方列表。";
 "jieli_get_sleep" = "读取睡眠数据";
 "jieli_get_heart_rate" = "读取心率数据";
 "jieli_heart_rate_value" = "心率：%d bpm";
@@ -80,23 +94,23 @@
 "logs" = "日志";
 "goals" = "目标 Goals";
 "alarms" = "闹钟 / 提醒";
-"jieli_alarms" = "闹钟 / 提醒（杰里）";
-"jieli_get_alarms" = "读取闹钟（杰里）";
+"jieli_alarms" = "闹钟 / 提醒（杰理）";
+"jieli_get_alarms" = "读取闹钟（杰理）";
 "jieli_add_alarm" = "添加示例闹钟（工作日 07:30）";
-"jieli_delete_alarms" = "删除全部闹钟（杰里）";
-"jieli_get_reminders" = "读取提醒（杰里）";
+"jieli_delete_alarms" = "删除全部闹钟（杰理）";
+"jieli_get_reminders" = "读取提醒（杰理）";
 "jieli_add_reminder" = "添加示例提醒（工作日 10:00）";
-"jieli_delete_reminders" = "删除全部提醒（杰里）";
-"jieli_alarm_demo_content" = "杰里起床闹钟";
-"jieli_reminder_demo_content" = "杰里自定义提醒";
-"jieli_alarm_added" = "杰里示例闹钟已添加";
-"jieli_reminder_added" = "杰里示例提醒已添加";
-"jieli_alarms_deleted" = "杰里闹钟已全部删除";
-"jieli_reminders_deleted" = "杰里提醒已全部删除";
+"jieli_delete_reminders" = "删除全部提醒（杰理）";
+"jieli_alarm_demo_content" = "杰理起床闹钟";
+"jieli_reminder_demo_content" = "杰理自定义提醒";
+"jieli_alarm_added" = "杰理示例闹钟已添加";
+"jieli_reminder_added" = "杰理示例提醒已添加";
+"jieli_alarms_deleted" = "杰理闹钟已全部删除";
+"jieli_reminders_deleted" = "杰理提醒已全部删除";
 "jieli_alarm_line" = "ID=%d  时间=%@  开关=%@  内容=%@";
 "jieli_alarm_rejected" = "设备未确认操作";
-"jieli_alarm_slots_full" = "杰里闹钟 ID 1～5 已全部占用";
-"jieli_reminder_slots_full" = "杰里提醒 ID 6～10 已全部占用";
+"jieli_alarm_slots_full" = "杰理闹钟 ID 1～5 已全部占用";
+"jieli_reminder_slots_full" = "杰理提醒 ID 6～10 已全部占用";
 "jieli_alarm_id_rule_note" = "Demo ID 约束：闹钟和提醒共享同一 ID 空间。\n当前范围：闹钟使用 1～5，提醒使用 6～10。\n注意：数量和 ID 区间仅用于 Demo，实际接入时需根据具体设备能力调整。";
 "jieli_delete_id_rejected" = "设备未确认删除 ID %d";
 "notify" = "通知 / 通讯录";
@@ -104,7 +118,7 @@
 "album" = "相册推送";
 "agps" = "AGPS 更新";
 "ota" = "OTA 升级";
-"jieli_ota" = "OTA 升级（杰里）";
+"jieli_ota" = "OTA 升级（杰理）";
 "status_sdk_ready" = "SDK 就绪";
 "status_bound_local" = "已绑定本地设备，尝试重连…";
 "status_connected" = "已连接 %@";
@@ -350,15 +364,15 @@
 "ota_err_unzip" = "固件解压失败";
 "ota_err_diff_resource" = "差分 OTA 需要 resource name/url/md5";
 "ota_err_no_ctrl" = "Zip 缺少 ctrl / diff_ctrl";
-"jieli_ota_phase_download" = "下载杰里聚合包";
-"jieli_ota_phase_push" = "推送到手表（杰里 OTA）";
-"jieli_ota_log_channel" = "通道：杰里 OTA V2";
-"jieli_ota_log_bytes" = "杰里聚合包：%d bytes";
-"jieli_ota_err_empty_bin" = "杰里升级包为空";
+"jieli_ota_phase_download" = "下载杰理聚合包";
+"jieli_ota_phase_push" = "推送到手表（杰理 OTA）";
+"jieli_ota_log_channel" = "通道：杰理 OTA V2";
+"jieli_ota_log_bytes" = "杰理聚合包：%d bytes";
+"jieli_ota_err_empty_bin" = "杰理升级包为空";
 
 /* Watchface */
 "watchface" = "表盘";
-"watchface_jieli" = "表盘（杰里）";
+"watchface_jieli" = "表盘（杰理）";
 "wf_tab_custom" = "自定义";
 "wf_tab_online" = "在线";
 "wf_tab_ai" = "AI";
@@ -494,7 +508,7 @@
 "ai_err_aflash_auth" = "艾闪用户未验证";
 
 /* Jieli manual measurement */
-"jieli_manual_measure" = "手动测量（杰里）";
+"jieli_manual_measure" = "手动测量（杰理）";
 "jieli_measure_hr" = "心率";
 "jieli_measure_hrv" = "心率变异性（HRV）";
 "jieli_measure_spo2" = "血氧";
@@ -543,7 +557,7 @@
 "jieli_detect_disable" = "关闭自动识别提示";
 
 /* Jieli auto monitoring */
-"jieli_auto_monitor" = "自动监测（杰里）";
+"jieli_auto_monitor" = "自动监测（杰理）";
 "jieli_monitor_every" = "已开启，每 %d 分钟检测一次";
 "jieli_monitor_invalid_interval" = "设备返回的检测间隔无效";
 "jieli_monitor_note" = "开关读取设备实际设置；读取失败的项目可点击右上角刷新重试。开启心率检测为每 5 分钟一次，皮肤温度与呼吸频率为每 60 分钟一次。保存失败会恢复原状态。";

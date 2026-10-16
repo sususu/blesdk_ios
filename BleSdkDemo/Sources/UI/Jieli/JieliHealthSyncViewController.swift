@@ -45,13 +45,13 @@ final class JieliHealthSyncViewController: UIViewController {
         return view
     }()
     private let statusLabel = UIHelpers.makeLabel("", style: .footnote)
-    private let tableView = UITableView(frame: .zero, style: .plain)
+    private let tableView = UITableView(frame: .zero, style: .insetGrouped)
     private var rows: [ResultRow] = []
     private var loading = false
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = .systemGroupedBackground
         setupUI()
         applyLocalizedChrome()
     }
@@ -68,15 +68,17 @@ final class JieliHealthSyncViewController: UIViewController {
         tableView.estimatedRowHeight = 72
         tableView.translatesAutoresizingMaskIntoConstraints = false
 
-        view.addSubview(actionCollectionView)
+        let actionsCard = UIHelpers.makeCard([actionCollectionView], title: L10n.tr("ui_actions"))
+        actionsCard.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(actionsCard)
         view.addSubview(statusLabel)
         view.addSubview(tableView)
         NSLayoutConstraint.activate([
-            actionCollectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 12),
-            actionCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            actionCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-            actionCollectionView.heightAnchor.constraint(equalToConstant: 304),
-            statusLabel.topAnchor.constraint(equalTo: actionCollectionView.bottomAnchor, constant: 10),
+            actionsCard.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16),
+            actionsCard.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            actionsCard.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            actionCollectionView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.4),
+            statusLabel.topAnchor.constraint(equalTo: actionsCard.bottomAnchor, constant: 20),
             statusLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             statusLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
             tableView.topAnchor.constraint(equalTo: statusLabel.bottomAnchor, constant: 8),
@@ -388,7 +390,7 @@ extension JieliHealthSyncViewController: UICollectionViewDataSource, UICollectio
             withReuseIdentifier: JieliHealthActionCell.reuseIdentifier,
             for: indexPath
         ) as! JieliHealthActionCell
-        cell.configure(title: L10n.tr(actions[indexPath.item].titleKey))
+        cell.configure(title: L10n.tr(actions[indexPath.item].titleKey), destructive: actions[indexPath.item].titleKey.hasPrefix("jieli_delete_"))
         return cell
     }
 
@@ -400,8 +402,8 @@ extension JieliHealthSyncViewController: UICollectionViewDataSource, UICollectio
     func collectionView(_ collectionView: UICollectionView,
                         layout collectionViewLayout: UICollectionViewLayout,
                         sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let width = floor((collectionView.bounds.width - 8) / 2)
-        return CGSize(width: width, height: 44)
+        let width = floor((collectionView.bounds.width - 16) / 3)
+        return CGSize(width: width, height: UIFontMetrics(forTextStyle: .subheadline).scaledValue(for: 56))
     }
 }
 
@@ -411,13 +413,16 @@ private final class JieliHealthActionCell: UICollectionViewCell {
 
     override init(frame: CGRect) {
         super.init(frame: frame)
-        contentView.backgroundColor = .systemBlue
-        contentView.layer.cornerRadius = 8
-        titleLabel.textColor = .white
-        titleLabel.font = .systemFont(ofSize: 15, weight: .semibold)
+        contentView.backgroundColor = .tertiarySystemGroupedBackground
+        contentView.layer.cornerRadius = 10
+        titleLabel.textColor = .label
+        titleLabel.font = .preferredFont(forTextStyle: .subheadline)
+        titleLabel.adjustsFontForContentSizeCategory = true
         titleLabel.textAlignment = .center
+        titleLabel.numberOfLines = 2
+        titleLabel.lineBreakMode = .byTruncatingTail
         titleLabel.adjustsFontSizeToFitWidth = true
-        titleLabel.minimumScaleFactor = 0.75
+        titleLabel.minimumScaleFactor = 0.5
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(titleLabel)
         NSLayoutConstraint.activate([
@@ -429,7 +434,12 @@ private final class JieliHealthActionCell: UICollectionViewCell {
 
     required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
 
-    func configure(title: String) { titleLabel.text = title }
+    func configure(title: String, destructive: Bool) {
+        titleLabel.text = title
+        titleLabel.textColor = destructive ? .systemRed : .label
+        accessibilityLabel = title
+        accessibilityTraits = .button
+    }
 }
 
 extension JieliHealthSyncViewController: UITableViewDataSource {

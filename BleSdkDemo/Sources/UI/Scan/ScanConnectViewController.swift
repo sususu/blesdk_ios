@@ -15,7 +15,7 @@ final class ScanConnectViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         title = L10n.tr("scan_title")
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = .systemGroupedBackground
         searchBar.placeholder = L10n.tr("scan_name_placeholder")
         searchBar.searchBarStyle = .minimal
         searchBar.autocapitalizationType = .none
@@ -31,16 +31,18 @@ final class ScanConnectViewController: UIViewController {
         table.keyboardDismissMode = .onDrag
         table.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
         view.addSubview(searchBar)
-        view.addSubview(scanButton)
+        let controls = UIHelpers.makeCard([UIHelpers.makeGrid([scanButton])])
+        controls.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(controls)
         view.addSubview(table)
         NSLayoutConstraint.activate([
             searchBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 4),
             searchBar.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 8),
             searchBar.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -8),
-            scanButton.topAnchor.constraint(equalTo: searchBar.bottomAnchor, constant: 8),
-            scanButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            scanButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-            table.topAnchor.constraint(equalTo: scanButton.bottomAnchor, constant: 12),
+            controls.topAnchor.constraint(equalTo: searchBar.bottomAnchor, constant: 8),
+            controls.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            controls.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            table.topAnchor.constraint(equalTo: controls.bottomAnchor, constant: 12),
             table.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             table.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             table.bottomAnchor.constraint(equalTo: view.bottomAnchor)

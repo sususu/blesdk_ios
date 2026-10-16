@@ -9,14 +9,14 @@ final class AiHostViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         title = L10n.tr("ai_section")
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = .systemGroupedBackground
 
         scroll.translatesAutoresizingMaskIntoConstraints = false
         scroll.alwaysBounceVertical = true
         view.addSubview(scroll)
 
         content.axis = .vertical
-        content.spacing = 10
+        content.spacing = 20
         content.translatesAutoresizingMaskIntoConstraints = false
         scroll.addSubview(content)
 
@@ -35,25 +35,26 @@ final class AiHostViewController: UIViewController {
 
         let hint = UIHelpers.makeLabel(L10n.tr("ai_host_hint"), style: .footnote)
         hint.textColor = .secondaryLabel
-        content.addArrangedSubview(hint)
+        content.addArrangedSubview(UIHelpers.makeCard([hint]))
 
         let guide = UIHelpers.makeButton("")
         guide.addTarget(self, action: #selector(tapGuide), for: .touchUpInside)
-        content.addArrangedSubview(guide)
         actionButtons.append(guide)
 
         let demo = UIHelpers.makeButton("")
         demo.addTarget(self, action: #selector(tapDemo), for: .touchUpInside)
-        content.addArrangedSubview(demo)
         actionButtons.append(demo)
 
-        content.addArrangedSubview(UIHelpers.makeLabel(L10n.tr("ai_analysis_section"), style: .headline))
+        content.addArrangedSubview(UIHelpers.makeCard([UIHelpers.makeGrid([guide, demo])], title: L10n.tr("ui_actions")))
+        var analysisButtons: [UIButton] = []
         for kind in AiAnalysisViewController.Kind.allCases {
             let button = UIHelpers.makeButton(L10n.tr(kind.titleKey))
             button.tag = kind.rawValue
             button.addTarget(self, action: #selector(tapAnalysis(_:)), for: .touchUpInside)
-            content.addArrangedSubview(button)
+            analysisButtons.append(button)
+            actionButtons.append(button)
         }
+        content.addArrangedSubview(UIHelpers.makeCard([UIHelpers.makeGrid(analysisButtons)], title: L10n.tr("ai_analysis_section")))
         applyLocalizedChrome()
     }
 
@@ -63,7 +64,7 @@ final class AiHostViewController: UIViewController {
     }
 
     private func applyLocalizedChrome() {
-        let titles = [L10n.tr("ai_guide"), L10n.tr("ai_demo")]
+        let titles = [L10n.tr("ai_guide"), L10n.tr("ai_demo")] + AiAnalysisViewController.Kind.allCases.map { L10n.tr($0.titleKey) }
         for (i, t) in titles.enumerated() where i < actionButtons.count {
             actionButtons[i].setTitle(t, for: .normal)
         }

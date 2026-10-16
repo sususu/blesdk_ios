@@ -33,7 +33,7 @@ final class JieliOnlineWatchfaceViewController: UIViewController, UICollectionVi
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = .systemGroupedBackground
         statusLabel.text = L10n.tr("feature_ready")
         progress.isHidden = true
 
@@ -48,24 +48,28 @@ final class JieliOnlineWatchfaceViewController: UIViewController, UICollectionVi
 
         logView.font = .monospacedSystemFont(ofSize: 11, weight: .regular)
         logView.isEditable = false
-        logView.backgroundColor = .secondarySystemBackground
+        logView.backgroundColor = .secondarySystemGroupedBackground
         logView.layer.cornerRadius = 8
 
         let refresh = UIHelpers.makeButton(L10n.tr("wf_refresh_list"))
         refresh.addTarget(self, action: #selector(refreshList), for: .touchUpInside)
 
-        let stack = UIStackView(arrangedSubviews: [statusLabel, refresh, progress, collection, logView])
+        logView.heightAnchor.constraint(equalToConstant: 120).isActive = true
+        let stack = UIStackView(arrangedSubviews: [
+            UIHelpers.makeCard([statusLabel, progress], title: L10n.tr("ui_status")),
+            UIHelpers.makeCard([UIHelpers.makeGrid([refresh])], title: L10n.tr("ui_actions")),
+            collection, UIHelpers.makeLogSection(logView)
+        ])
         stack.axis = .vertical
-        stack.spacing = 8
+        stack.spacing = 20
         stack.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(stack)
         NSLayoutConstraint.activate([
             stack.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 8),
-            stack.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 12),
-            stack.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -12),
+            stack.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            stack.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
             stack.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -8),
-            collection.heightAnchor.constraint(greaterThanOrEqualToConstant: 280),
-            logView.heightAnchor.constraint(equalToConstant: 120)
+            collection.heightAnchor.constraint(greaterThanOrEqualToConstant: 80)
         ])
         resolveDeviceTypeThenLoad()
     }

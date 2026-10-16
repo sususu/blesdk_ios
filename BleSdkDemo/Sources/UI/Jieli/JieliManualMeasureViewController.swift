@@ -81,26 +81,15 @@ final class JieliManualMeasureViewController: UITableViewController {
         cell.detailTextLabel?.numberOfLines = 0
         if indexPath.section == 0 {
             cell.selectionStyle = .none
-            let grid = UIStackView()
-            grid.axis = .vertical
-            grid.spacing = 10
-            for start in stride(from: 0, to: metrics.count, by: 2) {
-                let row = UIStackView()
-                row.spacing = 10
-                row.distribution = .fillEqually
-                for index in start..<min(start + 2, metrics.count) {
-                    let button = UIHelpers.makeButton(L10n.tr(metrics[index].titleKey), primary: selected == index)
-                    button.tag = index
-                    button.isEnabled = state == .idle
-                    button.titleLabel?.numberOfLines = 2
-                    button.titleLabel?.textAlignment = .center
-                    button.heightAnchor.constraint(greaterThanOrEqualToConstant: 56).isActive = true
-                    if selected == index { button.accessibilityTraits.insert(.selected) }
-                    button.addTarget(self, action: #selector(selectMetric(_:)), for: .touchUpInside)
-                    row.addArrangedSubview(button)
-                }
-                grid.addArrangedSubview(row)
+            let buttons = metrics.indices.map { index in
+                let button = UIHelpers.makeButton(L10n.tr(metrics[index].titleKey), primary: selected == index)
+                button.tag = index
+                button.isEnabled = state == .idle
+                if selected == index { button.accessibilityTraits.insert(.selected) }
+                button.addTarget(self, action: #selector(selectMetric(_:)), for: .touchUpInside)
+                return button
             }
+            let grid = UIHelpers.makeGrid(buttons)
             grid.translatesAutoresizingMaskIntoConstraints = false
             cell.contentView.addSubview(grid)
             NSLayoutConstraint.activate([

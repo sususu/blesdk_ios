@@ -58,7 +58,7 @@ pod 'JLBmpConvertKit', :git => 'https://github.com/sususu/JLBmpConvertKit.git', 
 
 ### Scan & connect
 
-- Scan nearby BLE devices (timeout, RSSI-sorted list).
+- Scan nearby BLE devices (timeout, RSSI-sorted list); filter by device name with case-insensitive substring matching.
 - Connect from a scan result or by MAC (`connectWithDevice` / `connectWithMac`).
 - Manual disconnect disables auto-reconnect.
 
@@ -100,6 +100,25 @@ Enabled after a successful bind; disabled on manual disconnect or unbind.
 2. Pull activities, heart rates, and sleeps
 3. Delete each non-empty category from the device after a successful pull
 4. Show a summary (counts + step sum) on the home log
+
+### Jieli health, monitoring and reminder settings
+
+- **Sync Data (Jieli)** reads skin temperature (`HwTemperature`, °C) and respiratory rate (`HwBreaths`, breaths/min), with timestamped results and separate confirmed deletion. Their BigData timestamps are seconds.
+- **Manual Measurement (Jieli)** supports heart rate, HRV, SpO2, stress, skin temperature and respiratory rate. Types use a two-column grid; measuring locks type selection. The page handles improper wear, stop/retry, a 60-second limit, disconnect and leaving/background cleanup.
+- **Auto Monitoring (Jieli)** reads and writes six independent switches. Enabling heart rate uses 5 minutes; skin temperature and respiratory rate use 60 minutes; disabling uses 0. Other types use their switch APIs. Failed reads can be retried; failed writes restore the previous state.
+- **Alarms / Reminders (Jieli)** adds low-battery reminders, vibration off/weak/medium/strong (33/66/99), and the local auto-detect workout prompt preference. Recognition prompts appear on Home and this settings page; they do not start workout recording.
+
+See [SDK integration reference](SDK_iOS.md) sections 9.5–9.6 and 11.5 for APIs and units.
+
+### AI analysis with mock health inputs
+
+Open **Home → AI** for six reports: exercise/health analysis, AI insights, body status, and sleep day/week/month. The measurements are mocked; reports use the **real AiSDK/cloud services** and require a connected, AI-authorized device.
+
+Channel ID and App Key default to the hawofit configuration, are visible and editable, and can be overridden with `AI_OAS_CHANNEL_ID` / `AI_OAS_APP_KEY`. Page edits are not persisted. Current AiSDK bundles OAS xcframeworks; the host does not need a separate OAS pod or private specs source.
+
+The page supports input preview, retry, a 90-second timeout and stale-result protection. Day/week/month sleep inputs cover 1 day / the last 7 days / the current month through today. Cloud behavior still needs verification on an authorized physical device.
+
+Read [AiSDK integration and report schemas](SDK_iOS.md#23-aisdk-与-app-主动分析), or open **AI → Integration Guide** in the app. `AiAnalysisMock` is the replacement point for real health data.
 
 ### Goals
 

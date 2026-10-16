@@ -9,39 +9,33 @@ class FeatureBaseViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = .systemGroupedBackground
         statusLabel.text = L10n.tr("feature_ready")
-        let scroll = UIScrollView()
-        scroll.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(scroll)
-        let content = UIStackView(arrangedSubviews: [statusLabel, actionsStack, resultLabel])
-        content.axis = .vertical
-        content.spacing = 12
-        content.translatesAutoresizingMaskIntoConstraints = false
-        scroll.addSubview(content)
+        let content = UIStackView(arrangedSubviews: [
+            UIHelpers.makeCard([statusLabel], title: L10n.tr("ui_status")),
+            UIHelpers.makeCard([actionsStack], title: L10n.tr("ui_actions")),
+            UIHelpers.makeCard([resultLabel], title: L10n.tr("ui_results"))
+        ])
         actionsStack.axis = .vertical
         actionsStack.spacing = 8
         resultLabel.textColor = .secondaryLabel
-        NSLayoutConstraint.activate([
-            scroll.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            scroll.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            scroll.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            scroll.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-            content.topAnchor.constraint(equalTo: scroll.topAnchor, constant: 16),
-            content.leadingAnchor.constraint(equalTo: scroll.leadingAnchor, constant: 16),
-            content.trailingAnchor.constraint(equalTo: scroll.trailingAnchor, constant: -16),
-            content.bottomAnchor.constraint(equalTo: scroll.bottomAnchor, constant: -24),
-            content.widthAnchor.constraint(equalTo: scroll.widthAnchor, constant: -32)
-        ])
+        UIHelpers.installScrollableContent(content, in: view)
         buildActions()
+        let buttons = actionsStack.arrangedSubviews.compactMap { $0 as? UIButton }
+        for button in buttons {
+            actionsStack.removeArrangedSubview(button)
+            button.removeFromSuperview()
+        }
+        actionsStack.addArrangedSubview(UIHelpers.makeGrid(buttons))
     }
 
     func buildActions() {}
 
     private var actionHandlers: [UIButton: () -> Void] = [:]
 
-    func addAction(_ title: String, handler: @escaping () -> Void) {
+    func addAction(_ title: String, destructive: Bool = false, handler: @escaping () -> Void) {
         let b = UIHelpers.makeButton(title)
+        if destructive { b.setTitleColor(.systemRed, for: .normal) }
         actionHandlers[b] = handler
         b.addTarget(self, action: #selector(actionTapped(_:)), for: .touchUpInside)
         actionsStack.addArrangedSubview(b)
@@ -72,7 +66,7 @@ class FeatureBaseViewController: UIViewController {
     }
 
     private func setActionsEnabled(_ enabled: Bool) {
-        actionsStack.arrangedSubviews.forEach { ($0 as? UIButton)?.isEnabled = enabled }
+        actionHandlers.keys.forEach { $0.isEnabled = enabled }
     }
 }
 
@@ -167,7 +161,7 @@ final class AlarmsViewController: FeatureBaseViewController {
                 }
             }
         }
-        addAction(L10n.tr("alarms_delete_all")) {
+        addAction(L10n.tr("alarms_delete_all"), destructive: true) {
             self.run(L10n.tr("alarms_deleting")) { done in
                 self.repo.deleteAllAlarms { result in
                     done(result.map { L10n.tr("alarms_delete_all_ok") })

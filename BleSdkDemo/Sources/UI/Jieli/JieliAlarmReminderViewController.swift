@@ -33,7 +33,7 @@ final class JieliAlarmReminderViewController: FeatureBaseViewController {
                 }
             }
         }
-        addAction(L10n.tr("jieli_delete_alarms")) {
+        addAction(L10n.tr("jieli_delete_alarms"), destructive: true) {
             self.confirmDelete(title: L10n.tr("jieli_delete_alarms")) {
                 self.run(L10n.tr("alarms_deleting")) { done in
                     self.jieliRepo.deleteAllAlarms { result in
@@ -56,7 +56,7 @@ final class JieliAlarmReminderViewController: FeatureBaseViewController {
                 }
             }
         }
-        addAction(L10n.tr("jieli_delete_reminders")) {
+        addAction(L10n.tr("jieli_delete_reminders"), destructive: true) {
             self.confirmDelete(title: L10n.tr("jieli_delete_reminders")) {
                 self.run(L10n.tr("alarms_deleting")) { done in
                     self.jieliRepo.deleteAllReminders { result in

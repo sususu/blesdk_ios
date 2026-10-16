@@ -1,8 +1,8 @@
 # HwBluetoothSDK 使用文档（iOS）
 
-**版本**：`3.2.10`（源码头文件宏 `HwBluetoothSDK_Version`；以运行时 `[[HwBluetoothSDK sharedInstance] version]` 为准）  
+**版本**：`3.2.17`（源码头文件宏 `HwBluetoothSDK_Version`；以运行时 `[[HwBluetoothSDK sharedInstance] version]` 为准）<br>
 **入口类**：`HwBluetoothSDK`（单例门面）  
-**最低 iOS 版本**：CocoaPods 声明 `9.0`（建议按业务实际抬升）  
+**最低 iOS 版本**：当前本地 Pod 声明 `13.0`；本 Demo 为 `14.0`<br>
 **说明**：本 SDK 通过 BLE 与华沃系智能手表/手环通信。对外统一通过 `[HwBluetoothSDK sharedInstance]` 调用，结果以 Block 异步返回。
 
 > **调用约定**  
@@ -36,6 +36,7 @@
 20. [全局监听器](#20-全局监听器)
 21. [协议分支说明](#21-协议分支说明)
 22. [推荐集成流程](#22-推荐集成流程)
+23. [AiSDK 与 App 主动分析](#23-aisdk-与-app-主动分析)
 
 ---
 
@@ -225,7 +226,7 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
 |-----|------|
 | `initSDK` | 初始化内部参数、监听蓝牙状态 |
 | `destroySDK` | 释放资源、停止监听 |
-| `version` | 返回 SDK 版本字符串，如 `3.2.10` |
+| `version` | 返回 SDK 版本字符串，如 `3.2.17` |
 
 > 与 Android `init(Application, maxMTU)` 不同：iOS **无 maxMTU 入参**（由系统与设备协商决定）。
 
@@ -856,6 +857,57 @@ HwHeartrateAlarm *alarm = [HwHeartrateAlarm new];
 
 ---
 
+### 9.5 杰理皮肤温度与呼吸频率
+
+Demo 入口：**同步数据（杰理）**，实现见 `JieliHealthRepository` / `JieliHealthSyncViewController`。
+
+| 数据 | 读取（HwBluetoothCenter） | 模型／数值单位 | 手动删除 |
+| --- | --- | --- | --- |
+| 皮肤温度 | `getSkinTemperatureBigDataWithCallback:` | `HwTemperature.temperature`，摄氏度浮点数 | `delSkinTemperatureBigDataWithCallback:` |
+| 呼吸频率 | `getBreathsBigDataWithCallback:` | `HwBreaths.rpmVal`，次／分钟 | `delBreathsBigDataWithCallback:` |
+
+两种模型的 `time` 均为 Unix **秒**，显示时直接构造 `Date(timeIntervalSince1970:)`；不要按 `HwWorkout` 的毫秒时间戳处理。结果按最新时间排序，空列表是正常结果。Demo 读取后不会自动删除，删除需用户确认。
+
+### 9.6 杰理手动测量与自动监测
+
+手动测量入口：**首页 → 手动测量（杰理）**。
+
+```swift
+let sdk = HwBluetoothSDK.sharedInstance()
+sdk.startMonitoring(with: .skinTemperature) { success, error in
+    // 写入操作须同时检查 success 和 error。
+}
+sdk.stopMonitoring(with: .skinTemperature, callback: nil)
+```
+
+| 类型（HwMonitorDataType） | 实时监听／对应移除方法 |
+| --- | --- |
+| `.heartRate` | `addHeartrateValueChangedListener` / `removeHeartrateValueChangedListener` |
+| `.HRV` | `addRealtimeHRVUpdateListener` / `removeRealtimeHRVUpdateListener` |
+| `.spO2` | `addSpo2ValueChangedListener` / `removeSpo2ValueChangedListener` |
+| `.stress` | `addStressValueChangedListener` / `removeStressValueChangedListener` |
+| `.skinTemperature` | `addRealtimeSkinTemperatureUpdateListener` / `removeRealtimeSkinTemperatureUpdateListener` |
+| `.respiratoryRate` | `addRealtimeRPMUpdateListener` / `removeRealtimeRPMUpdateListener` |
+
+先注册监听再启动；保留 Block 引用，以对应的 remove 方法移除本页监听，不要调用 removeAll 影响其他模块。还需处理 `addNotProperlyWornCallback`、`addMonitorStateChangedCallback`、断连及 `addTimedMeasureListener`；后者的 `time` 为**毫秒**。SDK 回调更新 UIKit 前切到主线程。
+
+Demo 测量期间禁止切换类型，60 秒无结束通知时主动停止；退出页面、进入后台时移除监听并停止设备测量。停止失败保留重试入口，旧会话回调不更新新会话。
+
+自动监测入口：**首页 → 自动监测（杰理）**，实现见 `JieliAutoMonitorViewController`。
+
+| 数据 | Swift 读取接口 | Swift 写入接口 | 本 Demo 的开启／关闭值 |
+| --- | --- | --- | --- |
+| 心率 | `sdk.getHeartrateMonitoringInterval(callback:)` | `sdk.setHeartrateMonitoringInterval(_:callback:)` | 5／0 分钟 |
+| HRV（Center） | `center.getAutoTrackHRV(callback:)` | `center.setAutoHRVWithStatus(_:callback:)` | 1／0 |
+| 血氧 | `sdk.getSpO2MonitorEnable(callback:)` | `sdk.setSpO2MonitorEnable(_:callback:)` | true／false |
+| 压力 | `sdk.getStressMonitorEnable(callback:)` | `sdk.setStressMonitorEnable(_:callback:)` | true／false |
+| 皮肤温度 | `sdk.getSkinTemperatureMonitorInterval(callback:)` | `sdk.setSkinTemperatureMonitorInterval(_:callback:)` | 60／0 分钟 |
+| 呼吸频率 | `sdk.getRespiratoryRateMonitorInterval(callback:)` | `sdk.setRespiratoryRateMonitorInterval(_:callback:)` | 60／0 分钟 |
+
+间隔是 Demo 策略，不代表所有产品固定使用该值；皮肤温度、呼吸频率沿用当前 hawofit 的 60 分钟设置。进入页面顺序读取设备实际状态，读取失败的项目禁用开关，可刷新重试；保存失败回滚，断连或更换设备时丢弃旧结果。读取布尔值 false 且没有 error 表示“关闭”，不表示读取失败。具体功能是否支持由机型／固件决定。
+
+---
+
 ## 10. 运动 Workout
 
 ### 10.1 同步历史运动
@@ -1245,6 +1297,18 @@ if (events.count > [HwPhoneScheduleEvent maxCount]) {
 3. 起止时间须合法且一般满足结束 ≥ 开始（跨天日程填完整 end 日期）。  
 4. 传输过程会按 MTU 自动拆帧，调用方无需关心分包；保持 BLE 连接直至回调成功。  
 5. 机型是否支持日程同步，以产品能力 / `getDeviceFeatures` 为准。
+
+---
+
+### 11.5 杰理低电量、震动与自动识别锻炼
+
+Demo 入口：**首页 → 闹钟／提醒（杰理）**。
+
+- 低电量提醒：`getLowBatteryReminderSwitchWithCallback:` / `setLowBatteryReminderSwitch:callback:`。
+- 震动：`getVibrationSettingsWithCallback:` / `setVibrationSettings:callback:`；模型 `HwVibrationSettings` 含 `on`（Swift 为 `isOn`）与 `intensity`。弱／中／强分别为 33／66／99；关闭时保留原强度。
+- 自动识别锻炼：沿用 hawofit 的 **App 本地提示开关**，不是设备检测开关。用 `addWorkoutTypeRecognitionCallback:` 接收类别，配对 `removeWorkoutTypeRecognitionCallback:` 移除本模块回调。
+
+识别类别：1 步行、2 跑步、3 骑行、4 椭圆机、5 划船机；未知类别忽略。Demo 在首页或闹钟／提醒页显示提示，可忽略、今天不再提示或关闭；本地设置在解绑后清除。该入口不启动运动记录。
 
 ---
 
@@ -2234,6 +2298,99 @@ AI / 穆斯林朝拜等扩展见 `HwBluetoothSDK.h` 中 `#pragma mark - AI` / `#
     }];
 }
 ```
+
+---
+
+## 23. AiSDK 与 App 主动分析
+
+### 23.1 依赖与入口
+
+蓝牙 SDK 与 AiSDK 是不同模块。本节对应当前 Demo 的 AiSDK 1.3.4 Git 交付；相同版本号可能对应不同提交，复现时以 `Podfile.lock` 中的 commit 和 checksum 为准。
+
+沿用仓库 `Podfile`，执行 `pod install` 并打开 `BleSdkDemo.xcworkspace`。当前 AiSDK 的 podspec 已包含 `NativeLib.xcframework` 和 `Vendor/OAS/*.xcframework`，**不需宿主再声明 OAS Pod 或添加寒霜 Specs 源**。旧提交若报 `OAS (= 2.5.0)` 找不到，应先核对是否已更新到自带二进制的交付。应用提供 `JLBmpConvertKit`，并在 SDK 初始化时注入转换器，见 `BleRepository.initSDK()`。
+
+Demo 分为两条流程：
+
+- **首页 → AI → AI DEMO**：手表触发语音、问答、表盘等；注册 `AiSDKCallback`，通过 `startWorking()` 开始监听。
+- **首页 → AI → AI 分析下六个入口**：App 点击生成报告。当前仅输入健康数据为 mock，返回内容来自真实云端，不是本地伪造报告。实现见 `AiAnalysisViewController` / `AiAnalysisMock`。
+
+### 23.2 渠道与设备初始化
+
+需要真实且具备 AI 授权的设备 ID；mock 健康数据不等于可以使用 mock 设备 ID。Demo 先检查 BLE 连接，再通过 `BleRepository.getDeviceInfo` 取得 ID，不能只用设备名或 MAC 替代。
+
+AI 洞察、身体状态、睡眠报告走 OAS。渠道参数需在 `setDeviceInfo` **之前**配置：
+
+```swift
+import AiSDK
+
+AiOASClient.shared.configure(
+    channelId: channelID,
+    appKey: appKey,
+    appUuid: nil,
+    appChannel: nil
+)
+let ai = AiSDK.sharedInstance()
+let info = AiDeviceInfo()
+info.setValue(deviceId, forKey: "Id")
+info.mac = deviceMac
+info.name = deviceName
+info.type = productType
+info.width = 480
+info.height = 480
+info.cornerRadius = 240
+info.thumbnailWidth = 264
+info.thumbnailHeight = 264
+info.thumbnailCornerRadius = 132
+info.currentLocale = "zh"
+info.supportedLocales = ["zh", "en"]
+info.healthAnalysisAppOnly = true
+ai.setDeviceInfo(info)
+```
+
+示例屏幕尺寸沿用 Demo 默认值；集成时填写真实产品参数，亦可复用 `AiDeviceInfoBuilder`。当前 `AiDeviceInfo` 暴露 `platformType`；平台解析复用 `AiPlatformHelper`。`setDeviceInfo` 触发 SDK 初始化，网络、授权和渠道错误必须显示给用户。
+
+Demo 的 Channel ID / App Key 默认沿用 hawofit，**明文显示、允许编辑**；环境变量 `AI_OAS_CHANNEL_ID` / `AI_OAS_APP_KEY` 可覆盖默认值。编辑仅对当前页面有效，不写 UserDefaults。文档示例不包含真实密钥。
+
+### 23.3 六项分析接口
+
+桥接头需包含：
+
+```objc
+#import <AiSDK/AiSDK.h>
+#import <AiSDK/AiSDK+HealthAgents.h>
+#import <AiSDK/DefaultHealthAnalysisResultHandler.h>
+```
+
+| Demo 功能 | 输入与调用 | 返回 |
+| --- | --- | --- |
+| 运动健康分析 | `HwHealthData` → `DefaultHealthAnalysisResultHandler.analysis(_:)`，`appOnly = true` | `AiSDKCallback.aiHealthAnalysisDone`，`HwHealthAnalysisResult` |
+| AI 洞察 | `AiExerciseInsightInput` → `generateExerciseInsight(_:completion:)` | 标题、正文、提醒类别、可选心情 |
+| 身体状态 | `AiBodyStatusInput` → `generateBodyStatus(_:completion:)` | 标题、等级、0～100 评分、正文 |
+| AI 睡眠（天） | `AiSleepChronotypeInput.period = 0` → `generateSleepChronotype(_:completion:)` | 最佳入睡时间、时型、解释、调整建议、睡眠计划 |
+| AI 睡眠（周） | 同上，`period = 1` | 同上 |
+| AI 睡眠（月） | 同上，`period = 2` | 同上 |
+
+运动健康分析使用原有健康汇总分析通道，不是运动详情的 `getAiExerciseAnalyzeWithType:data:callback:`。调用前保存旧 `AiSDK.callback`，只在本次请求期间接管；结束、超时、退出时取消本页 handler 并恢复旧 callback。`healthAnalysisAppOnly` / handler 的 `appOnly` 防止把 Demo 结果回传手表。
+
+其余五个入口使用直接 completion，不需为这些 App 主动调用注册全套手表监听，也不需单为它们调用 `startWorking()`。不要为退出分析页而全局 `stopWorking()`，避免中断其他模块。
+
+### 23.4 输入顺序、日期与单位
+
+- 运动健康分析：`HwHealthData.dailyDataList` 为最近 7 天，`day = 0...6`；Demo 基础资料为 30 岁、175 cm、70 kg，`weight = 700`（0.1 kg），睡眠为分钟。Swift 的 `PAI` 属性名为 `pai`。
+- AI 洞察：含当天最近 7 天，所有每日数组均为 7 项，**从近到远**保持相同顺序。日期为 `yyyy/MM/dd-yyyy/MM/dd`，结束日期在前。心情使用 SDK 约定的中文枚举，不能直接换成翻译后的字符串。
+- 身体状态：当天 `yyyy/MM/dd`；心率、HRV、压力等小时数组按时间顺序；睡眠分段数组对应一致。心率单位 bpm，HRV 为 ms，热量 kcal，活动与睡眠时长为分钟。
+- 睡眠日／周／月：分别为 1 项、最近 7 项、本月 1 日至当天的项数；均从近到远。日日期为 `yyyy/MM/dd`，周／月为结束日期到开始日期。月报不是滚动 30 天。
+- `sleepHours` 和 `getUpHours` 数量必须相同；Demo 固定 24 小时制，格式 `HH:mm:ss`。SDK 亦支持 `use12HourClock = true` 配合 `hh:mm:ss AM/PM`；缺失日期用字符串 `0` 占位。
+
+Mock 工厂是 `AiAnalysisMock`；替换真实数据时保留相同单位、日期和数组对齐规则，不要把返回报告一起 mock。
+
+### 23.5 UI 与验证边界
+
+Demo 请求期间禁用重复操作及参数编辑；90 秒超时后恢复操作，退出页面丢弃旧会话结果。该超时是 Demo UI 策略，不代表云端请求已取消。SDK 返回 error 或空结果均显示失败，可重新生成；不将错误伪装成成功报告。
+
+常见检查顺序：BLE 与设备 ID → AI 授权 → 渠道参数 → 网络 → 输入日期与数组数量 → 返回格式。语音录音功能才需麦克风权限，本页以健康数据生成报告不申请录音权限。
+
+已完成的验证为设备目标编译及 mock 输入检查（日／周／月数量、跨年与闰年日期、每日数组对齐）。**真实云端与授权设备联调仍需在真机执行**。本地 `tests/check_ai_analysis_mock.py` 是辅助检查，不随功能提交。
 
 ---
 

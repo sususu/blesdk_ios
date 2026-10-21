@@ -36,8 +36,11 @@
 "home_daily" = "提醒与日常";
 "home_media" = "表盘、媒体与 AI";
 "home_maintenance" = "升级与维护";
-"home_show_logs" = "展开运行日志";
-"home_hide_logs" = "收起运行日志";
+"home_show_logs" = "运行日志";
+"home_hide_logs" = "运行日志";
+"home_logs_count" = "%d 条";
+"home_logs_empty" = "暂无日志";
+"home_clear_logs" = "清空";
 "scan_connect" = "扫描连接";
 "bind_watch" = "绑定";
 "sync_data" = "同步数据";
@@ -113,6 +116,9 @@
 "jieli_reminder_slots_full" = "杰理提醒 ID 6～10 已全部占用";
 "jieli_alarm_id_rule_note" = "Demo ID 约束：闹钟和提醒共享同一 ID 空间。\n当前范围：闹钟使用 1～5，提醒使用 6～10。\n注意：数量和 ID 区间仅用于 Demo，实际接入时需根据具体设备能力调整。";
 "jieli_delete_id_rejected" = "设备未确认删除 ID %d";
+"raise_hand_light" = "抬手亮屏";
+"raise_hand_note" = "开启后，抬起手腕即可点亮手表屏幕。";
+"raise_hand_missing" = "设备未返回抬手亮屏开关";
 "notify" = "通知 / 通讯录";
 "music" = "音乐推送";
 "album" = "相册推送";
@@ -256,6 +262,52 @@
 "notify_switches_ok" = "已开启 Demo 开关";
 "notify_contacts_ok" = "通讯录已设置";
 "notify_emergency_ok" = "紧急联系人已设置";
+
+/* Notification switches (HaWoFit NotificationsNewVC) */
+"notify_switch" = "通知开关";
+"notify_switch_pair" = "系统配对";
+"notify_switch_paired" = "已配对，可以设置消息通知";
+"notify_switch_unpaired" = "未配对。请先完成系统蓝牙配对";
+"notify_switch_pairing" = "正在请求配对，请在系统弹窗中允许";
+"notify_switch_pair_action" = "请求配对";
+"notify_switch_pair_failed" = "配对未完成";
+"notify_switch_pair_timeout" = "配对超时";
+"notify_switch_pair_note" = "iOS 消息通知依赖系统蓝牙配对（ANCS）。未配对时向手表发起配对；配对成功后再读取并下发各应用开关。";
+"notify_switch_apps" = "应用通知";
+"notify_switch_apps_note" = "列表与 HaWoFit 默认应用一致，只显示设备返回的类型。打开后，对应应用的消息会推送到手表。";
+"notify_switch_none" = "设备未返回可设置的通知开关";
+"notify_app_calls" = "来电";
+"notify_app_sms" = "短信";
+"notify_app_missed" = "未接来电";
+"notify_app_email" = "邮件";
+"notify_app_calendar" = "日历";
+"notify_app_whatsapp" = "WhatsApp";
+"notify_app_facebook" = "Facebook";
+"notify_app_twitter" = "Twitter";
+"notify_app_youtube" = "YouTube";
+"notify_app_instagram" = "Instagram";
+"notify_app_skype" = "Skype";
+"notify_app_linkedin" = "LinkedIn";
+"notify_app_line" = "Line";
+"notify_app_snapchat" = "Snapchat";
+"notify_app_telegram" = "Telegram";
+"notify_app_kakaotalk" = "KakaoTalk";
+"notify_app_wechat" = "微信";
+"notify_app_qq" = "QQ";
+"notify_app_tiktok" = "抖音";
+"notify_app_gmail" = "Gmail";
+"notify_app_messenger" = "Messenger";
+"notify_app_pinterest" = "Pinterest";
+"notify_app_hangout" = "Hangout";
+"notify_app_outlook" = "Outlook";
+"notify_app_truecaller" = "Truecaller";
+"notify_app_tumblr" = "Tumblr";
+"notify_app_flickr" = "Flickr";
+"notify_app_vk" = "VK";
+"notify_app_viber" = "Viber";
+"notify_app_hangouts" = "Hangouts";
+"notify_app_zalo" = "Zalo";
+"notify_app_other" = "其他";
 
 /* Music */
 "music_query_storage" = "查询音乐存储";
@@ -655,6 +707,27 @@
 "ai_analysis_mock_insight" = "最近 7 天：步数 8200/7600/9100/6300/8500/7200/8800；活动 55/45/62/35/58/42/60 分钟，并包含热量、心情、心率、HRV、压力及睡眠。目标 8000 步／60 分钟／350 kcal。所有每日数组按从近到远排列。";
 "ai_analysis_mock_body" = "当天：8200 步、活动 55 分钟、360 kcal；6 小时段心率／静息心率／HRV／压力；睡眠 475 分钟（浅睡 250、深睡 110），睡眠评分 88。";
 
+/* AI health analysis */
+"ai_health_analysis" = "AI健康分析";
+"ai_health_empty" = "在手表的「运动健康分析」中点击生成报告。";
+"ai_health_waiting" = "正在等待手表生成报告。同一天的新报告会覆盖当天记录。";
+"ai_health_received" = "已收到手表健康分析报告";
+"ai_health_generate" = "生成演示报告";
+"ai_health_generating" = "正在生成…";
+"ai_health_saved" = "报告已保存";
+"ai_health_failed" = "健康分析失败";
+"ai_health_records" = "分析记录";
+"ai_health_records_empty" = "暂无分析记录";
+"ai_health_summary" = "AI 总结";
+"ai_health_today" = "今天";
+"ai_health_steps" = "步数";
+"ai_health_hr" = "心率";
+"ai_health_sleep" = "睡眠";
+"ai_health_spo2" = "血氧";
+"ai_health_stress" = "压力";
+"ai_health_pai" = "PAI";
+"ai_health_weight" = "体重";
+
 /* Jieli reminder notifications */
 "jieli_reminder_notify" = "提醒监听（杰理）";
 "jl_notify_start" = "开始监听";
@@ -721,3 +794,36 @@
 "jl_notify_meal" = "用餐时间到了";
 "jl_notify_bill" = "账单提醒时间到了";
 "jl_notify_custom" = "自定义提醒时间到了";
+
+/* Electronic card */
+"e_card" = "电子卡";
+"ecard_hint" = "将社交软件的个人二维码添加到您的手表上，就可随时随地使用了";
+"ecard_my_card" = "我的卡";
+"ecard_add" = "添加";
+"ecard_empty" = "还没有电子卡";
+"ecard_loading" = "正在读取电子卡…";
+"ecard_id" = "ID %d";
+"ecard_limit" = "最多添加 3 张电子卡";
+"ecard_name" = "名称";
+"ecard_name_limit" = "名称最多 40 个字符";
+"ecard_steps" = "添加步骤：";
+"ecard_step_1" = "1、点击上方二维码区域，添加或更换二维码；";
+"ecard_step_2" = "2、点击下方保存按钮，将卡片添加到手表。";
+"ecard_save" = "保存";
+"ecard_saving" = "正在保存…";
+"ecard_delete" = "删除";
+"ecard_delete_confirm" = "您确定删除吗?";
+"ecard_deleting" = "正在删除…";
+"ecard_need_qr" = "请添加二维码";
+"ecard_need_name" = "请输入名称";
+"ecard_scan" = "扫描二维码";
+"ecard_scan_hint" = "请把二维码放置在识别框中";
+"ecard_album" = "从相册选择";
+"ecard_source" = "添加二维码";
+"ecard_camera_denied" = "请在设置里面为应用打开摄像头权限";
+"ecard_camera_unavailable" = "当前设备无法使用相机，请从相册选择二维码";
+"ecard_permission_title" = "获取权限";
+"ecard_scan_failed" = "未识别到二维码";
+"ecard_settings" = "去设置";
+"ecard_loading_content" = "正在读取二维码…";
+"ecard_slots_full" = "没有可用的电子卡编号";

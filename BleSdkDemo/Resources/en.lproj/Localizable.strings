@@ -36,8 +36,11 @@
 "home_daily" = "Reminders & Daily Use";
 "home_media" = "Watchfaces, Media & AI";
 "home_maintenance" = "Updates & Maintenance";
-"home_show_logs" = "Show Activity Logs";
-"home_hide_logs" = "Hide Activity Logs";
+"home_show_logs" = "Activity Logs";
+"home_hide_logs" = "Activity Logs";
+"home_logs_count" = "%d";
+"home_logs_empty" = "No logs yet";
+"home_clear_logs" = "Clear";
 "scan_connect" = "Scan & Connect";
 "bind_watch" = "Bind";
 "sync_data" = "Sync Data";
@@ -113,6 +116,9 @@
 "jieli_reminder_slots_full" = "All Jieli reminder IDs (6–10) are occupied";
 "jieli_alarm_id_rule_note" = "Demo ID rule: alarms and reminders share one ID space.\nCurrent ranges: alarms use 1–5; reminders use 6–10.\nNote: these counts and ranges are for the demo only; adjust them to the target device capabilities.";
 "jieli_delete_id_rejected" = "The device did not confirm deletion of ID %d";
+"raise_hand_light" = "Lift Wrist Awaken";
+"raise_hand_note" = "When on, raising your wrist turns the watch screen on.";
+"raise_hand_missing" = "The device did not return the lift-wrist-awaken switch";
 "notify" = "Notify / Contacts";
 "music" = "Music Transfer";
 "album" = "Album Transfer";
@@ -256,6 +262,52 @@
 "notify_switches_ok" = "Switches enabled";
 "notify_contacts_ok" = "Demo contacts written";
 "notify_emergency_ok" = "Emergency contact set";
+
+/* Notification switches (HaWoFit NotificationsNewVC) */
+"notify_switch" = "Notification Switches";
+"notify_switch_pair" = "System Pairing";
+"notify_switch_paired" = "Paired. Message notifications can be configured";
+"notify_switch_unpaired" = "Not paired. Complete system Bluetooth pairing first";
+"notify_switch_pairing" = "Requesting pairing. Allow the system prompt";
+"notify_switch_pair_action" = "Request Pairing";
+"notify_switch_pair_failed" = "Pairing was not completed";
+"notify_switch_pair_timeout" = "Pairing timed out";
+"notify_switch_pair_note" = "iOS message notifications require system Bluetooth pairing (ANCS). If the watch is not paired, this page asks it to pair. Switches are read and written after pairing succeeds.";
+"notify_switch_apps" = "App Notifications";
+"notify_switch_apps_note" = "The list matches HaWoFit default apps and shows only types the device returns. When on, messages from that app are pushed to the watch.";
+"notify_switch_none" = "The device returned no configurable notification switches";
+"notify_app_calls" = "Incoming Call";
+"notify_app_sms" = "SMS";
+"notify_app_missed" = "Missed Call";
+"notify_app_email" = "E-mail";
+"notify_app_calendar" = "Calendar";
+"notify_app_whatsapp" = "WhatsApp";
+"notify_app_facebook" = "Facebook";
+"notify_app_twitter" = "Twitter";
+"notify_app_youtube" = "YouTube";
+"notify_app_instagram" = "Instagram";
+"notify_app_skype" = "Skype";
+"notify_app_linkedin" = "LinkedIn";
+"notify_app_line" = "Line";
+"notify_app_snapchat" = "Snapchat";
+"notify_app_telegram" = "Telegram";
+"notify_app_kakaotalk" = "KakaoTalk";
+"notify_app_wechat" = "WeChat";
+"notify_app_qq" = "QQ";
+"notify_app_tiktok" = "TikTok";
+"notify_app_gmail" = "Gmail";
+"notify_app_messenger" = "Messenger";
+"notify_app_pinterest" = "Pinterest";
+"notify_app_hangout" = "Hangout";
+"notify_app_outlook" = "Outlook";
+"notify_app_truecaller" = "Truecaller";
+"notify_app_tumblr" = "Tumblr";
+"notify_app_flickr" = "Flickr";
+"notify_app_vk" = "VK";
+"notify_app_viber" = "Viber";
+"notify_app_hangouts" = "Hangouts";
+"notify_app_zalo" = "Zalo";
+"notify_app_other" = "Others";
 
 /* Music */
 "music_query_storage" = "Query music storage";
@@ -655,6 +707,27 @@
 "ai_analysis_mock_insight" = "Last 7 days: steps 8200/7600/9100/6300/8500/7200/8800; activity 55/45/62/35/58/42/60 min, plus calories, mood, HR, HRV, stress and sleep. Goals: 8000 steps / 60 min / 350 kcal. Daily arrays are newest first.";
 "ai_analysis_mock_body" = "Today: 8200 steps, 55 activity min, 360 kcal; 6 hourly HR/resting HR/HRV/stress samples; 475 sleep min (250 light, 110 deep), sleep score 88.";
 
+/* AI health analysis */
+"ai_health_analysis" = "AI Health Analysis";
+"ai_health_empty" = "On the watch, open Exercise Health Analysis and tap Generate Report.";
+"ai_health_waiting" = "Waiting for the watch to generate a report. A new report replaces the record for the current day.";
+"ai_health_received" = "Health analysis report received from the watch";
+"ai_health_generate" = "Generate Demo Report";
+"ai_health_generating" = "Generating…";
+"ai_health_saved" = "Report saved";
+"ai_health_failed" = "Health analysis failed";
+"ai_health_records" = "Analysis Records";
+"ai_health_records_empty" = "No analysis records";
+"ai_health_summary" = "AI Summary";
+"ai_health_today" = "Today";
+"ai_health_steps" = "Steps";
+"ai_health_hr" = "Heart Rate";
+"ai_health_sleep" = "Sleep";
+"ai_health_spo2" = "SpO2";
+"ai_health_stress" = "Stress";
+"ai_health_pai" = "PAI";
+"ai_health_weight" = "Weight";
+
 /* Jieli reminder notifications */
 "jieli_reminder_notify" = "Reminder Listener (Jieli)";
 "jl_notify_start" = "Start Listening";
@@ -721,3 +794,36 @@
 "jl_notify_meal" = "Meal, it is time";
 "jl_notify_bill" = "Bill, it is time";
 "jl_notify_custom" = "Custom reminder, it is time";
+
+/* Electronic card */
+"e_card" = "E-Card";
+"ecard_hint" = "Add the personal QR code of the social software to your watch and use it anytime, anywhere";
+"ecard_my_card" = "My Card";
+"ecard_add" = "Add";
+"ecard_empty" = "No e-cards yet";
+"ecard_loading" = "Loading e-cards…";
+"ecard_id" = "ID %d";
+"ecard_limit" = "You can add up to 3 e-cards";
+"ecard_name" = "Name";
+"ecard_name_limit" = "Name can be at most 40 characters";
+"ecard_steps" = "Add steps:";
+"ecard_step_1" = "1. Click the QR code area above to add or replace the QR code;";
+"ecard_step_2" = "2. Click the Save button below to add the card to the watch.";
+"ecard_save" = "Save";
+"ecard_saving" = "Saving…";
+"ecard_delete" = "Delete";
+"ecard_delete_confirm" = "Are you sure to delete?";
+"ecard_deleting" = "Deleting…";
+"ecard_need_qr" = "Please add QR code";
+"ecard_need_name" = "Please enter a name";
+"ecard_scan" = "Scan QR code";
+"ecard_scan_hint" = "Place the QR code inside the frame";
+"ecard_album" = "Choose from Album";
+"ecard_source" = "Add QR Code";
+"ecard_camera_denied" = "The camera limited privileges, please enable in the system Settings";
+"ecard_camera_unavailable" = "Camera is unavailable. Choose a QR code from the album";
+"ecard_permission_title" = "Get Permission";
+"ecard_scan_failed" = "No QR code found";
+"ecard_settings" = "Settings";
+"ecard_loading_content" = "Loading QR code…";
+"ecard_slots_full" = "No free e-card slot";

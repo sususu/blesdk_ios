@@ -785,6 +785,59 @@ final class BleRepository {
         }
     }
 
+    // MARK: - Electronic cards (HaWoFit QrCard)
+
+    /// Reads e-card summaries from the watch. QR payload is fetched separately.
+    func getElectronicCards(completion: @escaping (Result<[ElectronicCard], Error>) -> Void) {
+        sdk.getQrcodeCards { cards, error in
+            DispatchQueue.main.async {
+                if let error = error {
+                    completion(.failure(error))
+                    return
+                }
+                let list = (cards ?? []).map {
+                    ElectronicCard(id: $0.id, name: $0.name, content: $0.content)
+                }
+                completion(.success(list))
+            }
+        }
+    }
+
+    func getElectronicCardContent(id: Int, completion: @escaping (Result<String, Error>) -> Void) {
+        sdk.getQrcodeCardContent(byId: id) { text, error in
+            DispatchQueue.main.async {
+                if let error = error { completion(.failure(error)) }
+                else { completion(.success(text ?? "")) }
+            }
+        }
+    }
+
+    func addElectronicCard(_ card: ElectronicCard, completion: @escaping (Result<Void, Error>) -> Void) {
+        sdk.addQrcodeCard(Self.hwQrCard(card)) { ok, error in
+            DispatchQueue.main.async { Self.boolResult(ok, error, completion) }
+        }
+    }
+
+    func editElectronicCard(_ card: ElectronicCard, completion: @escaping (Result<Void, Error>) -> Void) {
+        sdk.editQrcodeCard(Self.hwQrCard(card)) { ok, error in
+            DispatchQueue.main.async { Self.boolResult(ok, error, completion) }
+        }
+    }
+
+    func deleteElectronicCard(id: Int, completion: @escaping (Result<Void, Error>) -> Void) {
+        sdk.delQrcodeCard(byId: id) { ok, error in
+            DispatchQueue.main.async { Self.boolResult(ok, error, completion) }
+        }
+    }
+
+    private static func hwQrCard(_ card: ElectronicCard) -> HwQrCard {
+        let model = HwQrCard()
+        model.id = card.id
+        model.name = card.name
+        model.content = card.content
+        return model
+    }
+
     /// Reads the sedentary-reminder configuration from the device.
     func getSedentary(completion: @escaping (Result<HwSedentaryReminder, Error>) -> Void) {
         sdk.getSedentaryReminder { reminder, error in
@@ -887,6 +940,17 @@ final class BleRepository {
             }
         }
         run(0)
+    }
+
+    /// Writes one notification switch. Matches HaWoFit `setSocialSwitchWithType:S:`.
+    func setSocialSwitch(_ type: HwSocialSwitchType, on: Bool, completion: @escaping (Result<Void, Error>) -> Void) {
+        sdk.setSocialSwitchWith(type, s: on) { ok, error in
+            DispatchQueue.main.async {
+                if let error { completion(.failure(error)); return }
+                if ok { completion(.success(())); return }
+                completion(.failure(SdkError(code: -1, message: L10n.tr("jieli_alarm_rejected"))))
+            }
+        }
     }
 
     /// Writes two hardcoded demo contacts onto the device.

@@ -90,3 +90,22 @@ struct SdkError: Error, LocalizedError {
     let message: String
     var errorDescription: String? { "[\(code)] \(message)" }
 }
+
+/// Watch e-card (QR name card). List reads may omit `content`; load it by id before editing.
+struct ElectronicCard: Equatable {
+    var id: Int
+    var name: String
+    var content: String
+}
+
+enum ElectronicCardRules {
+    /// HaWoFit shows the add entry only while fewer than 3 cards exist.
+    static let maxCount = 3
+    /// HaWoFit `NameInputVC` limit for an e-card name, counted in UTF-16 code units.
+    static let maxNameUTF16 = 40
+    static let idRange = 1...10
+
+    static func nextId(used: Set<Int>) -> Int? {
+        idRange.first { !used.contains($0) }
+    }
+}

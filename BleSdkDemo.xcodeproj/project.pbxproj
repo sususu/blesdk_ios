@@ -32,6 +32,7 @@
 		22C33A9279D5EA3A3CBD2220 /* JieliManualMeasureViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF973DBBA57A72AE5FA132F4 /* JieliManualMeasureViewController.swift */; };
 		22C33A9279D5EA3A3CBD2221 /* JieliAutoMonitorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF973DBBA57A72AE5FA132F5 /* JieliAutoMonitorViewController.swift */; };
 		22C33A9279D5EA3A3CBD2222 /* AiAnalysisViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF973DBBA57A72AE5FA132F6 /* AiAnalysisViewController.swift */; };
+		A1A20001A1A20001A1A20001 /* AiHealthAnalysisViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1A10001A1A10001A1A10001 /* AiHealthAnalysisViewController.swift */; };
 		255E38BE21C4B69BBA9FF1CA /* SifliOtaPusher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E717FEEB44E3BA3EE0B389B /* SifliOtaPusher.swift */; };
 		2ABB1804C393B97C83F072C5 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD34F1A20A84C7AACA9F5217 /* AppDelegate.swift */; };
 		2C076A8A599942B99A769B92 /* OnlineWatchfaceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49B7674D8BD54992BE75ACA4 /* OnlineWatchfaceViewController.swift */; };
@@ -45,6 +46,8 @@
 		57AB498C14A031233E7137CE /* UnbindFlowViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6579266C6513A7C238F54CFD /* UnbindFlowViewController.swift */; };
 		6126B03BDE753C63C1475BD9 /* OtaFirmwareApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = D60674E7BC247DD7B39B41FD /* OtaFirmwareApi.swift */; };
 		61331A87A76AF27CCAE6BB3C /* FeatureViewControllers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EB3FAFDA08BFDBE6F331860 /* FeatureViewControllers.swift */; };
+		ECA10001ECA10001ECA10001 /* ElectronicCardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECA10002ECA10002ECA10002 /* ElectronicCardViewController.swift */; };
+		RHL20001RHL20001RHL20001 /* RaiseHandLightViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = RHL10001RHL10001RHL10001 /* RaiseHandLightViewController.swift */; };
 		6B93AC57E3937E4122FF9AEB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D4A3290874E6684FE560CA97 /* Assets.xcassets */; };
 		78CDE3DB7180C2C7D3A311C0 /* BindFlowViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5D8C7D3541C7418C8C259A3 /* BindFlowViewController.swift */; };
 		7D77EF66DE5F7F21F446F9D4 /* OtaUpgradeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B91DA5AF632A0141068D36C7 /* OtaUpgradeViewController.swift */; };
@@ -133,6 +136,8 @@
 		54B5306B5EFC774661A5DB61 /* BleSdkDemo-Jieli-Bridging-Header.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "BleSdkDemo-Jieli-Bridging-Header.h"; path = "BleSdkDemo/Supporting/BleSdkDemo-Jieli-Bridging-Header.h"; sourceTree = "<group>"; };
 		6579266C6513A7C238F54CFD /* UnbindFlowViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = UnbindFlowViewController.swift; path = BleSdkDemo/Sources/UI/Unbind/UnbindFlowViewController.swift; sourceTree = "<group>"; };
 		6EB3FAFDA08BFDBE6F331860 /* FeatureViewControllers.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = FeatureViewControllers.swift; path = BleSdkDemo/Sources/UI/Features/FeatureViewControllers.swift; sourceTree = "<group>"; };
+		ECA10002ECA10002ECA10002 /* ElectronicCardViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ElectronicCardViewController.swift; path = BleSdkDemo/Sources/UI/Features/ElectronicCardViewController.swift; sourceTree = "<group>"; };
+		RHL10001RHL10001RHL10001 /* RaiseHandLightViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RaiseHandLightViewController.swift; path = BleSdkDemo/Sources/UI/Features/RaiseHandLightViewController.swift; sourceTree = "<group>"; };
 		7866CD6110555D10C1B45FC7 /* AgpsXywBuilder.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AgpsXywBuilder.swift; path = BleSdkDemo/Sources/Services/AgpsXywBuilder.swift; sourceTree = "<group>"; };
 		87533339C8C8D14D102294FB /* BoundDeviceStore.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BoundDeviceStore.swift; path = BleSdkDemo/Sources/Services/BoundDeviceStore.swift; sourceTree = "<group>"; };
 		87FCCB64FDE7373D4B06F7CF /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; name = Info.plist; path = BleSdkDemo/Supporting/Info.plist; sourceTree = "<group>"; };
@@ -165,6 +170,7 @@
 		CF973DBBA57A72AE5FA132F4 /* JieliManualMeasureViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = JieliManualMeasureViewController.swift; path = BleSdkDemo/Sources/UI/Jieli/JieliManualMeasureViewController.swift; sourceTree = "<group>"; };
 		CF973DBBA57A72AE5FA132F5 /* JieliAutoMonitorViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = JieliAutoMonitorViewController.swift; path = BleSdkDemo/Sources/UI/Jieli/JieliAutoMonitorViewController.swift; sourceTree = "<group>"; };
 		CF973DBBA57A72AE5FA132F6 /* AiAnalysisViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AiAnalysisViewController.swift; path = BleSdkDemo/Sources/UI/AI/AiAnalysisViewController.swift; sourceTree = "<group>"; };
+		A1A10001A1A10001A1A10001 /* AiHealthAnalysisViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AiHealthAnalysisViewController.swift; path = BleSdkDemo/Sources/UI/AI/AiHealthAnalysisViewController.swift; sourceTree = "<group>"; };
 		D4A3290874E6684FE560CA97 /* Assets.xcassets */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder.assetcatalog; name = Assets.xcassets; path = BleSdkDemo/Resources/Assets.xcassets; sourceTree = "<group>"; };
 		D60674E7BC247DD7B39B41FD /* OtaFirmwareApi.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = OtaFirmwareApi.swift; path = BleSdkDemo/Sources/Services/Ota/OtaFirmwareApi.swift; sourceTree = "<group>"; };
 		D641DF46CA811EC15937CA3B /* LocaleHelper.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = LocaleHelper.swift; path = BleSdkDemo/Sources/Services/LocaleHelper.swift; sourceTree = "<group>"; };
@@ -314,6 +320,8 @@
 				B91DA5AF632A0141068D36C7 /* OtaUpgradeViewController.swift */,
 				2350CCE1DD1241DA119C437D /* AlbumTransferViewController.swift */,
 				6EB3FAFDA08BFDBE6F331860 /* FeatureViewControllers.swift */,
+				ECA10002ECA10002ECA10002 /* ElectronicCardViewController.swift */,
+				RHL10001RHL10001RHL10001 /* RaiseHandLightViewController.swift */,
 				02A439A6EEAD381A87B7EC56 /* MusicTransferViewController.swift */,
 				CF973DBBA57A72AE5FA132E6 /* HomeViewController.swift */,
 				A1F10001A1F10001A1F10001 /* AiHostViewController.swift */,
@@ -327,6 +335,7 @@
 				CF973DBBA57A72AE5FA132F4 /* JieliManualMeasureViewController.swift */,
 				CF973DBBA57A72AE5FA132F5 /* JieliAutoMonitorViewController.swift */,
 				CF973DBBA57A72AE5FA132F6 /* AiAnalysisViewController.swift */,
+				A1A10001A1A10001A1A10001 /* AiHealthAnalysisViewController.swift */,
 				CF973DBBA57A72AE5FA132E8 /* JieliHealthRepository.swift */,
 				CF973DBBA57A72AE5FA132E9 /* JieliAlarmRepository.swift */,
 				CF973DBBA57A72AE5FA132EA /* JieliAlarmReminderViewController.swift */,
@@ -646,6 +655,8 @@
 				7D77EF66DE5F7F21F446F9D4 /* OtaUpgradeViewController.swift in Sources */,
 				A55959D7EDBC03437D883E7C /* AlbumTransferViewController.swift in Sources */,
 				61331A87A76AF27CCAE6BB3C /* FeatureViewControllers.swift in Sources */,
+				ECA10001ECA10001ECA10001 /* ElectronicCardViewController.swift in Sources */,
+				RHL20001RHL20001RHL20001 /* RaiseHandLightViewController.swift in Sources */,
 				EBF773BDBEDA0F71E4A49AC3 /* MusicTransferViewController.swift in Sources */,
 				22C33A9279D5EA3A3CBD2212 /* HomeViewController.swift in Sources */,
 				A1B10001A1B10001A1B10001 /* AiHostViewController.swift in Sources */,
@@ -659,6 +670,7 @@
 				22C33A9279D5EA3A3CBD2220 /* JieliManualMeasureViewController.swift in Sources */,
 				22C33A9279D5EA3A3CBD2221 /* JieliAutoMonitorViewController.swift in Sources */,
 				22C33A9279D5EA3A3CBD2222 /* AiAnalysisViewController.swift in Sources */,
+				A1A20001A1A20001A1A20001 /* AiHealthAnalysisViewController.swift in Sources */,
 				22C33A9279D5EA3A3CBD2214 /* JieliHealthRepository.swift in Sources */,
 				22C33A9279D5EA3A3CBD2215 /* JieliAlarmRepository.swift in Sources */,
 				22C33A9279D5EA3A3CBD2216 /* JieliAlarmReminderViewController.swift in Sources */,

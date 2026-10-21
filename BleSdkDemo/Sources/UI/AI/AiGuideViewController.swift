@@ -155,6 +155,10 @@ final class AiGuideViewController: UIViewController {
     - Exercise & health analysis: HwHealthData →
       DefaultHealthAnalysisResultHandler.analysis(_:), appOnly = true.
       Result: AiSDKCallback.aiHealthAnalysisDone.
+      Home → AI Health Analysis listens for the watch Generate Report request
+      (startWorking, healthAnalysisAppOnly = false) and chains the current
+      AiSDKCallback, so AI DEMO keeps its own events. It does not call stopWorking.
+      The page can also generate a sample report with this handler, appOnly = true.
     - AI insights: AiExerciseInsightInput → generateExerciseInsight(_:completion:).
     - Body status: AiBodyStatusInput → generateBodyStatus(_:completion:).
     - AI sleep day/week/month: AiSleepChronotypeInput →

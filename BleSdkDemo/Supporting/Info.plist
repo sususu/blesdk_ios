@@ -31,9 +31,9 @@
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Used for AI watchface voice input debugging</string>
 	<key>NSCameraUsageDescription</key>
-	<string>用于拍摄表盘背景图片</string>
+	<string>用于拍摄表盘背景，以及扫描电子卡二维码</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>用于选择图片/视频作为表盘背景或推送到手表相册</string>
+	<string>用于选择图片/视频作为表盘背景、推送到手表相册，或识别电子卡二维码</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>用于保存相关媒体文件</string>
 	<key>UIAppFonts</key>

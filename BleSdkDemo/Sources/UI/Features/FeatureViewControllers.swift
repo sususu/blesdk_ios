@@ -306,3 +306,341 @@ final class NotifyViewController: FeatureBaseViewController {
         }
     }
 }
+
+/// iOS message-notification switches. Matches HaWoFit `NotificationsNewVC`:
+/// read the system pair state, request pairing when needed, then show the
+/// default apps the device reports and write each toggle with `setSocialSwitch`.
+final class NotificationSwitchViewController: UITableViewController {
+    private struct AppSpec {
+        let type: HwSocialSwitchType
+        let nameKey: String
+    }
+
+    private struct SwitchItem {
+        let type: HwSocialSwitchType
+        let nameKey: String
+        var on: Bool
+    }
+
+    private enum Phase {
+        case needConnect
+        case reading
+        case unpaired
+        case pairing
+        case paired
+        case failed
+    }
+
+    /// HaWoFit `socialapps.json` `defaultapps`, in the same order, plus Others.
+    private static let catalog: [AppSpec] = [
+        AppSpec(type: .calls, nameKey: "notify_app_calls"),
+        AppSpec(type: .message, nameKey: "notify_app_sms"),
+        AppSpec(type: .missCalls, nameKey: "notify_app_missed"),
+        AppSpec(type: .email, nameKey: "notify_app_email"),
+        AppSpec(type: .calendar, nameKey: "notify_app_calendar"),
+        AppSpec(type: .whatsApp, nameKey: "notify_app_whatsapp"),
+        AppSpec(type: .facebook, nameKey: "notify_app_facebook"),
+        AppSpec(type: .twitter, nameKey: "notify_app_twitter"),
+        AppSpec(type: .youtube, nameKey: "notify_app_youtube"),
+        AppSpec(type: .instagram, nameKey: "notify_app_instagram"),
+        AppSpec(type: .skype, nameKey: "notify_app_skype"),
+        AppSpec(type: .linkedin, nameKey: "notify_app_linkedin"),
+        AppSpec(type: .line, nameKey: "notify_app_line"),
+        AppSpec(type: .snapchat, nameKey: "notify_app_snapchat"),
+        AppSpec(type: .telegram, nameKey: "notify_app_telegram"),
+        AppSpec(type: .kakaoTalk, nameKey: "notify_app_kakaotalk"),
+        AppSpec(type: .wechat, nameKey: "notify_app_wechat"),
+        AppSpec(type: .QQ, nameKey: "notify_app_qq"),
+        AppSpec(type: .tikTok, nameKey: "notify_app_tiktok"),
+        AppSpec(type: .gmail, nameKey: "notify_app_gmail"),
+        AppSpec(type: .messenger, nameKey: "notify_app_messenger"),
+        AppSpec(type: .pinterest, nameKey: "notify_app_pinterest"),
+        AppSpec(type: .hangout, nameKey: "notify_app_hangout"),
+        AppSpec(type: .outlook, nameKey: "notify_app_outlook"),
+        AppSpec(type: .truecaller, nameKey: "notify_app_truecaller"),
+        AppSpec(type: .tumblr, nameKey: "notify_app_tumblr"),
+        AppSpec(type: .flickr, nameKey: "notify_app_flickr"),
+        AppSpec(type: .VK, nameKey: "notify_app_vk"),
+        AppSpec(type: .viber, nameKey: "notify_app_viber"),
+        AppSpec(type: .hangouts, nameKey: "notify_app_hangouts"),
+        AppSpec(type: .zalo, nameKey: "notify_app_zalo")
+    ]
+
+    private let repo = BleRepository.shared
+    private var phase: Phase = .reading
+    private var message = ""
+    private var items: [SwitchItem] = []
+    private var busy = false
+    private var request: UUID?
+    private var pairCallback: HwDevicePairStateCallback?
+
+    init() { super.init(style: .insetGrouped) }
+    required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        tableView.rowHeight = UITableView.automaticDimension
+        tableView.estimatedRowHeight = 56
+        navigationItem.rightBarButtonItem = UIBarButtonItem(
+            barButtonSystemItem: .refresh, target: self, action: #selector(reload)
+        )
+        let callback: HwDevicePairStateCallback = { [weak self] state in
+            DispatchQueue.main.async { self?.handlePairEvent(state) }
+        }
+        pairCallback = callback
+        HwBluetoothSDK.sharedInstance().addDevicePairStateCallback(callback)
+        NotificationCenter.default.addObserver(
+            self, selector: #selector(becameActive),
+            name: UIApplication.didBecomeActiveNotification, object: nil
+        )
+    }
+
+    deinit {
+        if let pairCallback {
+            HwBluetoothSDK.sharedInstance().removeDevicePairStateCallback(pairCallback)
+        }
+        NotificationCenter.default.removeObserver(self)
+    }
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        reload()
+    }
+
+    @objc private func becameActive() {
+        guard phase == .unpaired || phase == .pairing else { return }
+        reload()
+    }
+
+    @objc private func reload() {
+        title = L10n.tr("notify_switch")
+        guard repo.isConnected() else {
+            phase = .needConnect
+            message = L10n.tr("status_need_connect")
+            items = []
+            request = nil
+            setBusy(false)
+            return
+        }
+        phase = .reading
+        message = L10n.tr("jieli_settings_reading")
+        items = []
+        let token = UUID()
+        request = token
+        setBusy(true)
+        repo.getPairState { [weak self] result in
+            guard let self, self.request == token else { return }
+            switch result {
+            case .failure(let error):
+                self.phase = .failed
+                self.message = error.localizedDescription
+                self.request = nil
+                self.setBusy(false)
+            case .success(let paired):
+                if paired {
+                    self.loadSwitches(token: token)
+                } else {
+                    self.phase = .unpaired
+                    self.message = L10n.tr("notify_switch_unpaired")
+                    self.request = nil
+                    self.setBusy(false)
+                }
+            }
+        }
+    }
+
+    private func loadSwitches(token: UUID) {
+        message = L10n.tr("notify_getting_switches")
+        repo.getSocialSwitches { [weak self] result in
+            guard let self, self.request == token else { return }
+            self.request = nil
+            switch result {
+            case .failure(let error):
+                self.phase = .failed
+                self.message = error.localizedDescription
+                self.items = []
+            case .success(let list):
+                self.phase = .paired
+                self.message = L10n.tr("notify_switch_paired")
+                self.items = Self.makeItems(list)
+            }
+            self.setBusy(false)
+        }
+    }
+
+    private static func makeItems(_ list: [HwSocialSwitch]) -> [SwitchItem] {
+        let states = Dictionary(list.map { ($0.type, $0.s) }, uniquingKeysWith: { _, latest in latest })
+        var rows = catalog.compactMap { spec -> SwitchItem? in
+            guard let on = states[spec.type] else { return nil }
+            return SwitchItem(type: spec.type, nameKey: spec.nameKey, on: on)
+        }
+        rows.append(SwitchItem(type: .other, nameKey: "notify_app_other", on: states[.other] ?? false))
+        return rows
+    }
+
+    private func setBusy(_ value: Bool) {
+        busy = value
+        navigationItem.rightBarButtonItem?.isEnabled = !value
+        tableView.reloadData()
+    }
+
+    private func handlePairEvent(_ state: Int) {
+        guard !busy else { return }
+        switch state {
+        case 0:
+            reload()
+        case 2:
+            phase = .unpaired
+            message = L10n.tr("notify_switch_pair_timeout")
+            items = []
+            tableView.reloadData()
+        default:
+            phase = .unpaired
+            message = L10n.tr("notify_switch_pair_failed")
+            items = []
+            tableView.reloadData()
+        }
+    }
+
+    @objc private func requestPair() {
+        guard !busy, repo.isConnected(), phase == .unpaired || phase == .pairing else { return }
+        phase = .pairing
+        message = L10n.tr("notify_switch_pairing")
+        let token = UUID()
+        request = token
+        setBusy(true)
+        repo.requestDeviceToPair { [weak self] result in
+            guard let self, self.request == token else { return }
+            switch result {
+            case .failure(let error):
+                self.phase = .unpaired
+                self.message = error.localizedDescription
+                self.request = nil
+                self.setBusy(false)
+            case .success:
+                self.repo.getPairState { [weak self] result in
+                    guard let self, self.request == token else { return }
+                    switch result {
+                    case .success(true):
+                        self.loadSwitches(token: token)
+                    case .success(false):
+                        self.phase = .pairing
+                        self.message = L10n.tr("notify_switch_pairing")
+                        self.request = nil
+                        self.setBusy(false)
+                    case .failure(let error):
+                        self.phase = .pairing
+                        self.message = error.localizedDescription
+                        self.request = nil
+                        self.setBusy(false)
+                    }
+                }
+            }
+        }
+    }
+
+    private var showsPairAction: Bool {
+        phase == .unpaired || phase == .pairing
+    }
+
+    override func numberOfSections(in tableView: UITableView) -> Int {
+        phase == .paired ? 2 : 1
+    }
+
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        if section == 0 { return showsPairAction ? 2 : 1 }
+        return items.count
+    }
+
+    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        section == 0 ? L10n.tr("notify_switch_pair") : L10n.tr("notify_switch_apps")
+    }
+
+    override func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
+        if section == 0 { return L10n.tr("notify_switch_pair_note") }
+        if items.isEmpty { return L10n.tr("notify_switch_none") }
+        return L10n.tr("notify_switch_apps_note")
+    }
+
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        if indexPath.section == 0 {
+            return indexPath.row == 0 ? statusCell() : pairActionCell()
+        }
+        let item = items[indexPath.row]
+        let cell = UITableViewCell(style: .default, reuseIdentifier: nil)
+        cell.selectionStyle = .none
+        cell.textLabel?.text = L10n.tr(item.nameKey)
+        cell.textLabel?.numberOfLines = 0
+        let toggle = UISwitch()
+        toggle.isOn = item.on
+        toggle.isEnabled = !busy
+        toggle.tag = indexPath.row
+        toggle.accessibilityLabel = L10n.tr(item.nameKey)
+        toggle.addTarget(self, action: #selector(changed(_:)), for: .valueChanged)
+        cell.accessoryView = toggle
+        return cell
+    }
+
+    private func statusCell() -> UITableViewCell {
+        let cell = UITableViewCell(style: .subtitle, reuseIdentifier: nil)
+        cell.selectionStyle = .none
+        cell.textLabel?.text = L10n.tr("notify_switch")
+        cell.textLabel?.numberOfLines = 0
+        cell.detailTextLabel?.text = message
+        cell.detailTextLabel?.numberOfLines = 0
+        if busy {
+            let spinner = UIActivityIndicatorView(style: .medium)
+            spinner.startAnimating()
+            cell.accessoryView = spinner
+        }
+        return cell
+    }
+
+    private func pairActionCell() -> UITableViewCell {
+        let cell = UITableViewCell(style: .default, reuseIdentifier: nil)
+        cell.textLabel?.text = L10n.tr("notify_switch_pair_action")
+        cell.textLabel?.textColor = busy ? .tertiaryLabel : .systemBlue
+        cell.selectionStyle = busy ? .none : .default
+        cell.accessibilityLabel = L10n.tr("notify_switch_pair_action")
+        return cell
+    }
+
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+        guard indexPath.section == 0, indexPath.row == 1 else { return }
+        requestPair()
+    }
+
+    @objc private func changed(_ sender: UISwitch) {
+        let row = sender.tag
+        guard items.indices.contains(row), phase == .paired, !busy, repo.isConnected() else {
+            sender.isOn = items.indices.contains(row) ? items[row].on : false
+            if !repo.isConnected() {
+                phase = .needConnect
+                message = L10n.tr("status_need_connect")
+                items = []
+                tableView.reloadData()
+            }
+            return
+        }
+        let previous = items[row].on
+        let on = sender.isOn
+        items[row].on = on
+        message = L10n.tr("jieli_settings_saving")
+        let token = UUID()
+        request = token
+        setBusy(true)
+        repo.setSocialSwitch(items[row].type, on: on) { [weak self] result in
+            guard let self, self.request == token else { return }
+            self.request = nil
+            switch result {
+            case .success:
+                self.message = L10n.tr("notify_switch_paired")
+            case .failure(let error):
+                if self.items.indices.contains(row) { self.items[row].on = previous }
+                self.message = error.localizedDescription
+            }
+            self.setBusy(false)
+        }
+    }
+}

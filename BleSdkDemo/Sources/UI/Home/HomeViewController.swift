@@ -1,7 +1,7 @@
 import UIKit
 
 /// Home hub with grouped device controls and feature demos.
-final class HomeViewController: UIViewController {
+final class HomeViewController: UIViewController, UIGestureRecognizerDelegate {
     private var recognitionCallback: HwWorkoutTypeRecognitionCallback?
     private let repo = BleRepository.shared
 
@@ -20,8 +20,17 @@ final class HomeViewController: UIViewController {
     private let statusSpinner = UIActivityIndicatorView(style: .medium)
     private let deviceLabel = UIHelpers.makeLabel("", style: .subheadline)
     private let syncLabel = UIHelpers.makeLabel("", style: .footnote)
-    private let logToggle = UIHelpers.makeButton("")
+    private let logPanel = UIStackView()
+    private let logHeader = UIControl()
+    private let logTitleLabel = UIHelpers.makeLabel("", style: .subheadline)
+    private let logCountBadge = UIView()
+    private let logCountLabel = UIHelpers.makeLabel("", style: .caption1)
+    private let logChevron = UIImageView()
+    private let logClearButton = UIButton(type: .system)
     private let logView = UITextView()
+    private let versionLabel = UILabel()
+    private var logHeightConstraint: NSLayoutConstraint?
+    private var logsExpanded = false
     private var actionButtons: [String: UIButton] = [:]
     private var sectionLabels: [String: UILabel] = [:]
 
@@ -79,27 +88,14 @@ final class HomeViewController: UIViewController {
         content.translatesAutoresizingMaskIntoConstraints = false
         scroll.addSubview(content)
 
-        logToggle.addTarget(self, action: #selector(tapLogs), for: .touchUpInside)
-        logView.font = .monospacedSystemFont(ofSize: 12, weight: .regular)
-        logView.isEditable = false
-        logView.isSelectable = true
-        logView.backgroundColor = .secondarySystemGroupedBackground
-        logView.layer.cornerRadius = 8
-        logView.textContainerInset = UIEdgeInsets(top: 8, left: 8, bottom: 8, right: 8)
-        logView.textColor = .label
-        logView.isHidden = true
-
-        let logPanel = UIStackView(arrangedSubviews: [logToggle, logView])
-        logPanel.axis = .vertical
-        logPanel.spacing = 6
-        logPanel.translatesAutoresizingMaskIntoConstraints = false
+        setupLogPanel()
         view.addSubview(logPanel)
 
         NSLayoutConstraint.activate([
             scroll.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             scroll.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             scroll.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            scroll.bottomAnchor.constraint(equalTo: logPanel.topAnchor, constant: -8),
+            scroll.bottomAnchor.constraint(equalTo: logPanel.topAnchor, constant: -10),
             content.topAnchor.constraint(equalTo: scroll.contentLayoutGuide.topAnchor, constant: 16),
             content.leadingAnchor.constraint(equalTo: scroll.contentLayoutGuide.leadingAnchor, constant: 16),
             content.trailingAnchor.constraint(equalTo: scroll.contentLayoutGuide.trailingAnchor, constant: -16),
@@ -109,10 +105,6 @@ final class HomeViewController: UIViewController {
             logPanel.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
             logPanel.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -8)
         ])
-        // A hidden arranged view must be able to collapse to zero height.
-        let logHeight = logView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.22)
-        logHeight.priority = .defaultHigh
-        logHeight.isActive = true
 
         let connection = makeSection("home_connection")
         connection.addArrangedSubview(makeStatusRow())
@@ -132,7 +124,8 @@ final class HomeViewController: UIViewController {
             makeAction("jieli_sync_data", action: #selector(tapJieliSync)),
             makeAction("jieli_manual_measure", action: #selector(tapJieliMeasure)),
             makeAction("jieli_auto_monitor", action: #selector(tapJieliAutoMonitor)),
-            makeAction("goals", action: #selector(tapGoals))
+            makeAction("goals", action: #selector(tapGoals)),
+            makeAction("ai_health_analysis", action: #selector(tapAiHealthAnalysis))
         ]))
         syncLabel.textColor = .systemBlue
         health.addArrangedSubview(syncLabel)
@@ -140,9 +133,12 @@ final class HomeViewController: UIViewController {
         let daily = makeSection("home_daily")
         daily.addArrangedSubview(UIHelpers.makeGrid([
             makeAction("alarms", action: #selector(tapAlarms)),
+            makeAction("raise_hand_light", action: #selector(tapRaiseHand)),
             makeAction("jieli_alarms", action: #selector(tapJieliAlarms)),
             makeAction("jieli_reminder_notify", action: #selector(tapReminderNotify)),
-            makeAction("notify", action: #selector(tapNotify))
+            makeAction("notify", action: #selector(tapNotify)),
+            makeAction("notify_switch", action: #selector(tapNotifySwitch)),
+            makeAction("e_card", action: #selector(tapECard))
         ]))
 
         let media = makeSection("home_media")
@@ -182,14 +178,193 @@ final class HomeViewController: UIViewController {
         return button
     }
 
-    @objc private func tapLogs() {
-        logView.isHidden.toggle()
-        updateLogToggle()
+    private func setupLogPanel() {
+        logPanel.axis = .vertical
+        logPanel.spacing = 0
+        logPanel.translatesAutoresizingMaskIntoConstraints = false
+        logPanel.backgroundColor = .secondarySystemGroupedBackground
+        logPanel.layer.cornerRadius = 14
+        logPanel.clipsToBounds = true
+        logPanel.isLayoutMarginsRelativeArrangement = true
+        logPanel.directionalLayoutMargins = NSDirectionalEdgeInsets(top: 4, leading: 4, bottom: 4, trailing: 4)
+
+        let icon = UIImageView(image: UIImage(systemName: "text.alignleft"))
+        icon.tintColor = .secondaryLabel
+        icon.contentMode = .scaleAspectFit
+        icon.setContentHuggingPriority(.required, for: .horizontal)
+        icon.widthAnchor.constraint(equalToConstant: 18).isActive = true
+        icon.heightAnchor.constraint(equalToConstant: 18).isActive = true
+
+        logTitleLabel.font = .preferredFont(forTextStyle: .subheadline)
+        logTitleLabel.textColor = .label
+        logTitleLabel.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+
+        // Badge: fixed padding so the count sits centered in the background.
+        logCountBadge.backgroundColor = .tertiarySystemFill
+        logCountBadge.layer.cornerRadius = 10
+        logCountBadge.clipsToBounds = true
+        logCountBadge.setContentHuggingPriority(.required, for: .horizontal)
+        logCountBadge.setContentCompressionResistancePriority(.required, for: .horizontal)
+        logCountLabel.translatesAutoresizingMaskIntoConstraints = false
+        logCountLabel.font = .preferredFont(forTextStyle: .caption1)
+        logCountLabel.textAlignment = .center
+        logCountLabel.textColor = .secondaryLabel
+        logCountLabel.numberOfLines = 1
+        logCountBadge.addSubview(logCountLabel)
+        NSLayoutConstraint.activate([
+            logCountLabel.centerXAnchor.constraint(equalTo: logCountBadge.centerXAnchor),
+            logCountLabel.centerYAnchor.constraint(equalTo: logCountBadge.centerYAnchor),
+            logCountLabel.leadingAnchor.constraint(greaterThanOrEqualTo: logCountBadge.leadingAnchor, constant: 8),
+            logCountLabel.trailingAnchor.constraint(lessThanOrEqualTo: logCountBadge.trailingAnchor, constant: -8),
+            logCountBadge.heightAnchor.constraint(equalToConstant: 20),
+            logCountBadge.widthAnchor.constraint(greaterThanOrEqualToConstant: 28),
+            logCountBadge.widthAnchor.constraint(equalTo: logCountLabel.widthAnchor, constant: 16)
+        ])
+
+        logChevron.image = UIImage(systemName: "chevron.up")
+        logChevron.tintColor = .tertiaryLabel
+        logChevron.contentMode = .scaleAspectFit
+        logChevron.setContentHuggingPriority(.required, for: .horizontal)
+        logChevron.widthAnchor.constraint(equalToConstant: 14).isActive = true
+        logChevron.heightAnchor.constraint(equalToConstant: 14).isActive = true
+
+        // [icon] [Activity Logs] [Clear] …… [count] [chevron]
+        logClearButton.setTitleColor(.systemBlue, for: .normal)
+        logClearButton.titleLabel?.font = .preferredFont(forTextStyle: .footnote)
+        logClearButton.contentEdgeInsets = UIEdgeInsets(top: 4, left: 4, bottom: 4, right: 4)
+        logClearButton.addTarget(self, action: #selector(tapClearLogs), for: .touchUpInside)
+        logClearButton.setContentHuggingPriority(.required, for: .horizontal)
+        logClearButton.setContentCompressionResistancePriority(.required, for: .horizontal)
+        logClearButton.isHidden = true
+
+        let headerRow = UIStackView(arrangedSubviews: [
+            icon, logTitleLabel, logClearButton, UIView(), logCountBadge, logChevron
+        ])
+        headerRow.axis = .horizontal
+        headerRow.alignment = .center
+        headerRow.spacing = 8
+        headerRow.translatesAutoresizingMaskIntoConstraints = false
+        headerRow.isLayoutMarginsRelativeArrangement = true
+        headerRow.directionalLayoutMargins = NSDirectionalEdgeInsets(top: 10, leading: 10, bottom: 10, trailing: 10)
+
+        logHeader.translatesAutoresizingMaskIntoConstraints = false
+        logHeader.layer.cornerRadius = 10
+        logHeader.addSubview(headerRow)
+        // Expand/collapse via tap on header, but ignore touches on Clear.
+        let expandTap = UITapGestureRecognizer(target: self, action: #selector(tapLogs))
+        expandTap.cancelsTouchesInView = false
+        expandTap.delegate = self
+        logHeader.addGestureRecognizer(expandTap)
+        logHeader.addAction(UIAction { [weak self] _ in
+            self?.logHeader.backgroundColor = .tertiarySystemFill
+        }, for: .touchDown)
+        logHeader.addAction(UIAction { [weak self] _ in
+            self?.logHeader.backgroundColor = .clear
+        }, for: [.touchUpInside, .touchUpOutside, .touchCancel, .touchDragExit])
+
+        NSLayoutConstraint.activate([
+            headerRow.topAnchor.constraint(equalTo: logHeader.topAnchor),
+            headerRow.leadingAnchor.constraint(equalTo: logHeader.leadingAnchor),
+            headerRow.trailingAnchor.constraint(equalTo: logHeader.trailingAnchor),
+            headerRow.bottomAnchor.constraint(equalTo: logHeader.bottomAnchor)
+        ])
+
+        logView.font = .monospacedSystemFont(ofSize: 12, weight: .regular)
+        logView.isEditable = false
+        logView.isSelectable = true
+        logView.backgroundColor = .tertiarySystemGroupedBackground
+        logView.layer.cornerRadius = 10
+        logView.textContainerInset = UIEdgeInsets(top: 10, left: 8, bottom: 10, right: 8)
+        logView.textColor = .label
+        logView.isHidden = true
+        logView.alpha = 0
+        logView.setContentCompressionResistancePriority(.defaultLow, for: .vertical)
+
+        let height = logView.heightAnchor.constraint(equalToConstant: 0)
+        height.priority = .required
+        height.isActive = true
+        logHeightConstraint = height
+
+        logPanel.addArrangedSubview(logHeader)
+        logPanel.addArrangedSubview(logView)
+        logPanel.setCustomSpacing(0, after: logHeader)
     }
 
-    private func updateLogToggle() {
-        logToggle.setTitle(L10n.tr(logView.isHidden ? "home_show_logs" : "home_hide_logs"), for: .normal)
-        logToggle.setImage(UIImage(systemName: logView.isHidden ? "chevron.up" : "chevron.down"), for: .normal)
+    @objc private func tapLogs() {
+        setLogsExpanded(!logsExpanded, animated: true)
+    }
+
+    @objc private func tapClearLogs() {
+        guard !logs.isEmpty else { return }
+        logs.removeAll()
+        renderLogs()
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+    }
+
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
+        var view = touch.view
+        while let current = view {
+            if current === logClearButton { return false }
+            view = current.superview
+        }
+        return true
+    }
+
+    private func setLogsExpanded(_ expanded: Bool, animated: Bool) {
+        guard logsExpanded != expanded else {
+            updateLogChrome()
+            return
+        }
+        logsExpanded = expanded
+        let targetHeight: CGFloat = expanded ? max(160, view.bounds.height * 0.24) : 0
+        logClearButton.isHidden = !expanded
+        logClearButton.isEnabled = !logs.isEmpty
+        logView.isHidden = false
+
+        let animations = {
+            self.logHeightConstraint?.constant = targetHeight
+            self.logView.alpha = expanded ? 1 : 0
+            self.logChevron.transform = expanded
+                ? CGAffineTransform(rotationAngle: .pi)
+                : .identity
+            self.logPanel.setCustomSpacing(expanded ? 4 : 0, after: self.logHeader)
+            self.logPanel.directionalLayoutMargins = NSDirectionalEdgeInsets(
+                top: 4, leading: 4, bottom: expanded ? 8 : 4, trailing: 4
+            )
+            self.view.layoutIfNeeded()
+        }
+
+        if animated {
+            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+            UIView.animate(
+                withDuration: 0.28,
+                delay: 0,
+                usingSpringWithDamping: 0.9,
+                initialSpringVelocity: 0.4,
+                options: [.curveEaseInOut, .beginFromCurrentState]
+            ) {
+                animations()
+            } completion: { _ in
+                if !expanded {
+                    self.logView.isHidden = true
+                }
+                self.updateLogChrome()
+            }
+        } else {
+            animations()
+            if !expanded { logView.isHidden = true }
+            updateLogChrome()
+        }
+    }
+
+    private func updateLogChrome() {
+        logTitleLabel.text = L10n.tr("home_show_logs")
+        logClearButton.setTitle(L10n.tr("home_clear_logs"), for: .normal)
+        logCountLabel.text = L10n.tr("home_logs_count", logs.count)
+        logClearButton.isHidden = !logsExpanded
+        logClearButton.isEnabled = !logs.isEmpty
+        logHeader.accessibilityLabel = "\(L10n.tr("home_show_logs")), \(L10n.tr("home_logs_count", logs.count))"
+        logHeader.accessibilityTraits = [.button]
     }
 
     private func makeStatusRow() -> UIView {
@@ -204,9 +379,14 @@ final class HomeViewController: UIViewController {
 
     private func applyLocalizedChrome() {
         title = L10n.tr("app_name")
-        navigationItem.leftBarButtonItem = UIBarButtonItem(
-            title: "v\(repo.version())", style: .plain, target: nil, action: nil
-        )
+        // Plain UILabel in the left slot (customView), not a tappable UIBarButtonItem title.
+        versionLabel.font = .preferredFont(forTextStyle: .subheadline)
+        versionLabel.textColor = .secondaryLabel
+        versionLabel.textAlignment = .left
+        versionLabel.text = "v\(repo.version())"
+        versionLabel.isUserInteractionEnabled = false
+        versionLabel.sizeToFit()
+        navigationItem.leftBarButtonItem = UIBarButtonItem(customView: versionLabel)
         navigationItem.rightBarButtonItem = UIBarButtonItem(
             title: L10n.tr("language"), style: .plain, target: self, action: #selector(tapLanguage)
         )
@@ -217,7 +397,7 @@ final class HomeViewController: UIViewController {
         for (key, label) in sectionLabels {
             label.text = L10n.tr(key)
         }
-        updateLogToggle()
+        updateLogChrome()
         refreshUI()
         renderLogs()
     }
@@ -305,7 +485,7 @@ final class HomeViewController: UIViewController {
 
         for (key, button) in actionButtons {
             switch key {
-            case "scan_connect", "jieli_reminder_notify": button.isEnabled = !busy
+            case "scan_connect", "jieli_reminder_notify", "ai_health_analysis": button.isEnabled = !busy
             case "bind_watch": button.isEnabled = canBind
             case "sync_data", "jieli_sync_data": button.isEnabled = canSync
             case "unbind_watch": button.isEnabled = canUnbind
@@ -325,9 +505,11 @@ final class HomeViewController: UIViewController {
     }
 
     private func renderLogs() {
-        logView.text = logs.joined(separator: "\n")
+        logView.text = logs.isEmpty ? L10n.tr("home_logs_empty") : logs.joined(separator: "\n")
+        logView.textColor = logs.isEmpty ? .tertiaryLabel : .label
         // 保持顶部最新一条可见
         logView.setContentOffset(.zero, animated: false)
+        updateLogChrome()
     }
 
     private func requireConnectedFeature() -> Bool {
@@ -498,9 +680,18 @@ final class HomeViewController: UIViewController {
         guard requireConnectedFeature() else { return }
         navigationController?.pushViewController(GoalsViewController(), animated: true)
     }
+
+    /// Product-style AI health report. History is local; generating a demo report needs a connected device.
+    @objc private func tapAiHealthAnalysis() {
+        navigationController?.pushViewController(AiHealthAnalysisViewController(), animated: true)
+    }
     @objc private func tapAlarms() {
         guard requireConnectedFeature() else { return }
         navigationController?.pushViewController(AlarmsViewController(), animated: true)
+    }
+    @objc private func tapRaiseHand() {
+        guard requireConnectedFeature() else { return }
+        navigationController?.pushViewController(RaiseHandLightViewController(), animated: true)
     }
     @objc private func tapReminderNotify() {
         navigationController?.pushViewController(JieliReminderNotifyViewController(), animated: true)
@@ -521,6 +712,14 @@ final class HomeViewController: UIViewController {
     @objc private func tapNotify() {
         guard requireConnectedFeature() else { return }
         navigationController?.pushViewController(NotifyViewController(), animated: true)
+    }
+    @objc private func tapNotifySwitch() {
+        guard requireConnectedFeature() else { return }
+        navigationController?.pushViewController(NotificationSwitchViewController(), animated: true)
+    }
+    @objc private func tapECard() {
+        guard requireConnectedFeature() else { return }
+        navigationController?.pushViewController(ElectronicCardListViewController(), animated: true)
     }
     @objc private func tapMusic() {
         guard requireConnectedFeature() else { return }

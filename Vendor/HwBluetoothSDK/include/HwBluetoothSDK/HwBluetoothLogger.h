@@ -1,1 +1,1 @@
-/Users/sujiang/Projects/sdkdemo/Vendor/HwBluetoothSDK/HwBluetoothSDK.framework/Headers/HwBluetoothLogger.h
+../../HwBluetoothSDK.framework/Headers/HwBluetoothLogger.h

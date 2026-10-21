@@ -1,1 +1,0 @@
-/Users/sujiang/Projects/sdkdemo/Vendor/HwBluetoothSDK/HwBluetoothSDK.framework/Headers/HwJLOtaV2MockBluetooth.h

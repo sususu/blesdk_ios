@@ -1,1 +1,1 @@
-/Users/sujiang/Projects/sdkdemo/Vendor/HwBluetoothSDK/HwBluetoothSDK.framework/Headers/HwFeatureSwitch.h
+../../HwBluetoothSDK.framework/Headers/HwFeatureSwitch.h

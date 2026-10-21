@@ -33,7 +33,7 @@ final class JieliOtaUpgradeViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         title = L10n.tr("jieli_ota")
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = .systemGroupedBackground
         statusLabel.text = L10n.tr("feature_ready")
         macLabel.text = L10n.tr("ota_mac", "-")
         firmwareLabel.text = L10n.tr("ota_firmware", "-")
@@ -55,24 +55,17 @@ final class JieliOtaUpgradeViewController: UIViewController {
 
         logView.font = .monospacedSystemFont(ofSize: 12, weight: .regular)
         logView.isEditable = false
-        logView.backgroundColor = .secondarySystemBackground
+        logView.backgroundColor = .secondarySystemGroupedBackground
         logView.layer.cornerRadius = 8
 
+        logView.heightAnchor.constraint(equalToConstant: 160).isActive = true
         let stack = UIStackView(arrangedSubviews: [
-            statusLabel, macLabel, firmwareLabel, parsedLabel, newVersionLabel, infoLabel,
-            refresh, check, start, cancel, phaseLabel, progress, logView
+            UIHelpers.makeCard([statusLabel, macLabel, firmwareLabel, parsedLabel, newVersionLabel, infoLabel], title: L10n.tr("ui_status")),
+            UIHelpers.makeCard([UIHelpers.makeGrid([refresh, check, start, cancel])], title: L10n.tr("ui_actions")),
+            UIHelpers.makeCard([phaseLabel, progress], title: L10n.tr("ui_results")),
+            UIHelpers.makeLogSection(logView)
         ])
-        stack.axis = .vertical
-        stack.spacing = 10
-        stack.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(stack)
-        NSLayoutConstraint.activate([
-            stack.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16),
-            stack.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            stack.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-            stack.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16),
-            logView.heightAnchor.constraint(greaterThanOrEqualToConstant: 160)
-        ])
+        UIHelpers.installScrollableContent(stack, in: view)
         updateStartEnabled()
         refreshDeviceInfo()
     }

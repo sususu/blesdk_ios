@@ -1,1 +1,1 @@
-/Users/sujiang/Projects/sdkdemo/Vendor/HwBluetoothSDK/HwBluetoothSDK.framework/Headers/HwPrayerBeadsSwitch.h
+../../HwBluetoothSDK.framework/Headers/HwPrayerBeadsSwitch.h

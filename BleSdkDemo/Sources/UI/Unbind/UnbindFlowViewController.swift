@@ -32,7 +32,7 @@ final class UnbindFlowViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         title = L10n.tr("unbind_title")
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = .systemGroupedBackground
         startButton.setTitle(L10n.tr("unbind_start"), for: .normal)
         closeButton.setTitle(L10n.tr("close"), for: .normal)
         iosNoteLabel.text = L10n.tr("unbind_ios_banner")
@@ -56,8 +56,9 @@ final class UnbindFlowViewController: UIViewController {
         closeButton.addTarget(self, action: #selector(close), for: .touchUpInside)
         view.addSubview(iosNoteLabel)
         view.addSubview(table)
-        view.addSubview(startButton)
-        view.addSubview(closeButton)
+        let controls = UIHelpers.makeCard([UIHelpers.makeGrid([startButton, closeButton])])
+        controls.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(controls)
         NSLayoutConstraint.activate([
             iosNoteLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 8),
             iosNoteLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
@@ -65,13 +66,10 @@ final class UnbindFlowViewController: UIViewController {
             table.topAnchor.constraint(equalTo: iosNoteLabel.bottomAnchor, constant: 8),
             table.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             table.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            table.bottomAnchor.constraint(equalTo: startButton.topAnchor, constant: -12),
-            startButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            startButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-            startButton.bottomAnchor.constraint(equalTo: closeButton.topAnchor, constant: -8),
-            closeButton.leadingAnchor.constraint(equalTo: startButton.leadingAnchor),
-            closeButton.trailingAnchor.constraint(equalTo: startButton.trailingAnchor),
-            closeButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -12)
+            table.bottomAnchor.constraint(equalTo: controls.topAnchor, constant: -12),
+            controls.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            controls.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            controls.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -12)
         ])
     }
 

@@ -1,1 +1,1 @@
-/Users/sujiang/Projects/sdkdemo/Vendor/HwBluetoothSDK/HwBluetoothSDK.framework/Headers/HwBloodPressure.h
+../../HwBluetoothSDK.framework/Headers/HwBloodPressure.h

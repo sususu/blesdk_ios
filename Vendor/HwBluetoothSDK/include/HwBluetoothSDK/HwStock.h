@@ -1,1 +1,1 @@
-/Users/sujiang/Projects/sdkdemo/Vendor/HwBluetoothSDK/HwBluetoothSDK.framework/Headers/HwStock.h
+../../HwBluetoothSDK.framework/Headers/HwStock.h

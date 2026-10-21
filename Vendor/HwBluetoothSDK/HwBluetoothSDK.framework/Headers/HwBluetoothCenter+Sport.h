@@ -20,6 +20,9 @@
 #import "HwVO2max.h"
 #import "HwBodyState.h"
 #import "HwCommonDefines.h"
+#import "HwStanding.h"
+#import "HwBreaths.h"
+#import "HwTemperature.h"
 
 extern NSString * _Nonnull HwKeySportIndex;
 // cache key for sport state at timestamp
@@ -146,6 +149,8 @@ typedef void (^HwStressCallback)(NSArray<HwStress *> * _Nullable stressArr, NSEr
 typedef void (^HwHrvCallback)(NSArray<HwHrv *> * _Nullable hrvArr, NSError *_Nullable error);
 typedef void (^HwSpo2sCallback)(NSArray<HwSpo2 *> * _Nullable spo2Arr, NSError *_Nullable error);
 typedef void (^HwBpsCallback)(NSArray<HwBloodPressure *> * _Nullable bpArr, NSError *_Nullable error);
+typedef void (^HwBreathsCallback)(NSArray<HwBreaths *> * _Nullable breathsArr, NSError *_Nullable error);
+typedef void (^HwTemperatureCallback)(NSArray<HwTemperature *> * _Nullable temperatureArr, NSError *_Nullable error);
 
 /*! @brief
  获取设备中的运动和睡眠个数[gain the sport and sleep number of the device]
@@ -199,6 +204,7 @@ typedef void (^HwBpsCallback)(NSArray<HwBloodPressure *> * _Nullable bpArr, NSEr
                                                    callback:(HwHealthDataCountForLSCallback _Nonnull)callback;
 - (HwBluetoothTask *_Nullable) getBpNumWithCallback:(HwBpCountCallback _Nonnull)callback;
 - (HwBluetoothTask *_Nullable) getPAINumWithCallback:(HwBCIntegerCallback _Nonnull)callback;
+- (HwBluetoothTask *_Nullable) getStandingDataNumWithCallback:(HwBCIntegerCallback _Nonnull)callback;
 - (HwBluetoothTask *_Nullable) getVO2maxNumWithCallback:(HwBCIntegerCallback _Nonnull)callback;
 
 - (HwBluetoothTask *_Nullable) getSportsWithStartTime:(NSTimeInterval)startTime
@@ -245,6 +251,9 @@ typedef void (^HwBpsCallback)(NSArray<HwBloodPressure *> * _Nullable bpArr, NSEr
 
 - (HwBluetoothTask *_Nullable) getNewestHeartrateWithCallback:(HwNewestHeartRateCallback _Nullable)callback;
 
+- (HwBluetoothTask *_Nullable) getStandingDatasWithCount:(NSInteger)count
+                                                callback:(HwStandingDatasCallback _Nonnull)callback;
+- (HwBluetoothTask *_Nullable) delStandingDatasWithCallback:(HwBoolCallback _Nullable)callback;
 /*! @brief sport detail data
  
  Get the sport detail data stored on the device
@@ -518,6 +527,28 @@ Get heart rate data from device
  @return 任务[task]
  */
 - (HwBluetoothTask *_Nullable) getAutoDetectStressSpanWithCallback:(HwBCIntegerCallback _Nullable)callback;
+
+/*! @brief
+ 设置肤温自动检测间隔[set skin temperature auto-detect interval]
+ @param span 检测时间间隔，单位分钟；>0 开，0 关
+ */
+- (HwBluetoothTask *_Nullable) setSkinTemperatureMonitorInterval:(int)span callback:(HwBoolCallback _Nullable)callback;
+
+/*! @brief
+ 获取肤温自动检测间隔[get skin temperature auto-detect interval]
+ */
+- (HwBluetoothTask *_Nullable) getSkinTemperatureMonitorIntervalWithCallback:(HwBCIntegerCallback _Nullable)callback;
+
+/*! @brief
+ 设置呼吸频率自动检测间隔[set respiratory rate auto-detect interval]
+ @param span 检测时间间隔，单位分钟；>0 开，0 关
+ */
+- (HwBluetoothTask *_Nullable) setRespiratoryRateMonitorInterval:(int)span callback:(HwBoolCallback _Nullable)callback;
+
+/*! @brief
+ 获取呼吸频率自动检测间隔[get respiratory rate auto-detect interval]
+ */
+- (HwBluetoothTask *_Nullable) getRespiratoryRateMonitorIntervalWithCallback:(HwBCIntegerCallback _Nullable)callback;
 
 /*! @brief
  设置心率警告值[set the heartrate alert value]

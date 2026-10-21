@@ -20,6 +20,9 @@
 #pragma mark - HeartRate
 - (void)getHeartRateBigDataWithCallback:(HwHeartRateInfoArrayCallback _Nullable)callback;
 
+#pragma mark - RestingHeartRate
+- (void)getRestingHeartRateBigDataWithCallback:(HwHeartRateInfoArrayCallback _Nullable)callback;
+
 #pragma mark - Stress
 - (void)getStressBigDataWithCallback:(HwStressCallback _Nullable)callback;
 
@@ -28,12 +31,25 @@
 
 #pragma mark - Sprot
 - (void)getSportDetailBigDataWithCallback:(HwActivitiesCallback _Nullable)callback;
+- (HwBluetoothTask *_Nullable)delSportBigDataWithCallback:(HwBoolCallback _Nullable)callback;
 
 #pragma mark - AI record
 - (void)getAiRecordBigDataWithCallback:(HwDataCallback _Nonnull)callback;
 
 #pragma mark - Hrv
 - (void)getHrvBigDataWithCallback:(HwHrvCallback _Nonnull)callback;
+
+#pragma mark - Breaths
+- (void)getBreathsBigDataWithCallback:(HwBreathsCallback _Nonnull)callback;
+- (void)delBreathsBigDataWithCallback:(HwBoolCallback _Nullable )callback;
+
+#pragma mark - SkinTemperature
+- (void)getSkinTemperatureBigDataWithCallback:(HwTemperatureCallback _Nonnull)callback;
+- (void)delSkinTemperatureBigDataWithCallback:(HwBoolCallback _Nullable )callback;
+
+#pragma mark - BodyTemperature
+- (void)getBodyTemperatureBigDataWithCallback:(HwTemperatureCallback _Nonnull)callback;
+- (void)delBodyTemperatureBigDataWithCallback:(HwBoolCallback _Nullable )callback;
 
 @end
 

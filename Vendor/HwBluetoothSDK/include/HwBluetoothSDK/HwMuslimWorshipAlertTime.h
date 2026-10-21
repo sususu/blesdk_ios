@@ -1,1 +1,1 @@
-/Users/sujiang/Projects/sdkdemo/Vendor/HwBluetoothSDK/HwBluetoothSDK.framework/Headers/HwMuslimWorshipAlertTime.h
+../../HwBluetoothSDK.framework/Headers/HwMuslimWorshipAlertTime.h

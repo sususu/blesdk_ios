@@ -1,1 +1,1 @@
-/Users/sujiang/Projects/sdkdemo/Vendor/HwBluetoothSDK/HwBluetoothSDK.framework/Headers/HwMenstrual.h
+../../HwBluetoothSDK.framework/Headers/HwMenstrual.h

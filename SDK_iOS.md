@@ -1,14 +1,16 @@
 # HwBluetoothSDK 使用文档（iOS）
 
-**版本**：`3.2.10`（源码头文件宏 `HwBluetoothSDK_Version`；以运行时 `[[HwBluetoothSDK sharedInstance] version]` 为准）  
+**版本**：`3.2.17`（源码头文件宏 `HwBluetoothSDK_Version`；以运行时 `[[HwBluetoothSDK sharedInstance] version]` 为准）<br>
 **入口类**：`HwBluetoothSDK`（单例门面）  
-**最低 iOS 版本**：CocoaPods 声明 `9.0`（建议按业务实际抬升）  
+**最低 iOS 版本**：当前本地 Pod 声明 `13.0`；本 Demo 为 `14.0`<br>
+**文档分工**：[README.md](README.md) 介绍 Demo 的运行与操作；本文介绍客户 App 的 SDK 集成和接口调用。
+
 **说明**：本 SDK 通过 BLE 与华沃系智能手表/手环通信。对外统一通过 `[HwBluetoothSDK sharedInstance]` 调用，结果以 Block 异步返回。
 
 > **调用约定**  
 > - 业务 API（除扫描/连接相关状态查询外）需在 BLE 已连接后使用；多数产品还需完成绑定。  
 > - **必须使用** `[HwBluetoothSDK sharedInstance]`，不要自行 `alloc` 新实例。  
-> - 底层也可直接使用 `[HwBluetoothCenter sharedInstance]`（Demo 部分模块如此），正式集成推荐只用门面类。
+> - 底层也可直接使用 `[HwBluetoothCenter sharedInstance]`（Demo 部分模块如此），优先使用门面类及其持有的 Service；门面未暴露的能力再按对应章节使用 Center。
 
 ---
 
@@ -36,60 +38,52 @@
 20. [全局监听器](#20-全局监听器)
 21. [协议分支说明](#21-协议分支说明)
 22. [推荐集成流程](#22-推荐集成流程)
+23. [AiSDK 与 App 主动分析](#23-aisdk-与-app-主动分析)
 
 ---
 
 ## 1. 集成方式（CocoaPods / Framework）
 
-iOS 侧交付物为 **源码 Pod** 或厂商打包的 **`HwBluetoothSDK.framework`**，与 Android「AAR / Maven」对应。
+当前仓库交付的是 **本地静态蓝牙库与头文件**，推荐通过随包提供的 Pod 集成。先运行 Demo 的步骤见 [README.md](README.md)。
 
-### 1.1 CocoaPods（推荐有私有 Specs 时使用）
+### 1.1 CocoaPods（当前交付包推荐）
 
-在 `Podfile` 中：
+将本仓库的整个 `Vendor/HwBluetoothSDK` 目录复制到客户工程根目录，保留其中的 `.a`、framework 头文件、`include` 和 podspec，然后配置：
 
 ```ruby
-source 'https://github.com/CocoaPods/Specs.git'
-source 'https://github.com/sususu/LYSpecs.git'   # 华沃私有 Specs，以交付说明为准
-
-platform :ios, '12.0'
+platform :ios, '14.0' # 与 Demo 一致；仅蓝牙本地 Pod 的最低版本为 13.0
 use_frameworks!
 
 target 'YourApp' do
-  pod 'HwBluetoothSDK'   # 版本以交付清单 / Specs 为准
+  pod 'HwBluetoothSDK', :path => 'Vendor/HwBluetoothSDK'
 end
 ```
 
-然后：
+执行安装后打开客户工程生成的 `.xcworkspace`：
 
 ```bash
 pod install
 ```
 
-工程中：
+Objective-C 引入：
 
 ```objc
 #import <HwBluetoothSDK/HwBluetoothSDK.h>
-// 或（源码头）：
-#import "HwBluetoothSDK.h"
 ```
 
-Swift：
+Swift 引入：
 
 ```swift
 import HwBluetoothSDK
 ```
 
-| 项 | 值 |
-|----|-----|
-| Pod 名 | `HwBluetoothSDK` |
-| 源码仓库示例 | `http://192.168.12.244/ios/bluetoothsdk.git`（内网，以交付为准） |
-| 无强制三方依赖 | 当前 podspec 未强制依赖其它 Pod |
+当前本地 Pod 版本为 `3.2.17`；对外记录版本时以运行时 `version` 为准。本地 Pod 不要求私有 Specs，也无需访问内网源码仓库。若收到其它交付形式，使用随包提供的版本和安装说明。
 
-> **版本说明**：podspec 历史 tag 可能滞后于源码头宏。请以 `[[HwBluetoothSDK sharedInstance] version]` / `HwBluetoothSDK_Version` 为准对外声明。
+基础蓝牙能力无需 AiSDK / WatchfaceSDK；需要思澈传输或 AI 时，再加入对应依赖。复用完整 Demo 依赖时，请同时参考 [Podfile](Podfile) 中的动态 `use_frameworks!` 和 `post_install` 配置，避免遗漏模块及头文件搜索路径。
 
 ### 1.2 本地 Framework 方式
 
-将厂商提供的 `HwBluetoothSDK.framework`（及如有联动的其它 framework）拖入工程：
+当前包请优先使用 §1.1 的本地 Pod；其中蓝牙二进制为静态库，**不要 Embed & Sign**。以下仅适用于另行收到可独立集成的 framework 时，具体链接方式以该交付包为准：
 
 ```text
 YourApp/
@@ -110,9 +104,9 @@ Xcode 配置要点：
 | 能力 | 是否包含在 HwBluetoothSDK | 额外说明 |
 |------|---------------------------|----------|
 | BLE 扫描连接、健康数据、闹钟、天气、通用/差分 OTA | **是** | 通常只需集成本 SDK |
-| 杰理多文件传输（音乐/相册/在线表盘） | **是**（`+MultipleFileTransfer`） | 见 [§13](#13-表盘) / [§14](#14-音乐与相册推送) |
+| 杰理多文件传输（音乐/相册/在线表盘） | **是**（`HwMultipleFileTransferService`） | 见 [§13](#13-表盘) / [§14](#14-音乐与相册推送) |
 | 杰理自定义表盘配置下发 | **是**（`+JLWatchFace`） | `updateJLCustomWatceFace:` |
-| 杰理 JL OTA V2 固件升级 | **是**（`+JLOtaV2`） | 见 [§17.4](#174-方案-b杰理-jl-ota-v2生产主路径) |
+| 杰理 JL OTA V2 固件升级 | **是**（`HwOtaV2Service`） | 见 [§17.4](#174-方案-b杰理-jl-ota-v2生产主路径) |
 | 瑞昱 / 阿波罗通用固件 OTA | **是**（`+Ota`） | 见 [§17.3](#173-方案-a通用-otahwotadatamodel) |
 | 文件差分 OTA（备选） | **是**（`+FileDifferenceOta`） | 见 [§17.5](#175-方案-c文件差分-fdota备选通道) |
 | 思澈固件 DFU | **否** | 需额外 `SifliOTAManagerSDK`（`SFOTAManager`），见 [§17.6](#176-方案-d思澈-sifli-dfu额外依赖) |
@@ -136,7 +130,7 @@ Xcode 配置要点：
 
 ### 2.1 Info.plist 必填 / 建议项
 
-在 **App** 的 `Info.plist` 中声明（参考工程 `Example/HwBluetoothSDK/HwBluetoothSDK-Info.plist`）：
+在 **App** 的 `Info.plist` 中声明（参考本仓库 [Info.plist](BleSdkDemo/Supporting/Info.plist)；除蓝牙用途说明外，其他权限按实际访问的系统能力添加）：
 
 ```xml
 <!-- 蓝牙（iOS 13+ 必填 Always） -->
@@ -158,13 +152,16 @@ Xcode 配置要点：
 <key>NSPhotoLibraryUsageDescription</key>
 <string>用于自定义表盘与相册相关功能</string>
 
-<!-- 同步手机日程到表 -->
+<!-- 读取系统日历（旧版 iOS）；仅下发自行组装的日程不需要日历权限 -->
 <key>NSCalendarsUsageDescription</key>
-<string>用于将日程同步到手表</string>
+<string>用于读取日历并同步日程到手表</string>
+<!-- iOS 17+ 读取系统日历时使用完整访问权限 -->
+<key>NSCalendarsFullAccessUsageDescription</key>
+<string>用于读取日历并同步日程到手表</string>
 
-<!-- 找手机播放提示音等（按产品） -->
-<key>NSAppleMusicUsageDescription</key>
-<string>找手机等功能可能需要播放提示音</string>
+<!-- 使用语音录音时；仅生成健康分析报告不需要 -->
+<key>NSMicrophoneUsageDescription</key>
+<string>用于语音输入</string>
 ```
 
 ### 2.2 后台模式（建议）
@@ -177,7 +174,7 @@ Xcode 配置要点：
 </array>
 ```
 
-用于断连重连、运动中保持 Central。上架审核需与实际用途一致。
+用于后台 BLE Central 通信，不代表 App 可无限执行或持续重连。重连由 App 管理；本 Demo 在前台且自动重连已开启时执行重连。
 
 ### 2.3 运行时申请
 
@@ -202,9 +199,11 @@ if (sdk.powerOn) {
 
 ## 3. 快速开始
 
+先完成 §1 的依赖与 §2 的权限配置。文档中含 `...`、占位变量或 App 自定义方法的代码是流程示例，需要补齐业务实现；具体接口签名以当前交付包头文件为准。
+
 ### 3.1 初始化
 
-在 `AppDelegate` / `SceneDelegate` 启动时初始化（**必须**）：
+在 App 启动时初始化一次（例如 `AppDelegate`）；不要在每个页面或每个 Scene 重复初始化：
 
 ```objc
 #import "HwBluetoothSDK.h"
@@ -225,7 +224,7 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
 |-----|------|
 | `initSDK` | 初始化内部参数、监听蓝牙状态 |
 | `destroySDK` | 释放资源、停止监听 |
-| `version` | 返回 SDK 版本字符串，如 `3.2.10` |
+| `version` | 返回 SDK 版本字符串，如 `3.2.17` |
 
 > 与 Android `init(Application, maxMTU)` 不同：iOS **无 maxMTU 入参**（由系统与设备协商决定）。
 
@@ -253,7 +252,7 @@ iOS 以 **Block** 为主，失败信息在 `NSError *`（`error.code` 即 `HwBCC
 | `HwSearchDevicesCallback` | `(NSArray<HwBluetoothDevice *> *devices, NSError *error)` | 扫描结果（可能多次回调） |
 | 各类业务回调 | 如 `HwActivitiesCallback`、`HwDeviceInfoCallback` | 见对应 `.h` |
 
-通用定义见 `HwCommonDefines.h`；错误域与码见 `HwBluetoothError.h`。
+通用定义见 `HwCommonDefines.h`；错误域与码见 `HwBluetoothError.h`。返回对象或数值的回调先检查 `error` 和必要的非空条件；布尔回调同时检查成功标志。SDK 原始回调不要假定在主线程，更新 UIKit 前用 `dispatch_async(dispatch_get_main_queue(), ^{ ... });`。
 
 示例：
 
@@ -306,20 +305,20 @@ iOS 以 **Block** 为主，失败信息在 `NSError *`（`error.code` 即 `HwBCC
 HwBluetoothSDK *sdk = [HwBluetoothSDK sharedInstance];
 
 [sdk scanWithCallback:^(NSArray<HwBluetoothDevice *> *devices, NSError *error) {
+    if (error) { /* 显示扫描错误 */ return; }
     for (HwBluetoothDevice *d in devices) {
         NSString *name = d.name;
-        NSString *mac = d.mac;   // 可能为空（部分已系统配对外设）
-        // 更新列表
+        NSString *mac = d.macAddress;   // 可能为空（部分已系统配对外设）
+        // 切到主线程更新设备列表；保留扫描返回的设备对象供用户选择连接
     }
 } stopAfter:8.0 stopCallback:^{
     // 扫描超时结束
 }];
 
-// 提前停止
-[sdk stopScan];
+// 用户选定设备或离开扫描页时调用 [sdk stopScan]；不要在启动扫描后立即停止。
 ```
 
-设备模型：`HwBluetoothDevice`（包装 `CBPeripheral`，含 name / mac / uuid / rssi 等）。
+设备模型：`HwBluetoothDevice`（包装 `CBPeripheral`，含 name / macAddress / uuid / rssi 等）。
 
 ### 5.2 连接
 
@@ -404,7 +403,7 @@ Android 有显式 `createBond` / `removeBond`。iOS 上系统负责配对弹窗�
 配对完成通知（手机发起配对时）：
 
 ```objc
-[sdk addDevicePairStateCallback:^(/* 见头文件 */) { /* ... */ }];
+[sdk addDevicePairStateCallback:^(NSInteger pairState) { /* 见设备配对状态 */ }];
 ```
 
 > Android 的 `createBond` / `removeBond` 在 iOS 无直接对等 API；经典蓝牙配对由系统处理，或通过本节 `requestDeviceToPair` / `getPairState` 配合产品 SOP。
@@ -416,10 +415,9 @@ Android 有显式 `createBond` / `removeBond`。iOS 上系统负责配对弹窗�
 ```objc
 [sdk startBindDeviceWithCallback:^(BOOL b, NSError *error) {
     if (!b || error) return;
-    // 同步时间 / 用户信息 / 单位 / 语言，再 endBind
+    // App 实现见 §22：串行同步环境，并在全部成功后调用 endBindDevice。
+    [self syncEnvironmentAndEndBind];
 }];
-
-[sdk endBindDeviceWithCallback:^(BOOL b, NSError *error) { }];
 
 [sdk getBindStateWithCallback:^(HwBindState bindState, NSError *error) {
     // HwBindStateNone / HwBindStateDone / 另有 OTA 相关态（如 0x81）按固件
@@ -457,8 +455,15 @@ LS16 多阶段绑定（专用）：
 解绑：
 
 ```objc
-[sdk unbindDeviceWithCallback:^(BOOL b, NSError *error) { }];
-[sdk removeConnectionCache];
+// App 先关闭自己的自动重连，再执行解绑。
+[sdk unbindDeviceWithCallback:^(BOOL success, NSError *error) {
+    if (!success || error) { /* 显示错误，决定是否重试 */ return; }
+    [sdk disconnectWithCallback:^(NSError *disconnectError) {
+        if (disconnectError) { /* 显示断开失败，保留重试入口 */ return; }
+        [sdk removeConnectionCache];
+        // 清除 App 保存的绑定记录，再提示用户到系统蓝牙设置中“忽略此设备”。
+    }];
+}];
 ```
 
 ---
@@ -471,12 +476,13 @@ LS16 多阶段绑定（专用）：
 
 ```objc
 [sdk getDeviceInfoWithCallback:^(HwDeviceInfo *info, NSError *error) {
-    // id / type / firmwareVersion / battery / protocolVersion / features ...
+    // Objective-C: Id / type / firmwareVersion / battery / protocolVersion 等
+    // Swift 中 Id 映射为 id；设备特征单独调用 getDeviceFeaturesWithCallback。
     // protocolVersion 较大时通常为 WL 一类新协议（与 Android ≥100 同源思路，以产品文档为准）
 }];
 
 [sdk getBatteryWithCallback:^(NSInteger n, NSError *error) { /* 0~100 */ }];
-[sdk getBatteryStateWithCallback:^(NSInteger battery, BOOL charging, NSError *error) { }];
+[sdk getBatteryStateWithCallback:^(NSInteger battery, BOOL charging, BOOL savingMode, NSError *error) { }];
 [sdk getFirmwareVersionWithCallback:^(NSString *str, NSError *error) { }];
 [sdk getDeviceTypeWithCallback:^(NSString *str, NSError *error) { }];
 [sdk getDeviceIdWithCallback:^(NSString *str, NSError *error) { }];
@@ -488,14 +494,14 @@ LS16 多阶段绑定（专用）：
 电量变化：
 
 ```objc
-[sdk addBatteryStateChangedListener:^(NSInteger battery, BOOL charging) { }];
+[sdk addBatteryStateChangedListener:^(NSInteger battery, BOOL charging, BOOL savingMode) { }];
 ```
 
 ### 7.2 用户信息 / 时间 / 单位 / 语言
 
 ```objc
 HwUserInfo *user = [HwUserInfo new];
-user.gender = 0;          // 0 男 / 1 女
+user.gender = HwSexMale; // HwSexMale / HwSexFemale
 user.age = 28;
 user.height = 175;        // cm
 user.weight = 700;        // 0.1kg → 70.0kg
@@ -510,7 +516,7 @@ user.weight = 700;        // 0.1kg → 70.0kg
 [sdk setUnit:HwUnitMetric callback:^(BOOL b, NSError *error) { }];
 [sdk getUnitWithCallback:^(HwUnit unit, NSError *error) { }];
 
-[sdk setLanguage:HwLanguageSimplifiedChinese callback:^(BOOL b, NSError *error) { }];
+[sdk setLanguage:HwLanguageChineseSimplified callback:^(BOOL b, NSError *error) { }];
 [sdk getLanguageWithCallback:^(HwLanguage language, NSError *error) { }];
 [sdk getDeviceSupportedLanguages:^(NSArray *langs, NSError *error) { }];
 ```
@@ -525,10 +531,10 @@ user.weight = 700;        // 0.1kg → 70.0kg
                 goal:8000
             callback:^(BOOL b, NSError *error) { }];
 
-[sdk getGoalWithCallback:^(/* HwGoal 模型 */, NSError *error) { }];
+[sdk getGoalWithCallback:^(HwGoal *goal, NSError *error) { }];
 
-[sdk addGoalUpdatedListener:^(/* type, value */) { }];
-[sdk addGoalsUpdatedListener:^(/* 多个目标 */) { }];
+[sdk addGoalUpdatedListener:^(HwGoalType type, NSInteger value) { }];
+[sdk addGoalsUpdatedListener:^(NSArray<HwGoalValue *> *values) { }];
 ```
 
 ---
@@ -545,18 +551,24 @@ user.weight = 700;        // 0.1kg → 70.0kg
                                       NSError *error) {
     if (error) return;
 
-    [sdk getActivities:activityCount callback:^(NSArray<HwActivity *> *list, NSError *error) {
-        // 入库后删除设备侧缓存
-        [sdk deleteActivitiesWithCallback:^(BOOL b, NSError *error) { }];
-    }];
-
-    [sdk getSleeps:sleepPointCount callback:^(NSArray<HwSleep *> *list, NSError *error) {
-        [sdk deleteSleepsWithCallback:^(BOOL b, NSError *error) { }];
-    }];
-
-    [sdk getHeartrates:heartrateCount callback:^(NSArray<HwHeartRate *> *list, NSError *error) {
-        [sdk deleteHeartratesWithCallback:^(BOOL b, NSError *error) { }];
-    }];
+    if (activityCount > 0) {
+        [sdk getActivities:activityCount callback:^(NSArray<HwActivity *> *list, NSError *error) {
+            if (error || !list) { /* 读取失败：不要删除 */ return; }
+            // App 可靠保存成功后，再在保存完成回调中调用 deleteActivitiesWithCallback:。
+        }];
+    }
+    if (sleepPointCount > 0) {
+        [sdk getSleeps:sleepPointCount callback:^(NSArray<HwSleep *> *list, NSError *error) {
+            if (error || !list) { return; }
+            // 可靠保存成功后，再调用 deleteSleepsWithCallback:。
+        }];
+    }
+    if (heartrateCount > 0) {
+        [sdk getHeartrates:heartrateCount callback:^(NSArray<HwHeartRate *> *list, NSError *error) {
+            if (error || !list) { return; }
+            // 可靠保存成功后，再调用 deleteHeartratesWithCallback:。
+        }];
+    }
 }];
 ```
 
@@ -575,6 +587,8 @@ user.weight = 700;        // 0.1kg → 70.0kg
 [sdk deleteStressWithCallback:^(BOOL b, NSError *error) { }];
 [sdk deleteBloodOxygenWithCallback:^(BOOL b, NSError *error) { }];
 ```
+
+读取失败或落库失败时保留设备数据供重试；不要将空结果或同步完成提示当作删除条件。通用数据读取在 SDK 内按请求处理，App 应串行安排同步批次，避免与传输任务并发。
 
 ### 9.2 LS / BigData 路径
 
@@ -624,7 +638,7 @@ HwHeartrateAlarm *alarm = [HwHeartrateAlarm new];
 [sdk stopSpO2MonitoringWithCallback:^(BOOL b, NSError *error) { }];
 
 [sdk addHeartrateValueChangedListener:^(NSInteger bpm) { }];
-[sdk addSpo2ValueChangedListener:^(/* spo2 */) { }];
+[sdk addSpo2ValueChangedListener:^(NSInteger spo2, long time) { }];
 [sdk addStressValueChangedListener:^(NSInteger stress) { }];
 ```
 
@@ -856,6 +870,57 @@ HwHeartrateAlarm *alarm = [HwHeartrateAlarm new];
 
 ---
 
+### 9.5 杰理皮肤温度与呼吸频率
+
+Demo 入口：**首页 → 健康数据 → 同步数据（杰理）**，实现见 `JieliHealthRepository` / `JieliHealthSyncViewController`。
+
+| 数据 | 读取（HwBluetoothCenter） | 模型／数值单位 | 手动删除 |
+| --- | --- | --- | --- |
+| 皮肤温度 | `getSkinTemperatureBigDataWithCallback:` | `HwTemperature.temperature`，摄氏度浮点数 | `delSkinTemperatureBigDataWithCallback:` |
+| 呼吸频率 | `getBreathsBigDataWithCallback:` | `HwBreaths.rpmVal`，次／分钟 | `delBreathsBigDataWithCallback:` |
+
+两种模型的 `time` 均为 Unix **秒**，显示时直接构造 `Date(timeIntervalSince1970:)`；不要按 `HwWorkout` 的毫秒时间戳处理。结果按最新时间排序，空列表是正常结果。Demo 读取后不会自动删除，删除需用户确认。
+
+### 9.6 杰理手动测量与自动监测
+
+手动测量入口：**首页 → 健康数据 → 手动测量（杰理）**。
+
+```swift
+let sdk = HwBluetoothSDK.sharedInstance()
+sdk.startMonitoring(with: .skinTemperature) { success, error in
+    // 写入操作须同时检查 success 和 error。
+}
+sdk.stopMonitoring(with: .skinTemperature, callback: nil)
+```
+
+| 类型（HwMonitorDataType） | 实时监听／对应移除方法 |
+| --- | --- |
+| `.heartRate` | `addHeartrateValueChangedListener` / `removeHeartrateValueChangedListener` |
+| `.HRV` | `addRealtimeHRVUpdateListener` / `removeRealtimeHRVUpdateListener` |
+| `.spO2` | `addSpo2ValueChangedListener` / `removeSpo2ValueChangedListener` |
+| `.stress` | `addStressValueChangedListener` / `removeStressValueChangedListener` |
+| `.skinTemperature` | `addRealtimeSkinTemperatureUpdateListener` / `removeRealtimeSkinTemperatureUpdateListener` |
+| `.respiratoryRate` | `addRealtimeRPMUpdateListener` / `removeRealtimeRPMUpdateListener` |
+
+先注册监听再启动；保留 Block 引用，以对应的 remove 方法移除本页监听，不要调用 removeAll 影响其他模块。还需处理 `addNotProperlyWornCallback`、`addMonitorStateChangedCallback`、断连及 `addTimedMeasureListener`；后者的 `time` 为**毫秒**。SDK 回调更新 UIKit 前切到主线程。
+
+Demo 测量期间禁止切换类型，60 秒无结束通知时主动停止；退出页面、进入后台时移除监听并停止设备测量。停止失败保留重试入口，旧会话回调不更新新会话。
+
+自动监测入口：**首页 → 健康数据 → 自动监测（杰理）**，实现见 `JieliAutoMonitorViewController`。
+
+| 数据 | Swift 读取接口 | Swift 写入接口 | 本 Demo 的开启／关闭值 |
+| --- | --- | --- | --- |
+| 心率 | `sdk.getHeartrateMonitoringInterval(callback:)` | `sdk.setHeartrateMonitoringInterval(_:callback:)` | 5／0 分钟 |
+| HRV（Center） | `center.getAutoTrackHRV(callback:)` | `center.setAutoHRVWithStatus(_:callback:)` | 1／0 |
+| 血氧 | `sdk.getSpO2MonitorEnable(callback:)` | `sdk.setSpO2MonitorEnable(_:callback:)` | true／false |
+| 压力 | `sdk.getStressMonitorEnable(callback:)` | `sdk.setStressMonitorEnable(_:callback:)` | true／false |
+| 皮肤温度 | `sdk.getSkinTemperatureMonitorInterval(callback:)` | `sdk.setSkinTemperatureMonitorInterval(_:callback:)` | 60／0 分钟 |
+| 呼吸频率 | `sdk.getRespiratoryRateMonitorInterval(callback:)` | `sdk.setRespiratoryRateMonitorInterval(_:callback:)` | 60／0 分钟 |
+
+间隔是 Demo 策略，不代表所有产品固定使用该值；皮肤温度、呼吸频率沿用当前 hawofit 的 60 分钟设置。进入页面顺序读取设备实际状态，读取失败的项目禁用开关，可刷新重试；保存失败回滚，断连或更换设备时丢弃旧结果。读取布尔值 false 且没有 error 表示“关闭”，不表示读取失败。具体功能是否支持由机型／固件决定。
+
+---
+
 ## 10. 运动 Workout
 
 ### 10.1 同步历史运动
@@ -863,7 +928,8 @@ HwHeartrateAlarm *alarm = [HwHeartrateAlarm new];
 ```objc
 [sdk getWorkoutsWithCallback:^(NSArray<HwWorkout *> *list, NSError *error) {
     // 轨迹点等可能需额外接口，见 +Workout / +WorkoutTrack
-    [sdk deleteWorkoutsWithCallback:^(BOOL b, NSError *error) { }];
+    if (error || !list) { return; }
+    // App 可靠保存成功后，再在保存完成回调中调用 deleteWorkoutsWithCallback:。
 }];
 
 // LS 时间窗
@@ -873,7 +939,7 @@ HwHeartrateAlarm *alarm = [HwHeartrateAlarm new];
 ### 10.2 App 控制运动
 
 ```objc
-[sdk startWorkoutWithType:HwWorkoutTypeOutdoorRun callback:^(BOOL b, NSError *error) { }];
+[sdk startWorkoutWithType:HwWorkoutTypeOutdoorRunning callback:^(BOOL b, NSError *error) { }];
 [sdk suspendWorkoutWithCallback:^(BOOL b, NSError *error) { }];
 [sdk resumeWorkoutWithCallback:^(BOOL b, NSError *error) { }];
 [sdk stopWorkoutWithCallback:^(BOOL b, NSError *error) { }];
@@ -883,7 +949,7 @@ HwHeartrateAlarm *alarm = [HwHeartrateAlarm new];
 [sdk addWorkoutRealtimeDataUpdateListener:^(HwWorkoutRealtimeData *data) {
     // 步数 / 距离 / 心率 / GPS 等
 }];
-[sdk addWorkoutStateUpdatedCallback:^(/* state */) { }];
+[sdk addWorkoutStateUpdatedCallback:^(BOOL stopped) { }];
 
 // App 向手表推送实时数据（手机主 GPS 运动等场景）
 [sdk setWorkoutRealtimeData:realtimeData callback:^(BOOL b, NSError *error) { }];
@@ -902,7 +968,7 @@ HwHeartrateAlarm *alarm = [HwHeartrateAlarm new];
 - **`HwWorkout.startTime` / `endTime`、采样点 `time`、实时数据 `time` 多为毫秒级时间戳**（与健康数据「秒」不同，入库时注意换算）。  
 - `index` 仅便于调试，勿作业务唯一键。  
 - 无效/无此指标的采样点字段常见填 **-255**（见 `HwWorkoutPoint`）。  
-- 拉取历史后建议 `deleteWorkoutsWithCallback:`。
+- 历史数据成功读取且可靠保存后，才按业务策略调用 `deleteWorkoutsWithCallback:`。
 
 #### 10.3.1 `HwWorkoutType`（运动类型）
 
@@ -953,7 +1019,8 @@ HwHeartrateAlarm *alarm = [HwHeartrateAlarm new];
 | `actionRate` | `NSUInteger` | 动作频率 |
 | `maxConsecutiveActionCount` | `NSUInteger` | 最大连续动作次数 |
 | `interruptActionCount` | `NSUInteger` | 中断动作次数 |
-| `actualDuration1/2/3` | `NSUInteger` | 分段实际时长 |
+| `actualDuration1` / `actualDuration2` | `double` | 拉桨 / 回桨时长，秒，可含小数 |
+| `actualDuration3` | `NSUInteger` | 第三段时长，按产品约定 |
 | `aerobicTrainingEffect` / `anaerobicTrainingEffect` | `NSUInteger` | 有氧 / 无氧训练效果 |
 | `strike` | `NSUInteger` | 步幅，单位 **0.01 米** |
 | `recoveryTime` | `NSUInteger` | 锻炼恢复时间 |
@@ -1135,7 +1202,7 @@ HwStandingSetting *standing = [HwStandingSetting new];
 [sdk getRemindersWithCallback:^(NSArray<HwReminder *> *list, NSError *error) { }];
 
 // 按类型批量
-[sdk setReminderEvents:list type:HwReminderTypeXxx callback:^(BOOL b, NSError *error) { }];
+[sdk setReminderEvents:list type:HwReminderTypeDrinkWater callback:^(BOOL b, NSError *error) { }];
 [sdk getAllReminderEvents:type callback:^(NSArray *list, NSError *error) { }];
 [sdk delAllReminderEvents:type callback:^(BOOL b, NSError *error) { }];
 ```
@@ -1149,7 +1216,7 @@ HwStandingSetting *standing = [HwStandingSetting new];
                                            callback:^(BOOL b, NSError *error) { }];
 ```
 
-> 需在 Info.plist 配置 `NSCalendarsUsageDescription`，并由 App 自行读取系统日历后组装模型。单次最多 **`[HwPhoneScheduleEvent maxCount]` = 30** 条，超出将回调参数错误（`HwBCCodeParamsError`）。
+> SDK 只下发 App 提供的模型，不读取系统日历；仅同步自行组装的数据不需要日历权限。若 App 读取系统日历，iOS 17+ 使用 `NSCalendarsFullAccessUsageDescription` 和 `requestFullAccessToEventsWithCompletion:`；旧版按 `NSCalendarsUsageDescription` 和对应 EventKit 授权接口处理。获得授权后再组装模型。单次最多 **`[HwPhoneScheduleEvent maxCount]` = 30** 条，超出将回调参数错误（`HwBCCodeParamsError`）。
 
 #### `HwPhoneScheduleEvent` 字段说明
 
@@ -1230,7 +1297,8 @@ HwPhoneScheduleReminder *r = [[HwPhoneScheduleReminder alloc]
 
 NSArray<HwPhoneScheduleEvent *> *events = @[event];
 if (events.count > [HwPhoneScheduleEvent maxCount]) {
-    // 自行截断或分页策略；超过 30 条 SDK 直接失败
+    // 全量覆盖接口：按业务选择最多 30 条，不能分页追加；此处先终止。
+    return;
 }
 [[HwBluetoothSDK sharedInstance] syncPhoneSchedules:events
                                            callback:^(BOOL b, NSError *error) {
@@ -1248,13 +1316,55 @@ if (events.count > [HwPhoneScheduleEvent maxCount]) {
 
 ---
 
+### 11.5 杰理低电量、震动与自动识别锻炼
+
+Demo 入口：**首页 → 提醒与日常 → 闹钟／提醒（杰理）**。
+
+- 低电量提醒：`getLowBatteryReminderSwitchWithCallback:` / `setLowBatteryReminderSwitch:callback:`。
+- 震动：`getVibrationSettingsWithCallback:` / `setVibrationSettings:callback:`；模型 `HwVibrationSettings` 含 `on`（Swift 为 `isOn`）与 `intensity`。弱／中／强分别为 33／66／99；关闭时保留原强度。
+- 自动识别锻炼：沿用 hawofit 的 **App 本地提示开关**，不是设备检测开关。用 `addWorkoutTypeRecognitionCallback:` 接收类别，配对 `removeWorkoutTypeRecognitionCallback:` 移除本模块回调。
+
+识别类别：1 步行、2 跑步、3 骑行、4 椭圆机、5 划船机；未知类别忽略。Demo 在首页或闹钟／提醒页显示提示，可忽略、今天不再提示或关闭；本地设置在解绑后清除。该入口不启动运动记录。
+
+---
+
+### 11.6 杰理设备提醒监听
+
+与通知开关下发（§12）不同，此功能接收手表主动上报的提醒。SDK 的 `HwReminderNotifyCallback` 参数为 `HwReminderNotifyType` 和可空的 `NSData`；完整枚举见 `HwBluetoothDeviceRequestManager.h`。
+
+```objc
+HwReminderNotifyCallback reminderCallback = ^(HwReminderNotifyType type, NSData *data) {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        // 检查当前绑定/连接设备，再更新 UI；不要在这里同步执行耗时工作。
+    });
+};
+// 将 reminderCallback 保存在组件属性中，供停止监听时移除。
+[[HwBluetoothSDK sharedInstance] addReminderNotifyCallback:reminderCallback];
+```
+
+停止监听或解绑时，用保存的同一份 Block 移除；不要移除其他模块的回调：
+
+```objc
+[[HwBluetoothSDK sharedInstance] removeReminderNotifyCallback:reminderCallback];
+```
+
+Demo 入口：**首页 → 提醒与日常 → 提醒监听（杰理）**。实现见 [JieliReminderNotifyManager.swift](BleSdkDemo/Sources/Services/Jieli/JieliReminderNotifyManager.swift) 和 [事件模型](BleSdkDemo/Sources/Models/JieliReminderEvent.swift)。
+
+- 对齐 hawofit 的 19 类事件：饮水、洗手、低电、久坐、四项每日目标、易孕期、生理期、闹钟和八类自定义提醒。SDK 中其他类型暂不展示，与参考实现保持一致。
+- 闹钟载荷为两个字节的小时、分钟；检查长度及 `0...23` / `0...59` 范围，缺失或无效时回退到接收时刻，以系统时间格式显示。
+- 同类型、同载荷在两秒内去重，使用单调时钟；通知授权不影响事件记录、前台弹窗及目标数据读取。
+- Demo 由客户手动开启，不判断无屏或机型。监听绑定到当前设备；停止、解绑或换设备时移除自己的回调、清理自己的待显示弹窗和通知，忽略旧异步结果。后台本地通知依赖 App 实际收到 BLE 事件，不保证被系统终止后仍能接收。
+- 每日步数／距离／热量／活动时长目标达成后，0.5 秒内事件合并；若正在使用其他功能、传输或后台，则等待，最长 180 秒。活动读取使用 `getSportDetailBigDataWithCallback:`，30 秒未完成则显示超时；**只读，不调用删除接口**。成功后更新 Demo 首页和监听页摘要。生产 App 应自行落库并刷新业务页面。
+
+---
+
 ## 12. 通知 / 通讯录
 
 ### 12.1 通知开关
 
 ```objc
 [sdk getSocialSwitchesWithCallback:^(NSArray<HwSocialSwitch *> *list, NSError *error) { }];
-[sdk setSocialSwitchWithType:HwSocialSwitchTypeWeChat S:YES callback:^(BOOL b, NSError *error) { }];
+[sdk setSocialSwitchWithType:HwSocialSwitchTypeWechat S:YES callback:^(BOOL b, NSError *error) { }];
 [sdk setSocialSwitches:list callback:^(BOOL b, NSError *error) { }];
 
 // 部分机型：下发社交 App 图标包等
@@ -1340,21 +1450,22 @@ HwBluetoothSDK *sdk = [HwBluetoothSDK sharedInstance];
 ### 13.2 杰理：在线表盘安装
 
 1. App 侧下载在线表盘 **bin**（服务器包格式以产品为准）。  
-2. 组装 `HwMultipleFileTransferModel`，`transferType = MultipleFileTransferTypeOnlineDial`。  
-3. 调用 `startMultipleFileTransfer:`。
+2. 组装 `HwMultipleFileTransferModel`，启动方法的 `transferType` 参数传 `MultipleFileTransferTypeOnlineDial`。
+3. 调用 `multipleFileTransferService` 的 `startWithFileModels:transferType:readyCallback:progressCallback:finishCallback:`。
 
 ```objc
 HwMultipleFileTransferModel *model = [HwMultipleFileTransferModel new];
 model.fileData = binData;                 // 下载好的表盘二进制
 model.fileName = @"WatchfaceName";        // 与设备侧名称约定一致
 
-[[HwBluetoothCenter sharedInstance] startMultipleFileTransfer:@[model]
+[[HwBluetoothSDK sharedInstance].multipleFileTransferService startWithFileModels:@[model]
                                                  transferType:MultipleFileTransferTypeOnlineDial
                                                 readyCallback:^(BOOL b, NSError *error) {
     // ready：可开始刷进度 UI
 } progressCallback:^(float f, NSError *error) {
     // f: 0.0 ~ 1.0
 } finishCallback:^(BOOL b, NSError *error) {
+    if (!b || error) { /* 显示安装失败 */ return; }
     // 成功后建议本地缓存已安装表盘信息
 }];
 ```
@@ -1368,12 +1479,14 @@ model.fileName = @"WatchfaceName";        // 与设备侧名称约定一致
 3. 每张图一个 `HwMultipleFileTransferModel`：  
    - 背景：`fileName = @"bg1"` / `@"bg2"` …  
    - 缩略图：`fileName = @"pw"`  
-4. `startMultipleFileTransfer:… transferType:MultipleFileTransferTypeCustomDialImage`。  
+4. `multipleFileTransferService` 的 `startWithFileModels:… transferType:MultipleFileTransferTypeCustomDialImage`。
 5. 传输成功后调用 `updateJLCustomWatceFace:` 写入显示模式、封面下标、组件坐标等。
 
 ```objc
+#import <HwBluetoothSDK/HwBluetoothCenter+JLWatchFace.h>
+
 // fileModelArr: bg1..bgN + pw
-[[HwBluetoothCenter sharedInstance] startMultipleFileTransfer:fileModelArr
+[[HwBluetoothSDK sharedInstance].multipleFileTransferService startWithFileModels:fileModelArr
                                                  transferType:MultipleFileTransferTypeCustomDialImage
                                                 readyCallback:^(BOOL b, NSError *error) { }
                                              progressCallback:^(float f, NSError *error) { }
@@ -1508,7 +1621,7 @@ HwCustomWatchface *wf = [HwCustomWatchface new];
 2. 推送过程建议亮屏，保持手机靠近手表。  
 3. `progressCallback` 中 `float` 为 **0.0~1.0**（思澈库多为 0~100，注意换算）。  
 4. 杰理图片必须先转成设备识别的像素格式，再放入 `fileData`。  
-5. 思澈取消用 `SifliWatchfaceSDK stop`；本 SDK 的 MFT / Picture OTA 一般无独立 cancel API，失败后重试前应确保上次传输已结束。
+5. 思澈取消用 `SifliWatchfaceSDK stop`；杰理多文件传输取消用 `sdk.multipleFileTransferService.stop`；经典 Picture OTA 用 `stopOtaWithCallback:`。确认会话结束后再重试。
 
 ---
 
@@ -1520,7 +1633,7 @@ HwCustomWatchface *wf = [HwCustomWatchface new];
 
 | 产品线 | 音乐 | 相册 | 依赖 |
 |--------|------|------|------|
-| **杰理** | `startMultipleFileTransfer` + `MultipleFileTransferTypeMusic` | 同上 + `MultipleFileTransferTypePhoto` | 仅本 SDK（图片转换可用杰理工具库） |
+| **杰理** | `multipleFileTransferService.startWithFileModels` + `MultipleFileTransferTypeMusic` | 同上 + `MultipleFileTransferTypePhoto` | 仅本 SDK（图片转换可用杰理工具库） |
 | **思澈** | `SifliWatchfaceSDK setMusicFiles…` | `SifliWatchfaceSDK setPictures…` | **额外** `SifliWatchfaceSDK` |
 
 ```text
@@ -1541,7 +1654,7 @@ BLE 已连接且已绑定
 
 ### 14.2 多文件传输模型（杰理主路径）
 
-头文件：`HwMultipleFileTransferModel.h` / `HwBluetoothCenter+MultipleFileTransfer.h`。
+头文件：`HwMultipleFileTransferModel.h` / `HwMultipleFileTransferService.h`。
 
 | `MultipleFileTransferType` | 值 | 用途 |
 |----------------------------|----|------|
@@ -1562,15 +1675,17 @@ BLE 已连接且已绑定
 | `photoType` | — | `MultipleFileTransferPhotoTypeJPG` / `PNG` |
 
 ```objc
-[[HwBluetoothCenter sharedInstance] startMultipleFileTransfer:models
+[[HwBluetoothSDK sharedInstance].multipleFileTransferService startWithFileModels:models
                                                  transferType:/* Music 或 Photo */
                                                 readyCallback:^(BOOL b, NSError *error) { }
                                              progressCallback:^(float f, NSError *error) { /* 0~1 */ }
                                                finishCallback:^(BOOL b, NSError *error) { }];
 ```
 
-亦可使用文件夹便捷接口：`startMultipleFileTransferWithFilePath:transferType:...`。  
-调试日志：`setMftLogBlock:`。
+Service 由 `HwBluetoothSDK` 创建并持有，使用前先 `initSDK`，不要自行 `alloc/new`。取消使用 `[[HwBluetoothSDK sharedInstance].multipleFileTransferService stop]`，运行状态可查询 `isRunning`。
+
+亦可使用文件夹便捷接口：`multipleFileTransferService` 的 `startWithFilePath:transferType:readyCallback:progressCallback:finishCallback:`。
+调试日志：`multipleFileTransferService.logBlock`。
 
 ### 14.3 音乐推送
 
@@ -1601,13 +1716,13 @@ for (/* 每首选中的曲目 */) {
     [arr addObject:m];
 }
 
-[[HwBluetoothCenter sharedInstance] startMultipleFileTransfer:arr
+[[HwBluetoothSDK sharedInstance].multipleFileTransferService startWithFileModels:arr
                                                  transferType:MultipleFileTransferTypeMusic
                                                 readyCallback:^(BOOL b, NSError *error) { }
                                              progressCallback:^(float f, NSError *error) {
     // 更新进度条 f
 } finishCallback:^(BOOL b, NSError *error) {
-    if (b) {
+    if (b && !error) {
         [[HwBluetoothSDK sharedInstance] getMusicAvailableStorageWithCallback:...];
     }
 }];
@@ -1665,7 +1780,7 @@ NSMutableArray<HwMultipleFileTransferModel *> *fileModelArr = [NSMutableArray ne
     [fileModelArr addObject:m];
 }];
 
-[[HwBluetoothCenter sharedInstance] startMultipleFileTransfer:fileModelArr
+[[HwBluetoothSDK sharedInstance].multipleFileTransferService startWithFileModels:fileModelArr
                                                  transferType:MultipleFileTransferTypePhoto
                                                 readyCallback:^(BOOL b, NSError *error) { }
                                              progressCallback:^(float f, NSError *error) { }
@@ -1695,7 +1810,7 @@ NSString *devId = [HwBluetoothSDK sharedInstance].connectedDevice.peripheral.ide
 2. **音乐**推送前查 `getMusicAvailableStorage`；相册空间不足多在回调错误里体现（思澈 `:37`）。  
 3. 杰理进度 `float` 为 **0~1**；思澈进度多为 **0~100**。  
 4. 思澈结束或取消务必 `stop`，避免会话残留。  
-5. iOS 读本地音乐/相册需配置 `NSPhotoLibraryUsageDescription` 等（见 §2），并遵守沙盒与系统文件安全访问（`UIDocumentPicker` 需 `startAccessingSecurityScopedResource`）。  
+5. 按实际访问方式配置权限：直接读取相册才申请相册权限；文件选择器导入 MP3 不需要相册或 Apple Music 权限。使用文件副本时读取沙盒内文件；外部 security-scoped URL 则成对调用 `startAccessingSecurityScopedResource` / `stopAccessingSecurityScopedResource`。
 6. 其它存储查询（按产品）：`getOfflineMapAvailableStorageWithCallback:`、`getCoustomInterfaceAvailableStorageWithCallback:`。
 
 ---
@@ -1712,7 +1827,7 @@ NSArray<HwWeatherInfo *> *forecast = ...;
                    forecast:forecast
                    callback:^(BOOL b, NSError *error) { }];
 
-[sdk setWeatherUnit:HwWeatherUnitCelsius callback:^(BOOL b, NSError *error) { }];
+[sdk setWeatherUnit:HwWeatherUnitC callback:^(BOOL b, NSError *error) { }];
 [sdk getWeatherUnitWithCallback:^(HwWeatherUnit unit, NSError *error) { }];
 
 [sdk addCurrentWeatherUnitChangedCallback:^(HwWeatherUnit unit) { }];
@@ -1737,8 +1852,8 @@ NSArray<HwWeatherInfo *> *forecast = ...;
 // 遥控拍照
 [sdk enterCameraWithCallback:^(BOOL b, NSError *error) { }];
 [sdk exitCameraWithCallback:^(BOOL b, NSError *error) { }];
-[sdk addCameraEventCallback:^(/* 拍照事件 */) { }];
-[sdk addCameraDelayEventCallback:^(/* 倒计时拍照 */) { }];
+[sdk addCameraEventCallback:^(HwCameraEvent event) { }];
+[sdk addCameraDelayEventCallback:^(HwCameraEvent event, NSInteger delay, NSInteger photoNum) { }];
 ```
 
 ---
@@ -1791,15 +1906,15 @@ if (!sdk.connected) { /* 引导连接 */ return; }
 [[HwBluetoothCenter sharedInstance] stopOtaWithCallback:^(BOOL b, NSError *error) { }];
 ```
 
-### 17.2 通道选择（与现网一致）
+### 17.2 通道选择（按产品配置）
 
 ```text
-固件文件已下载到本地
+固件文件已下载、校验完整，且已按产品配置确认芯片方案
         │
         ├─ 思澈产品（MCU = sifli）──────────► 方案 D：SifliOTAManagerSDK.startOTANand
         │
-        ├─ 杰理协议（protocolVersion ≥ 100，
-        │   或厂商标注的 JL/WL02 等机型）───► 方案 B：jlOtaV2StartWithBinData
+        ├─ 厂商确认的杰理机型
+        │   （不可仅凭 protocolVersion ≥ 100）───► 方案 B：otaV2Service.startWithBinData
         │
         └─ 其它（瑞昱 / 阿波罗等）──────────► 方案 A：otaWithDataModels
 ```
@@ -1807,7 +1922,7 @@ if (!sdk.connected) { /* 引导连接 */ return; }
 | 方案 | API | 是否在 HwBluetoothSDK 内 | 数据包形态 |
 |------|-----|--------------------------|------------|
 | **A. 通用 OTA** | `otaWithDataModels:` / 门面同名接口 | **是** | 每个文件一份 `HwOtaDataModel`；bin **前 4 字节为写入地址** |
-| **B. 杰理 JL OTA V2** | `jlOtaV2StartWithBinData:` | **是** | 多文件 **按序拼接成一个** `NSData` |
+| **B. 杰理 JL OTA V2** | `otaV2Service.startWithBinData:readyCallback:progressCallback:finishCallback:` | **是** | 多文件 **按序拼接成一个** `NSData` |
 | **C. 文件差分 fdOta** | `fdOtaStartWithFileData:` | **是**（备选） | 同样拼接成一个 `NSData`；按产品启用 |
 | **D. 思澈 DFU** | `SFOTAManager startOTANand:…` | **否，额外 SDK** | 主包 ZIP 解压后按文件名前缀映射镜像 |
 
@@ -1911,7 +2026,7 @@ NSString *otaDeviceName = sdk.connectedDevice.name; // 产品约定的 OTA 广�
 
 ### 17.4 方案 B：杰理 JL OTA V2（生产主路径）
 
-适用于 **杰理协议** 机型（现网判断思路：`protocolVersion >= 100`，或以厂商机型表为准）。
+适用于厂商确认的 **杰理协议** 机型。协议号 `>= 100` 只是 Demo 的兜底判断，客户应以机型与 MCU 配置选择通道。
 
 #### 17.4.1 组装数据
 
@@ -1921,33 +2036,35 @@ NSString *otaDeviceName = sdk.connectedDevice.name; // 产品约定的 OTA 广�
 NSMutableData *binData = [NSMutableData data];
 for (NSString *path in localFirmwarePaths) {
     NSData *part = [NSData dataWithContentsOfFile:path];
-    if (part.length) [binData appendData:part];
+    if (!part.length) { NSLog(@"固件文件读取失败：%@", path); return; }
+    [binData appendData:part];
 }
 ```
 
 #### 17.4.2 启动 / 停止
 
 ```objc
-HwBluetoothCenter *center = [HwBluetoothCenter sharedInstance];
+HwOtaV2Service *service = [HwBluetoothSDK sharedInstance].otaV2Service;
+if (!service) { /* SDK 未就绪：提示错误，不进入升级 */ return; }
+service.logLevel = HwOtaLogLevelDebug; // 可选
 
-[center jlOtaV2SetLogLevel:HwJLOtaLogLevelDebug]; // 可选
+[service startWithBinData:binData
+           readyCallback:^(BOOL ready, NSError *error) {
+               if (!ready || error) { /* 启动失败 */ }
+           }
+        progressCallback:^(float progress, NSError *error) {
+               // progress: 0.0 ~ 1.0
+           }
+          finishCallback:^(BOOL success, NSError *error) {
+               if (!success || error) { /* 显示失败 */ return; }
+               // 等待设备重启，再重连并核对版本。
+           }];
 
-[center jlOtaV2StartWithBinData:binData
-                  readyCallback:^(BOOL b, NSError *error) {
-                      if (error) { /* 启动失败 */ }
-                  }
-               progressCallback:^(float f, NSError *error) {
-                      // f: 0.0 ~ 1.0
-                  }
-                 finishCallback:^(BOOL b, NSError *error) {
-                      // 成功后建议短延时再提示「重启」并等待重连
-                 }];
-
-// 取消 / 收尾
-[center jlOtaV2Stop];
+// 用户取消或离开升级流程时调用；勿紧接启动后立即执行。
+// [service stop];
 ```
 
-OTA 进行中请避免对其它模块发指令；失败后确认会话已 `jlOtaV2Stop` 再重试。
+OTA 进行中请避免对其它模块发指令；取消调用 `service.stop`，确认结束后再重试。Service 由 SDK 持有，不要自行创建。
 
 ### 17.5 方案 C：文件差分 fdOta（备选通道）
 
@@ -2005,7 +2122,7 @@ SFOTAManager *manager = [SFOTAManager share];
 manager.delegate = self; // 实现进度 / 完成 / 错误回调
 
 [manager startOTANandWithTargetDeviceIdentifier:devId
-                                   resourcePath:pictureOrResourceURL  // 可无
+                                   resourcePath:pictureOrResourceURL  // 无资源包时传 nil，不要传空 file:// URL
                             controlImageFilePath:ctrlOrDiffCtrlURL
                                   imageFileInfos:nandImageInfoArray
                                        tryResume:YES];   // 支持中断后续传
@@ -2025,7 +2142,7 @@ manager.delegate = self; // 实现进度 / 完成 / 错误回调
 | 进行中 | 保持亮屏；禁用返回或二次确认；提示勿远离手表 |
 | 互斥 | 禁止同时推音乐/相册/表盘；杰理期间暂停其它写指令 |
 | 成功 | 提示设备重启；经典路径可延时约数秒～十余秒再重连；然后 `getDeviceInfo` / `getFirmwareVersion` 校验 |
-| 失败 | 展示错误文案，提供重试；思澈调用 `stop`；杰理确认 `jlOtaV2Stop`；必要时 `forceOutOTADevice` |
+| 失败 | 展示错误文案，提供重试；思澈调用 `stop`；杰理确认 `otaV2Service.stop`；必要时 `forceOutOTADevice` |
 
 相关错误码：`HwBCCodeOtaError`(90)、`HwBCCodePowerLowError`(80)、`HwBCCodeBLEDisconnected`(13)、`HwBCCodeBLEUnavailable`(9) 等。思澈错误含通话中（如文案 `:65`）、设备忙等，以三方 SDK 说明为准。
 
@@ -2035,6 +2152,7 @@ manager.delegate = self; // 实现进度 / 完成 / 错误回调
 - (void)startFirmwareUpgradeWithLocalFiles:(NSArray<NSDictionary *> *)files
                                isSifli:(BOOL)isSifli
                             isJLProtocol:(BOOL)isJL {
+    if (!files.count) { /* 固件列表为空 */ return; }
     // files: @[ @{ @"type": @(HwOtaTypePlatform), @"path": @"..." }, ... ]
 
     if (isSifli) {
@@ -2044,12 +2162,16 @@ manager.delegate = self; // 实现进度 / 完成 / 错误回调
     if (isJL) {
         NSMutableData *bin = [NSMutableData data];
         for (NSDictionary *f in files) {
-            [bin appendData:[NSData dataWithContentsOfFile:f[@"path"]]];
+            NSData *part = [NSData dataWithContentsOfFile:f[@"path"]];
+            if (!part.length) { /* 固件文件缺失或为空：终止 */ return; }
+            [bin appendData:part];
         }
-        [[HwBluetoothCenter sharedInstance] jlOtaV2StartWithBinData:bin
-                                                      readyCallback:...
-                                                   progressCallback:...
-                                                     finishCallback:...];
+        HwOtaV2Service *service = [HwBluetoothSDK sharedInstance].otaV2Service;
+        if (!service || !bin.length) { /* 未就绪或固件为空 */ return; }
+        [service startWithBinData:bin
+                   readyCallback:...
+                progressCallback:...
+                  finishCallback:...];
         return;
     }
 
@@ -2057,6 +2179,7 @@ manager.delegate = self; // 实现进度 / 完成 / 错误回调
     NSMutableArray *models = [NSMutableArray new];
     for (NSDictionary *f in files) {
         NSData *data = [NSData dataWithContentsOfFile:f[@"path"]];
+        if (data.length <= 4) { /* 地址头或固件本体不完整 */ return; }
         HwOtaType type = [f[@"type"] integerValue];
         [models addObject:[HwOtaDataModel dataModelWithType:type data:data]];
     }
@@ -2075,7 +2198,7 @@ manager.delegate = self; // 实现进度 / 完成 / 错误回调
 |------|-------------|
 | 门面 OTA | `HwBluetoothSDK` → `otaWithDataModels:otaDeviceName:…` / `batteryLimit:` |
 | 经典 OTA 核心 | `HwBluetoothCenter+Ota.h` → `HwOtaDataModel` / `HwOtaType` / `startOta…` / `stopOta…` |
-| 杰理 OTA V2 | `HwBluetoothCenter+JLOtaV2.h` |
+| 杰理 OTA V2 | `HwOtaV2Service.h` |
 | 差分 OTA | `HwBluetoothCenter+FileDifferenceOta.h` |
 | 退出 OTA 模式 | `forceOutOTADeviceWithCallback:` |
 | 思澈固件 DFU | **额外** `SifliOTAManagerSDK`（`SFOTAManager`） |
@@ -2094,7 +2217,7 @@ manager.delegate = self; // 实现进度 / 完成 / 错误回调
                               callback:^(BOOL b, NSError *error) { }];
 
 [sdk setDeviceMapAuthCode:authCode uuid:uuid callback:^(BOOL b, NSError *error) { }];
-[sdk setDeviceMapTheme:HwMapThemeXxx callback:^(BOOL b, NSError *error) { }];
+[sdk setDeviceMapTheme:HwMapThemeLight callback:^(BOOL b, NSError *error) { }];
 [sdk setDeviceMapCenterWithLongitude:lng latitude:lat callback:^(BOOL b, NSError *error) { }];
 [sdk setDeviceMapRangeWithLongitude:... /* 见头文件 */ callback:^(BOOL b, NSError *error) { }];
 
@@ -2187,12 +2310,12 @@ AI / 穆斯林朝拜等扩展见 `HwBluetoothSDK.h` 中 `#pragma mark - AI` / `#
 | `protocolVersion` 较大 / 产品标注 WL | 健康多用 BigData 或新协议路径；闹钟/提醒可能走新接口 |
 | `ForLS` / `ForLS16` / `startLS16Bind` | LS 系列 |
 | `Sifli` / 表盘按名称 | 思澈芯片绑定与表盘名管理 |
-| `JLOtaV2` / `JLWatchFace` | 杰理 |
+| `otaV2Service` / `JLWatchFace` | 杰理 OTA V2 / 自定义表盘配置 |
 | `otaWithDataModels` / `HwOtaType*` | 瑞昱 / 阿波罗通用固件 OTA（bin 前 4 字节地址） |
-| `jlOtaV2*` | 杰理固件 OTA V2（多文件拼接） |
+| `otaV2Service` | 杰理固件 OTA V2（多文件拼接） |
 | `fdOta*` | 文件差分固件 OTA（备选） |
 | 思澈 `SFOTAManager` | 思澈固件 DFU（额外 SDK；ZIP 解压后按前缀映射） |
-| `MultipleFileTransfer` | 杰理：音乐 / 相册 / 在线·自定义表盘资源 |
+| `HwMultipleFileTransferService` | 杰理：音乐 / 相册 / 在线·自定义表盘资源 |
 | 无后缀常规 API | 通用主路径 |
 
 不确定时以厂商产品对接文档为准。
@@ -2206,10 +2329,10 @@ AI / 穆斯林朝拜等扩展见 `HwBluetoothSDK.h` 中 `#pragma mark - AI` / `#
 2. 注册全局 Listener（连接态、找手机、设备事件等）
 3. 首次绑定：蓝牙授权 → scan → connect →（按需系统配对）→ startBind*
 4. 绑定成功：setDeviceTime / setUserInfo / setUnit / setLanguage / setGoal → endBind
-5. 保存 MAC；调用 updateMacAddressIfNeedWithMac
-6. 日常：connectWithMac → getDeviceInfo → getHealthDataCount + get*/delete*
+5. 绑定结束成功后保存 MAC / UUID 等设备标识；按需调用 updateMacAddressIfNeedWithMac
+6. 日常：connectWithMac → getDeviceInfo → 读取数据 → 可靠保存成功后再按需 delete*
 7. 通知开关、天气、表盘、音乐、OTA 按业务调用
-8. 解绑：unbindDevice → removeConnectionCache → disconnect
+8. 解绑：关闭自动重连 → unbindDevice → disconnect → removeConnectionCache → 清除 App 绑定记录 → 提示系统“忽略此设备”
 9. 进程退出：remove Listener → destroySDK
 ```
 
@@ -2224,16 +2347,113 @@ AI / 穆斯林朝拜等扩展见 `HwBluetoothSDK.h` 中 `#pragma mark - AI` / `#
             if (!b || error) return;
             [sdk setUnit:HwUnitMetric callback:^(BOOL b, NSError *error) {
                 if (!b || error) return;
-                [sdk endBindDeviceWithCallback:^(BOOL b, NSError *error) {
-                    if (b && !error) {
-                        // 进入主页，开始健康同步
-                    }
+                [sdk setLanguage:HwLanguageChineseSimplified callback:^(BOOL b, NSError *error) {
+                    if (!b || error) return;
+                    [sdk endBindDeviceWithCallback:^(BOOL b, NSError *error) {
+                        if (b && !error) {
+                            // 保存绑定记录，进入主页；按业务需要开始同步。
+                        }
+                    }];
                 }];
             }];
         }];
     }];
 }
 ```
+
+---
+
+## 23. AiSDK 与 App 主动分析
+
+### 23.1 依赖与入口
+
+蓝牙 SDK 与 AiSDK 是不同模块。本节对应当前 Demo 的 AiSDK 1.3.4 Git 交付；相同版本号可能对应不同提交，复现时以 `Podfile.lock` 中的 commit 和 checksum 为准。
+
+沿用仓库 `Podfile`，执行 `pod install` 并打开 `BleSdkDemo.xcworkspace`。当前 AiSDK 的 podspec 已包含 `NativeLib.xcframework` 和 `Vendor/OAS/*.xcframework`，**不需宿主再声明 OAS Pod 或添加寒霜 Specs 源**。旧提交若报 `OAS (= 2.5.0)` 找不到，应先核对是否已更新到自带二进制的交付。应用提供 `JLBmpConvertKit`，并在 SDK 初始化时注入转换器，见 `BleRepository.initSDK()`。
+
+Demo 分为两条流程：
+
+- **首页 → 表盘、媒体与 AI → AI → AI DEMO**：手表触发语音、问答、表盘等；注册 `AiSDKCallback`，通过 `startWorking()` 开始监听。
+- **首页 → 表盘、媒体与 AI → AI → AI 分析下六个入口**：App 点击生成报告。当前仅输入健康数据为 mock，返回内容来自真实云端，不是本地伪造报告。实现见 `AiAnalysisViewController` / `AiAnalysisMock`。
+
+### 23.2 渠道与设备初始化
+
+需要真实且具备 AI 授权的设备 ID；mock 健康数据不等于可以使用 mock 设备 ID。Demo 先检查 BLE 连接，再通过 `BleRepository.getDeviceInfo` 取得 ID，不能只用设备名或 MAC 替代。
+
+AI 洞察、身体状态、睡眠报告走 OAS。渠道参数需在 `setDeviceInfo` **之前**配置：
+
+```swift
+import AiSDK
+
+AiOASClient.shared.configure(
+    channelId: channelID,
+    appKey: appKey,
+    appUuid: nil,
+    appChannel: nil
+)
+let ai = AiSDK.sharedInstance()
+let info = AiDeviceInfo()
+info.setValue(deviceId, forKey: "Id")
+info.mac = deviceMac
+info.name = deviceName
+info.type = productType
+info.width = 480
+info.height = 480
+info.cornerRadius = 240
+info.thumbnailWidth = 264
+info.thumbnailHeight = 264
+info.thumbnailCornerRadius = 132
+info.currentLocale = "zh"
+info.supportedLocales = ["zh", "en"]
+info.platformType = .jieLi // 此例为杰理；思澈用 .sifli，瑞昱用 .realtek
+info.healthAnalysisAppOnly = true
+ai.setDeviceInfo(info)
+```
+
+示例屏幕尺寸沿用 Demo 默认值；集成时填写真实产品参数，亦可复用 `AiDeviceInfoBuilder`。当前 `AiDeviceInfo` 暴露 `platformType`；平台应按产品配置确定；Demo 的 `AiPlatformHelper` 仅提供协议号和手动开关的兜底判断，不能替代客户机型配置。`setDeviceInfo` 触发 SDK 初始化，网络、授权和渠道错误必须显示给用户。
+
+Demo 的 Channel ID / App Key 默认沿用 hawofit，**明文显示、允许编辑**；环境变量 `AI_OAS_CHANNEL_ID` / `AI_OAS_APP_KEY` 可覆盖默认值。编辑仅对当前页面有效，不写 UserDefaults。文档示例不包含真实密钥。
+
+### 23.3 六项分析接口
+
+桥接头需包含：
+
+```objc
+#import <AiSDK/AiSDK.h>
+#import <AiSDK/AiSDK+HealthAgents.h>
+#import <AiSDK/DefaultHealthAnalysisResultHandler.h>
+```
+
+| Demo 功能 | 输入与调用 | 返回 |
+| --- | --- | --- |
+| 运动健康分析 | `HwHealthData` → `DefaultHealthAnalysisResultHandler.analysis(_:)`，`appOnly = true` | `AiSDKCallback.aiHealthAnalysisDone`，`HwHealthAnalysisResult` |
+| AI 洞察 | `AiExerciseInsightInput` → `generateExerciseInsight(_:completion:)` | 标题、正文、提醒类别、可选心情 |
+| 身体状态 | `AiBodyStatusInput` → `generateBodyStatus(_:completion:)` | 标题、等级、0～100 评分、正文 |
+| AI 睡眠（天） | `AiSleepChronotypeInput.period = 0` → `generateSleepChronotype(_:completion:)` | 最佳入睡时间、时型、解释、调整建议、睡眠计划 |
+| AI 睡眠（周） | 同上，`period = 1` | 同上 |
+| AI 睡眠（月） | 同上，`period = 2` | 同上 |
+
+运动健康分析使用原有健康汇总分析通道，不是运动详情的 `getAiExerciseAnalyzeWithType:data:callback:`。调用前保存旧 `AiSDK.callback`，只在本次请求期间接管；结束、超时、退出时取消本页 handler 并恢复旧 callback。`healthAnalysisAppOnly` / handler 的 `appOnly` 防止把 Demo 结果回传手表。
+
+其余五个入口使用直接 completion，不需为这些 App 主动调用注册全套手表监听，也不需单为它们调用 `startWorking()`。不要为退出分析页而全局 `stopWorking()`，避免中断其他模块。
+
+### 23.4 输入顺序、日期与单位
+
+- 运动健康分析：`HwHealthData.dailyDataList` 为最近 7 天，`day = 0...6`；Demo 基础资料为 30 岁、175 cm、70 kg，`weight = 700`（0.1 kg），睡眠为分钟。Swift 的 `PAI` 属性名为 `pai`。
+- AI 洞察：含当天最近 7 天，所有每日数组均为 7 项，**从近到远**保持相同顺序。日期为 `yyyy/MM/dd-yyyy/MM/dd`，结束日期在前。心情使用 SDK 约定的中文枚举，不能直接换成翻译后的字符串。
+- 身体状态：当天 `yyyy/MM/dd`；心率、HRV、压力等小时数组按时间顺序；睡眠分段数组对应一致。心率单位 bpm，HRV 为 ms，热量 kcal，活动与睡眠时长为分钟。
+- 睡眠日／周／月：分别为 1 项、最近 7 项、本月 1 日至当天的项数；均从近到远。日日期为 `yyyy/MM/dd`，周／月为结束日期到开始日期。月报不是滚动 30 天。
+- `sleepHours` 和 `getUpHours` 数量必须相同；Demo 固定 24 小时制，格式 `HH:mm:ss`。SDK 亦支持 `use12HourClock = true` 配合 `hh:mm:ss AM/PM`；缺失日期用字符串 `0` 占位。
+
+Mock 工厂是 `AiAnalysisMock`；替换真实数据时保留相同单位、日期和数组对齐规则，不要把返回报告一起 mock。
+
+### 23.5 UI 与验证边界
+
+Demo 请求期间禁用重复操作及参数编辑；90 秒超时后恢复操作，退出页面丢弃旧会话结果。该超时是 Demo UI 策略，不代表云端请求已取消。SDK 返回 error 或空结果均显示失败，可重新生成；不将错误伪装成成功报告。
+
+常见检查顺序：BLE 与设备 ID → AI 授权 → 渠道参数 → 网络 → 输入日期与数组数量 → 返回格式。语音录音功能才需麦克风权限，本页以健康数据生成报告不申请录音权限。
+
+接入时需验证日／周／月输入数量、跨年与闰年日期、每日数组对齐以及数据单位；**真实云端与授权设备联调需在真机执行**。编译通过不能替代授权、网络和设备上的结果校验。
 
 ---
 
@@ -2252,9 +2472,9 @@ AI / 穆斯林朝拜等扩展见 `HwBluetoothSDK.h` 中 `#pragma mark - AI` / `#
 | 运动 | `HwWorkout` / `HwWorkoutRealtimeData` |
 | 闹钟提醒 | `HwAlarm` / `HwReminder` / `HwSedentaryReminder` |
 | 天气 | `HwWeatherInfo` |
-| 固件 OTA | `HwOtaDataModel` / `HwOtaType`；`+Ota`；`+JLOtaV2`；`+FileDifferenceOta`；思澈额外 `SifliOTAManagerSDK` |
+| 固件 OTA | `HwOtaDataModel` / `HwOtaType`；`+Ota`；`HwOtaV2Service`；`+FileDifferenceOta`；思澈额外 `SifliOTAManagerSDK` |
 | 表盘 | `+WatchFace`；`createOnlineWatchFaceDataAddress:`；`createWatchFaceOtaDataWithIndex:`；`HwJLWatchFaceConfigModel` |
-| 音乐/相册/表盘文件 | `+MultipleFileTransfer` / `HwMultipleFileTransferModel` |
+| 音乐/相册/表盘文件 | `HwMultipleFileTransferService` / `HwMultipleFileTransferModel` |
 | 杰理自定义表盘配置 | `+JLWatchFace` → `updateJLCustomWatceFace:` |
 | Category 聚合 | `HwBluetoothInterfaces.h` |
 | 思澈推送（额外） | `SifliWatchfaceSDK`（音乐/相册/QJS 表盘，按交付） |
@@ -2270,9 +2490,9 @@ AI / 穆斯林朝拜等扩展见 `HwBluetoothSDK.h` 中 `#pragma mark - AI` / `#
 | 失败回调 | `onFail(int code)` | `NSError *` / `error.code` |
 | 经典蓝牙配对 | `createBond` / `removeBond` | 系统配对 + `requestDeviceToPair` |
 | 本地绑定标记 | `setBind` / `isBind` | `getBindState` + App 自存 |
-| 音乐 / 相册 | SPP 或 WL 媒体 / 思澈 ZIP | 杰理：`MultipleFileTransfer`；思澈：额外 `SifliWatchfaceSDK` |
+| 音乐 / 相册 | SPP 或 WL 媒体 / 思澈 ZIP | 杰理：`HwMultipleFileTransferService`；思澈：额外 `SifliWatchfaceSDK` |
 | 表盘安装 | `setOnlineWatchface` / QJS / 自定义 | 杰理 MFT；经典 Picture OTA；思澈 `SifliWatchfaceSDK` |
-| 固件 OTA | 通用 `ota` / WL `starWlOta` / 思澈 `SifliDFU` | 通用 `otaWithDataModels` / 杰理 `jlOtaV2` / 思澈额外 `SifliOTAManagerSDK`；差分 `fdOta` 为备选 |
+| 固件 OTA | 通用 `ota` / WL `starWlOta` / 思澈 `SifliDFU` | 通用 `otaWithDataModels` / 杰理 `otaV2Service` / 思澈额外 `SifliOTAManagerSDK`；差分 `fdOta` 为备选 |
 | 权限 | Manifest + 运行时 | Info.plist + 系统弹窗 |
 
 ---
@@ -2281,7 +2501,7 @@ AI / 穆斯林朝拜等扩展见 `HwBluetoothSDK.h` 中 `#pragma mark - AI` / `#
 
 1. **业务指令在连接成功且（多数产品）绑定完成后调用**；断连时常见 `HwBCCodeBLEDisconnected`。  
 2. **Callback 勿做重耗时工作**；耗时逻辑请切队列/子线程。  
-3. **健康/运动同步后建议 `delete*`**，避免手表堆积与重复同步。  
+3. **健康/运动数据成功读取并可靠保存后，才按业务策略 `delete*`**；读取或保存失败时保留数据供重试。
 4. **OTA / 推表盘 / 推音乐过程中**避免并发其它大流量指令。  
 5. iOS 上已系统连接的设备，务必处理 **MAC 为空** 场景（`updateMacAddressIfNeedWithMac`）。  
 6. AI、穆斯林、对讲等高阶能力需对应固件；头文件虽暴露 API，接入前向厂商确认。  

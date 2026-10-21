@@ -164,7 +164,7 @@ final class JieliCustomWatchfaceViewController: UIViewController,
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = .systemGroupedBackground
         configureLayout()
         configurePreview()
         configureEditorControls()
@@ -181,7 +181,7 @@ final class JieliCustomWatchfaceViewController: UIViewController,
     private func configureLayout() {
         scroll.translatesAutoresizingMaskIntoConstraints = false
         content.axis = .vertical
-        content.spacing = 10
+        content.spacing = 20
         content.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(scroll)
         scroll.addSubview(content)
@@ -191,52 +191,40 @@ final class JieliCustomWatchfaceViewController: UIViewController,
             scroll.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             scroll.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             scroll.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
-            content.topAnchor.constraint(equalTo: scroll.contentLayoutGuide.topAnchor, constant: 12),
-            content.leadingAnchor.constraint(equalTo: scroll.frameLayoutGuide.leadingAnchor, constant: 12),
-            content.trailingAnchor.constraint(equalTo: scroll.frameLayoutGuide.trailingAnchor, constant: -12),
-            content.bottomAnchor.constraint(equalTo: scroll.contentLayoutGuide.bottomAnchor, constant: -12),
-            content.widthAnchor.constraint(equalTo: scroll.frameLayoutGuide.widthAnchor, constant: -24)
+            content.topAnchor.constraint(equalTo: scroll.contentLayoutGuide.topAnchor, constant: 16),
+            content.leadingAnchor.constraint(equalTo: scroll.frameLayoutGuide.leadingAnchor, constant: 16),
+            content.trailingAnchor.constraint(equalTo: scroll.frameLayoutGuide.trailingAnchor, constant: -16),
+            content.bottomAnchor.constraint(equalTo: scroll.contentLayoutGuide.bottomAnchor, constant: -16),
+            content.widthAnchor.constraint(equalTo: scroll.frameLayoutGuide.widthAnchor, constant: -32)
         ])
 
         progress.isHidden = true
-        content.addArrangedSubview(statusLabel)
-        content.addArrangedSubview(progress)
-        content.addArrangedSubview(previewPanel)
-
         let presetButton = UIHelpers.makeButton(L10n.tr("wf_size_preset"))
         presetButton.addTarget(self, action: #selector(pickPreset(_:)), for: .touchUpInside)
-        content.addArrangedSubview(presetButton)
-        content.addArrangedSubview(makeFieldRow("W", widthField, "H", heightField))
-        content.addArrangedSubview(makeFieldRow("Corner", cornerField, "ThumbW", thumbWField))
-        content.addArrangedSubview(makeFieldRow("ThumbH", thumbHField, "ThumbR", thumbCornerField))
-
-        content.addArrangedSubview(backgroundCountLabel)
-        content.addArrangedSubview(thumbnailCollection)
-        let photoButtons = UIStackView(arrangedSubviews: [addPhotosButton, deletePhotoButton])
-        photoButtons.axis = .horizontal
-        photoButtons.spacing = 8
-        photoButtons.distribution = .fillEqually
-        content.addArrangedSubview(photoButtons)
-
-        content.addArrangedSubview(makeSectionLabel(L10n.tr("wf_jl_display_mode")))
-        content.addArrangedSubview(displayModeControl)
-        content.addArrangedSubview(makeSectionLabel(L10n.tr("wf_jl_pointer_style")))
-        content.addArrangedSubview(pointerStyleControl)
-
-        for button in componentButtons {
-            content.addArrangedSubview(button)
-        }
-
-        content.addArrangedSubview(makeSectionLabel(L10n.tr("wf_jl_text_color")))
-        content.addArrangedSubview(makeColorRow())
-        content.addArrangedSubview(installButton)
+        content.addArrangedSubview(UIHelpers.makeCard([statusLabel, progress], title: L10n.tr("ui_status")))
+        content.addArrangedSubview(UIHelpers.makeCard([previewPanel], title: L10n.tr("ui_preview")))
+        content.addArrangedSubview(UIHelpers.makeCard([
+            makeFieldRow("W", widthField, "H", heightField),
+            makeFieldRow("Corner", cornerField, "ThumbW", thumbWField),
+            makeFieldRow("ThumbH", thumbHField, "ThumbR", thumbCornerField)
+        ], title: L10n.tr("ui_parameters")))
+        content.addArrangedSubview(UIHelpers.makeCard([
+            backgroundCountLabel, thumbnailCollection,
+            UIHelpers.makeGrid([presetButton, addPhotosButton, deletePhotoButton])
+        ], title: L10n.tr("wf_pick_bg")))
+        content.addArrangedSubview(UIHelpers.makeCard([
+            makeSectionLabel(L10n.tr("wf_jl_display_mode")), displayModeControl,
+            makeSectionLabel(L10n.tr("wf_jl_pointer_style")), pointerStyleControl,
+            UIHelpers.makeGrid(componentButtons),
+            makeSectionLabel(L10n.tr("wf_jl_text_color")), makeColorRow()
+        ], title: L10n.tr("ui_parameters")))
+        content.addArrangedSubview(UIHelpers.makeCard([UIHelpers.makeGrid([installButton])], title: L10n.tr("ui_actions")))
 
         logView.font = .monospacedSystemFont(ofSize: 11, weight: .regular)
         logView.isEditable = false
-        logView.backgroundColor = .secondarySystemBackground
         logView.layer.cornerRadius = 8
         logView.heightAnchor.constraint(equalToConstant: 100).isActive = true
-        content.addArrangedSubview(logView)
+        content.addArrangedSubview(UIHelpers.makeLogSection(logView))
     }
 
     private func configurePreview() {

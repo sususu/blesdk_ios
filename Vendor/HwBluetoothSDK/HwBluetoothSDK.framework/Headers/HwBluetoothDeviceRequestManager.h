@@ -10,6 +10,8 @@
 #import "HwGoalValue.h"
 #import "HwCameraImage.h"
 #import "HwDeviceDefines.h"
+#import "HwMonitorDataType.h"
+#import "HwWorkout.h"
 
 @class HwWorkoutRealtimeData;
 #pragma mark - Camera
@@ -74,6 +76,73 @@ typedef void (^HwDeviceControlCallback)(BOOL success);
 typedef void (^HwDevicePairStateCallback)(NSInteger pairState);
 typedef void (^HwWorkoutRealtimeDataUpdatedCallback)(HwWorkoutRealtimeData *_Nonnull realtimeData);
 typedef void (^HwWorkoutStateUpdatedCallback)(BOOL stopped);
+typedef void (^HwWorkoutTypeRecognitionCallback)(NSInteger cate);
+
+typedef NS_ENUM(NSInteger, HwReminderNotifyType) {
+    HwReminderNotifyTypeLowBattery = 0x01,
+    HwReminderNotifyTypeSedentary = 0x02,
+    HwReminderNotifyTypeMenstrualFertile = 0x03,
+    HwReminderNotifyTypeMenstrualPeriod = 0x04,
+    HwReminderNotifyTypeDrinkWater = 0x05,
+    HwReminderNotifyTypeWashHand = 0x06,
+    HwReminderNotifyTypeCustomMeeting = 0x07,
+    HwReminderNotifyTypeCustomSleep = 0x08,
+    HwReminderNotifyTypeCustomSchedule = 0x09,
+    HwReminderNotifyTypeCustomWorkout = 0x0A,
+    HwReminderNotifyTypeCustomMedicine = 0x0B,
+    HwReminderNotifyTypeCustomMeal = 0x0C,
+    HwReminderNotifyTypeCustomBill = 0x0D,
+    HwReminderNotifyTypeCustom = 0x0E,
+    HwReminderNotifyTypeGoalStep = 0x0F,
+    HwReminderNotifyTypeGoalDistance = 0x10,
+    HwReminderNotifyTypeGoalCalorie = 0x11,
+    HwReminderNotifyTypeGoalDuration = 0x12,
+    HwReminderNotifyTypeDailyLowHeartRate = 0x13,
+    HwReminderNotifyTypeDailyHighHeartRate = 0x14,
+    HwReminderNotifyTypeWorkoutHighHeartRate = 0x15,
+    HwReminderNotifyTypeWorkoutGoalStep = 0x16,
+    HwReminderNotifyTypeWorkoutGoalCalorie = 0x17,
+    HwReminderNotifyTypeWorkoutGoalDistance = 0x18,
+    HwReminderNotifyTypeWorkoutGoalDuration = 0x19,
+    HwReminderNotifyTypeAlarm = 0x1a,
+    HwReminderNotifyTypeUnknown = 0xFF
+};
+typedef void (^HwReminderNotifyCallback)(HwReminderNotifyType type, NSData *_Nullable datas);
+
+static inline HwReminderNotifyType HwReminderNotifyTypeFromValue(NSInteger value)
+{
+    switch (value) {
+        case HwReminderNotifyTypeLowBattery:
+        case HwReminderNotifyTypeSedentary:
+        case HwReminderNotifyTypeMenstrualFertile:
+        case HwReminderNotifyTypeMenstrualPeriod:
+        case HwReminderNotifyTypeDrinkWater:
+        case HwReminderNotifyTypeWashHand:
+        case HwReminderNotifyTypeCustomMeeting:
+        case HwReminderNotifyTypeCustomSleep:
+        case HwReminderNotifyTypeCustomSchedule:
+        case HwReminderNotifyTypeCustomWorkout:
+        case HwReminderNotifyTypeCustomMedicine:
+        case HwReminderNotifyTypeCustomMeal:
+        case HwReminderNotifyTypeCustomBill:
+        case HwReminderNotifyTypeCustom:
+        case HwReminderNotifyTypeGoalStep:
+        case HwReminderNotifyTypeGoalDistance:
+        case HwReminderNotifyTypeGoalCalorie:
+        case HwReminderNotifyTypeGoalDuration:
+        case HwReminderNotifyTypeDailyLowHeartRate:
+        case HwReminderNotifyTypeDailyHighHeartRate:
+        case HwReminderNotifyTypeWorkoutHighHeartRate:
+        case HwReminderNotifyTypeWorkoutGoalStep:
+        case HwReminderNotifyTypeWorkoutGoalCalorie:
+        case HwReminderNotifyTypeWorkoutGoalDistance:
+        case HwReminderNotifyTypeWorkoutGoalDuration:
+        case HwReminderNotifyTypeAlarm:
+            return (HwReminderNotifyType)value;
+        default:
+            return HwReminderNotifyTypeUnknown;
+    }
+}
 typedef void (^HwBatteryStateCallback)(NSInteger battery, BOOL charging, BOOL savingMode, NSError *_Nullable error);
 typedef void (^HwBatteryStateChangedCallback)(NSInteger battery, BOOL charging, BOOL savingMode);
 typedef void (^HwWatchfaceIdChangedCallback)(NSInteger Id);
@@ -82,7 +151,11 @@ typedef void (^HwCurrentWeatherUnitChangedCallback)(HwWeatherUnit unit);
 typedef void (^HwUnitUpdateChangedCallback)(HwUnitStyle unit);
 typedef void (^HwGpsShouldUpdateCallback)(long validStartTime, long validEndTime);
 typedef void (^HwIntValueChangedCallback)(NSInteger val);
+typedef void (^HwFloatValueChangedCallback)(float val);
+typedef void (^HwNotProperlyWornCallback)(void);
+typedef void (^HwMonitorStateChangedCallback)(HwMonitorDataType type);
 typedef void (^HwSpo2ValueChangedCallback)(NSInteger val,long time);
+typedef void (^HwTimedMeasureCallback)(HwMonitorDataType type, double value, long time);
 typedef void (^HwGoalUpdatedCallback)(HwGoalType type, NSInteger val);
 typedef void (^HwGoalsUpdatedCallback)(NSArray<HwGoalValue *> *_Nonnull goalValues);
 typedef void (^HwHealthDataUpdatedCallback)(NSInteger step, NSInteger distance, NSInteger calories, NSInteger duration, NSInteger activeCount);
@@ -158,6 +231,14 @@ typedef void (^HwAiSubscriptionInfoRequestCallback)(NSString *_Nullable mac);
 - (void) removeWorkoutStateUpdatedCallback:(HwWorkoutStateUpdatedCallback _Nonnull)callback;
 - (void) removeAllWorkoutStateUpdatedCallbacks;
 
+- (void) addWorkoutTypeRecognitionCallback:(HwWorkoutTypeRecognitionCallback _Nonnull)callback;
+- (void) removeWorkoutTypeRecognitionCallback:(HwWorkoutTypeRecognitionCallback _Nonnull)callback;
+- (void) removeAllWorkoutTypeRecognitionCallbacks;
+
+- (void) addReminderNotifyCallback:(HwReminderNotifyCallback _Nonnull)callback;
+- (void) removeReminderNotifyCallback:(HwReminderNotifyCallback _Nonnull)callback;
+- (void) removeAllReminderNotifyCallbacks;
+
 - (void) addSpO2StateUpdatedCallback:(HwSpO2StateUpdatedCallback _Nonnull)callback;
 - (void) removeSpO2StateUpdatedCallback:(HwSpO2StateUpdatedCallback _Nonnull)callback;
 - (void) removeAllSpO2StateUpdatedCallbacks;
@@ -186,6 +267,9 @@ typedef void (^HwAiSubscriptionInfoRequestCallback)(NSString *_Nullable mac);
 - (void) removeDeviceRequestGpsLocationListener:(HwRequestGpsLocationCallback _Nonnull)callback;
 - (void) removeAllDeviceRequestGpsLocationListeners;
 
+- (void) addTimedMeasureCallback:(HwTimedMeasureCallback _Nonnull)callback;
+- (void) removeTimedMeasureCallback:(HwTimedMeasureCallback _Nonnull)callback;
+
 - (void) addHeartrateValueChangedCallback:(HwIntValueChangedCallback _Nonnull)callback;
 - (void) removeHeartrateValueChangedCallback:(HwIntValueChangedCallback _Nonnull)callback;
 - (void) removeAllHeartrateValueChangedCallbacks;
@@ -197,6 +281,26 @@ typedef void (^HwAiSubscriptionInfoRequestCallback)(NSString *_Nullable mac);
 - (void) addSpo2ValueChangedCallback:(HwSpo2ValueChangedCallback _Nonnull)callback;
 - (void) removeSpo2ValueChangedCallback:(HwSpo2ValueChangedCallback _Nonnull)callback;
 - (void) removeAllSpo2ValueChangedCallbacks;
+
+- (void) addNotProperlyWornCallback:(HwNotProperlyWornCallback _Nonnull)callback;
+- (void) removeNotProperlyWornCallback:(HwNotProperlyWornCallback _Nonnull)callback;
+- (void) removeAllNotProperlyWornCallbacks;
+
+- (void) addMonitorStateChangedCallback:(HwMonitorStateChangedCallback _Nonnull)callback;
+- (void) removeMonitorStateChangedCallback:(HwMonitorStateChangedCallback _Nonnull)callback;
+- (void) removeAllMonitorStateChangedCallbacks;
+
+- (void) addRealtimeHRVUpdateCallback:(HwIntValueChangedCallback _Nonnull)callback;
+- (void) removeRealtimeHRVUpdateCallback:(HwIntValueChangedCallback _Nonnull)callback;
+- (void) removeAllRealtimeHRVUpdateCallbacks;
+
+- (void) addRealtimeRPMUpdateCallback:(HwIntValueChangedCallback _Nonnull)callback;
+- (void) removeRealtimeRPMUpdateCallback:(HwIntValueChangedCallback _Nonnull)callback;
+- (void) removeAllRealtimeRPMUpdateCallbacks;
+
+- (void) addRealtimeSkinTemperatureUpdateCallback:(HwFloatValueChangedCallback _Nonnull)callback;
+- (void) removeRealtimeSkinTemperatureUpdateCallback:(HwFloatValueChangedCallback _Nonnull)callback;
+- (void) removeAllRealtimeSkinTemperatureUpdateCallbacks;
 
 - (void) addGoalUpdatedCallback:(HwGoalUpdatedCallback _Nonnull)callback;
 - (void) removeGoalUpdatedCallback:(HwGoalUpdatedCallback _Nonnull)callback;

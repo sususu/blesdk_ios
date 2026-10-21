@@ -20,12 +20,16 @@ final class JieliHealthSyncViewController: UIViewController {
         ActionItem(titleKey: "jieli_get_heart_rate", action: { [weak self] in self?.getHeartRate() }),
         ActionItem(titleKey: "jieli_get_stress", action: { [weak self] in self?.getStress() }),
         ActionItem(titleKey: "jieli_get_blood_oxygen", action: { [weak self] in self?.getBloodOxygen() }),
+        ActionItem(titleKey: "jieli_get_breaths", action: { [weak self] in self?.getBreaths() }),
+        ActionItem(titleKey: "jieli_get_skin_temperature", action: { [weak self] in self?.getSkinTemperature() }),
         ActionItem(titleKey: "jieli_get_sport_detail", action: { [weak self] in self?.getSportDetail() }),
         ActionItem(titleKey: "jieli_get_workouts", action: { [weak self] in self?.getWorkouts() }),
         ActionItem(titleKey: "jieli_delete_sleep", action: { [weak self] in self?.confirmDelete(titleKey: "jieli_delete_sleep", operation: self?.repo.deleteSleep) }),
         ActionItem(titleKey: "jieli_delete_heart_rate", action: { [weak self] in self?.confirmDelete(titleKey: "jieli_delete_heart_rate", operation: self?.repo.deleteHeartRate) }),
         ActionItem(titleKey: "jieli_delete_stress", action: { [weak self] in self?.confirmDelete(titleKey: "jieli_delete_stress", operation: self?.repo.deleteStress) }),
         ActionItem(titleKey: "jieli_delete_blood_oxygen", action: { [weak self] in self?.confirmDelete(titleKey: "jieli_delete_blood_oxygen", operation: self?.repo.deleteBloodOxygen) }),
+        ActionItem(titleKey: "jieli_delete_breaths", action: { [weak self] in self?.confirmDelete(titleKey: "jieli_delete_breaths", operation: self?.repo.deleteBreaths) }),
+        ActionItem(titleKey: "jieli_delete_skin_temperature", action: { [weak self] in self?.confirmDelete(titleKey: "jieli_delete_skin_temperature", operation: self?.repo.deleteSkinTemperature) }),
         ActionItem(titleKey: "jieli_delete_sport_detail", action: { [weak self] in self?.confirmDelete(titleKey: "jieli_delete_sport_detail", operation: self?.repo.deleteSportDetail) }),
         ActionItem(titleKey: "jieli_delete_workouts", action: { [weak self] in self?.confirmDelete(titleKey: "jieli_delete_workouts", operation: self?.repo.deleteWorkouts) })
     ]
@@ -41,13 +45,13 @@ final class JieliHealthSyncViewController: UIViewController {
         return view
     }()
     private let statusLabel = UIHelpers.makeLabel("", style: .footnote)
-    private let tableView = UITableView(frame: .zero, style: .plain)
+    private let tableView = UITableView(frame: .zero, style: .insetGrouped)
     private var rows: [ResultRow] = []
     private var loading = false
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = .systemGroupedBackground
         setupUI()
         applyLocalizedChrome()
     }
@@ -64,15 +68,17 @@ final class JieliHealthSyncViewController: UIViewController {
         tableView.estimatedRowHeight = 72
         tableView.translatesAutoresizingMaskIntoConstraints = false
 
-        view.addSubview(actionCollectionView)
+        let actionsCard = UIHelpers.makeCard([actionCollectionView], title: L10n.tr("ui_actions"))
+        actionsCard.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(actionsCard)
         view.addSubview(statusLabel)
         view.addSubview(tableView)
         NSLayoutConstraint.activate([
-            actionCollectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 12),
-            actionCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            actionCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-            actionCollectionView.heightAnchor.constraint(equalToConstant: 304),
-            statusLabel.topAnchor.constraint(equalTo: actionCollectionView.bottomAnchor, constant: 10),
+            actionsCard.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16),
+            actionsCard.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            actionsCard.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            actionCollectionView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.4),
+            statusLabel.topAnchor.constraint(equalTo: actionsCard.bottomAnchor, constant: 20),
             statusLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             statusLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
             tableView.topAnchor.constraint(equalTo: statusLabel.bottomAnchor, constant: 8),
@@ -168,6 +174,44 @@ final class JieliHealthSyncViewController: UIViewController {
                         ResultRow(
                             index: offset + 1,
                             title: L10n.tr("jieli_spo2_value", Int(item.spo2)),
+                            detail: L10n.tr("jieli_data_time", self.formatTime(item.time))
+                        )
+                    }
+            }
+        )
+    }
+
+    private func getSkinTemperature() {
+        request(
+            title: L10n.tr("jieli_get_skin_temperature"),
+            operation: repo.getSkinTemperature,
+            map: { [weak self] list in
+                guard let self = self else { return [] }
+                return list.compactMap { $0 as? HwTemperature }
+                    .sorted { $0.time > $1.time }
+                    .enumerated().map { offset, item in
+                        ResultRow(
+                            index: offset + 1,
+                            title: L10n.tr("jieli_skin_temperature_value", Double(item.temperature)),
+                            detail: L10n.tr("jieli_data_time", self.formatTime(item.time))
+                        )
+                    }
+            }
+        )
+    }
+
+    private func getBreaths() {
+        request(
+            title: L10n.tr("jieli_get_breaths"),
+            operation: repo.getBreaths,
+            map: { [weak self] list in
+                guard let self = self else { return [] }
+                return list.compactMap { $0 as? HwBreaths }
+                    .sorted { $0.time > $1.time }
+                    .enumerated().map { offset, item in
+                        ResultRow(
+                            index: offset + 1,
+                            title: L10n.tr("jieli_breaths_value", Int(item.rpmVal)),
                             detail: L10n.tr("jieli_data_time", self.formatTime(item.time))
                         )
                     }
@@ -310,6 +354,7 @@ final class JieliHealthSyncViewController: UIViewController {
     }
 
     private func formatTime(_ timestamp: TimeInterval) -> String {
+        // BigData skin temperature and respiratory rate timestamps are seconds.
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
         return formatter.string(from: Date(timeIntervalSince1970: timestamp))
@@ -345,7 +390,7 @@ extension JieliHealthSyncViewController: UICollectionViewDataSource, UICollectio
             withReuseIdentifier: JieliHealthActionCell.reuseIdentifier,
             for: indexPath
         ) as! JieliHealthActionCell
-        cell.configure(title: L10n.tr(actions[indexPath.item].titleKey))
+        cell.configure(title: L10n.tr(actions[indexPath.item].titleKey), destructive: actions[indexPath.item].titleKey.hasPrefix("jieli_delete_"))
         return cell
     }
 
@@ -357,8 +402,8 @@ extension JieliHealthSyncViewController: UICollectionViewDataSource, UICollectio
     func collectionView(_ collectionView: UICollectionView,
                         layout collectionViewLayout: UICollectionViewLayout,
                         sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let width = floor((collectionView.bounds.width - 8) / 2)
-        return CGSize(width: width, height: 44)
+        let width = floor((collectionView.bounds.width - 16) / 3)
+        return CGSize(width: width, height: UIFontMetrics(forTextStyle: .subheadline).scaledValue(for: 56))
     }
 }
 
@@ -368,13 +413,16 @@ private final class JieliHealthActionCell: UICollectionViewCell {
 
     override init(frame: CGRect) {
         super.init(frame: frame)
-        contentView.backgroundColor = .systemBlue
-        contentView.layer.cornerRadius = 8
-        titleLabel.textColor = .white
-        titleLabel.font = .systemFont(ofSize: 15, weight: .semibold)
+        contentView.backgroundColor = .tertiarySystemGroupedBackground
+        contentView.layer.cornerRadius = 10
+        titleLabel.textColor = .label
+        titleLabel.font = .preferredFont(forTextStyle: .subheadline)
+        titleLabel.adjustsFontForContentSizeCategory = true
         titleLabel.textAlignment = .center
+        titleLabel.numberOfLines = 2
+        titleLabel.lineBreakMode = .byTruncatingTail
         titleLabel.adjustsFontSizeToFitWidth = true
-        titleLabel.minimumScaleFactor = 0.75
+        titleLabel.minimumScaleFactor = 0.5
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(titleLabel)
         NSLayoutConstraint.activate([
@@ -386,7 +434,12 @@ private final class JieliHealthActionCell: UICollectionViewCell {
 
     required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
 
-    func configure(title: String) { titleLabel.text = title }
+    func configure(title: String, destructive: Bool) {
+        titleLabel.text = title
+        titleLabel.textColor = destructive ? .systemRed : .label
+        accessibilityLabel = title
+        accessibilityTraits = .button
+    }
 }
 
 extension JieliHealthSyncViewController: UITableViewDataSource {

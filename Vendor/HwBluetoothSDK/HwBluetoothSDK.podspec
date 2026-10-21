@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'HwBluetoothSDK'
-  s.version          = '3.2.7'
+  s.version          = '3.2.17'
   s.summary          = 'HuaWo Bluetooth SDK (prebuilt static framework)'
   s.description      = 'Local vendored HwBluetoothSDK (static archive) for BleSdkDemo'
   s.homepage         = 'https://github.com/sususu/LYSpecs'

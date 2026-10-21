@@ -1,1 +1,1 @@
-/Users/sujiang/Projects/sdkdemo/Vendor/HwBluetoothSDK/HwBluetoothSDK.framework/Headers/HwHealthData.h
+../../HwBluetoothSDK.framework/Headers/HwHealthData.h

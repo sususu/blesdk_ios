@@ -139,6 +139,10 @@ typedef NS_ENUM(NSInteger, HwBCCode)
      */
     HwBCCodeDeviceSavingMode = 66,
     /**
+     Device is in breath-training mode [呼吸训练模式中]
+     */
+    HwBCCodeInBreathTrain = 86,
+    /**
      Device low power, can not start workout
      */
     HwBCCodePowerLowError = 80,

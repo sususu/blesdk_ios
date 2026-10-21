@@ -42,14 +42,14 @@ final class AiDemoViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         title = L10n.tr("ai_demo")
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = .systemGroupedBackground
         statusLabel.text = L10n.tr("ai_demo_hint")
         statusLabel.numberOfLines = 0
         progress.isHidden = true
 
         scroll.translatesAutoresizingMaskIntoConstraints = false
         content.axis = .vertical
-        content.spacing = 10
+        content.spacing = 20
         content.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(scroll)
         scroll.addSubview(content)
@@ -58,11 +58,11 @@ final class AiDemoViewController: UIViewController {
             scroll.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             scroll.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             scroll.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
-            content.topAnchor.constraint(equalTo: scroll.contentLayoutGuide.topAnchor, constant: 12),
-            content.leadingAnchor.constraint(equalTo: scroll.frameLayoutGuide.leadingAnchor, constant: 12),
-            content.trailingAnchor.constraint(equalTo: scroll.frameLayoutGuide.trailingAnchor, constant: -12),
-            content.bottomAnchor.constraint(equalTo: scroll.contentLayoutGuide.bottomAnchor, constant: -12),
-            content.widthAnchor.constraint(equalTo: scroll.frameLayoutGuide.widthAnchor, constant: -24)
+            content.topAnchor.constraint(equalTo: scroll.contentLayoutGuide.topAnchor, constant: 16),
+            content.leadingAnchor.constraint(equalTo: scroll.frameLayoutGuide.leadingAnchor, constant: 16),
+            content.trailingAnchor.constraint(equalTo: scroll.frameLayoutGuide.trailingAnchor, constant: -16),
+            content.bottomAnchor.constraint(equalTo: scroll.contentLayoutGuide.bottomAnchor, constant: -16),
+            content.widthAnchor.constraint(equalTo: scroll.frameLayoutGuide.widthAnchor, constant: -32)
         ])
 
         [resultImage, previewImage].forEach {
@@ -75,7 +75,7 @@ final class AiDemoViewController: UIViewController {
         logView.font = .monospacedSystemFont(ofSize: 11, weight: .regular)
         logView.isEditable = false
         logView.backgroundColor = .black
-        logView.textColor = .green
+        logView.textColor = .label
         logView.layer.cornerRadius = 8
         logView.heightAnchor.constraint(equalToConstant: 220).isActive = true
 
@@ -101,20 +101,16 @@ final class AiDemoViewController: UIViewController {
         jieliSwitch.isOn = useJieli
         jieliSwitch.addTarget(self, action: #selector(platformChanged), for: .valueChanged)
 
-        content.addArrangedSubview(statusLabel)
-        content.addArrangedSubview(deviceLabel)
-        content.addArrangedSubview(presetBtn)
-        content.addArrangedSubview(makeFieldRow("W", widthField, "H", heightField))
-        content.addArrangedSubview(makeFieldRow("Corner", cornerField, "ThumbW", thumbWField))
-        content.addArrangedSubview(makeFieldRow("ThumbH", thumbHField, "ThumbR", thumbCornerField))
-        content.addArrangedSubview(makeSwitchRow(L10n.tr("ai_platform_jieli"), jieliSwitch))
-        content.addArrangedSubview(makeButtonRow([startBtn, stopBtn]))
-        content.addArrangedSubview(applyBtn)
-        content.addArrangedSubview(clearLogBtn)
-        content.addArrangedSubview(makeImagePairRow())
-        content.addArrangedSubview(progress)
-        content.addArrangedSubview(UIHelpers.makeLabel(L10n.tr("logs"), style: .footnote))
-        content.addArrangedSubview(logView)
+        content.addArrangedSubview(UIHelpers.makeCard([statusLabel, deviceLabel], title: L10n.tr("ui_status")))
+        content.addArrangedSubview(UIHelpers.makeCard([
+            makeFieldRow("W", widthField, "H", heightField),
+            makeFieldRow("Corner", cornerField, "ThumbW", thumbWField),
+            makeFieldRow("ThumbH", thumbHField, "ThumbR", thumbCornerField),
+            makeSwitchRow(L10n.tr("ai_platform_jieli"), jieliSwitch)
+        ], title: L10n.tr("ui_parameters")))
+        content.addArrangedSubview(UIHelpers.makeCard([UIHelpers.makeGrid([presetBtn, startBtn, applyBtn, stopBtn, clearLogBtn])], title: L10n.tr("ui_actions")))
+        content.addArrangedSubview(UIHelpers.makeCard([makeImagePairRow(), progress], title: L10n.tr("ui_results")))
+        content.addArrangedSubview(UIHelpers.makeLogSection(logView))
 
         bridge.onLog = { [weak self] msg in self?.append(msg) }
         bridge.onStatus = { [weak self] msg in self?.statusLabel.text = msg }
@@ -155,14 +151,6 @@ final class AiDemoViewController: UIViewController {
         let row = UIStackView(arrangedSubviews: [label, sw])
         row.axis = .horizontal
         row.distribution = .equalSpacing
-        return row
-    }
-
-    private func makeButtonRow(_ buttons: [UIButton]) -> UIStackView {
-        let row = UIStackView(arrangedSubviews: buttons)
-        row.axis = .horizontal
-        row.spacing = 10
-        row.distribution = .fillEqually
         return row
     }
 

@@ -52,13 +52,13 @@ final class AiWatchfaceViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = .systemGroupedBackground
         statusLabel.text = L10n.tr("wf_ai_hint")
         progress.isHidden = true
 
         scroll.translatesAutoresizingMaskIntoConstraints = false
         content.axis = .vertical
-        content.spacing = 10
+        content.spacing = 20
         content.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(scroll)
         scroll.addSubview(content)
@@ -67,11 +67,11 @@ final class AiWatchfaceViewController: UIViewController {
             scroll.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             scroll.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             scroll.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
-            content.topAnchor.constraint(equalTo: scroll.contentLayoutGuide.topAnchor, constant: 12),
-            content.leadingAnchor.constraint(equalTo: scroll.frameLayoutGuide.leadingAnchor, constant: 12),
-            content.trailingAnchor.constraint(equalTo: scroll.frameLayoutGuide.trailingAnchor, constant: -12),
-            content.bottomAnchor.constraint(equalTo: scroll.contentLayoutGuide.bottomAnchor, constant: -12),
-            content.widthAnchor.constraint(equalTo: scroll.frameLayoutGuide.widthAnchor, constant: -24)
+            content.topAnchor.constraint(equalTo: scroll.contentLayoutGuide.topAnchor, constant: 16),
+            content.leadingAnchor.constraint(equalTo: scroll.frameLayoutGuide.leadingAnchor, constant: 16),
+            content.trailingAnchor.constraint(equalTo: scroll.frameLayoutGuide.trailingAnchor, constant: -16),
+            content.bottomAnchor.constraint(equalTo: scroll.contentLayoutGuide.bottomAnchor, constant: -16),
+            content.widthAnchor.constraint(equalTo: scroll.frameLayoutGuide.widthAnchor, constant: -32)
         ])
 
         [resultImage, previewImage].forEach {
@@ -83,7 +83,7 @@ final class AiWatchfaceViewController: UIViewController {
         }
         logView.font = .monospacedSystemFont(ofSize: 11, weight: .regular)
         logView.isEditable = false
-        logView.backgroundColor = .secondarySystemBackground
+        logView.backgroundColor = .secondarySystemGroupedBackground
         logView.layer.cornerRadius = 8
         logView.heightAnchor.constraint(equalToConstant: 140).isActive = true
 
@@ -106,23 +106,17 @@ final class AiWatchfaceViewController: UIViewController {
         animeSwitch.addTarget(self, action: #selector(styleChanged), for: .valueChanged)
         pencilSwitch.addTarget(self, action: #selector(styleChanged), for: .valueChanged)
 
-        content.addArrangedSubview(statusLabel)
-        content.addArrangedSubview(deviceIdLabel)
-        content.addArrangedSubview(presetBtn)
-        content.addArrangedSubview(makeFieldRow("W", widthField, "H", heightField))
-        content.addArrangedSubview(makeFieldRow("Corner", cornerField, "ThumbW", thumbWField))
-        content.addArrangedSubview(makeFieldRow("ThumbH", thumbHField, "ThumbR", thumbCornerField))
-        content.addArrangedSubview(makeSwitchRow(L10n.tr("wf_ai_style_anime"), animeSwitch))
-        content.addArrangedSubview(makeSwitchRow(L10n.tr("wf_ai_style_pencil"), pencilSwitch))
-        content.addArrangedSubview(startBtn)
-        content.addArrangedSubview(applyBtn)
-        content.addArrangedSubview(stopBtn)
-        content.addArrangedSubview(UIHelpers.makeLabel(L10n.tr("wf_ai_result"), style: .footnote))
-        content.addArrangedSubview(resultImage)
-        content.addArrangedSubview(UIHelpers.makeLabel(L10n.tr("wf_ai_preview"), style: .footnote))
-        content.addArrangedSubview(previewImage)
-        content.addArrangedSubview(progress)
-        content.addArrangedSubview(logView)
+        content.addArrangedSubview(UIHelpers.makeCard([statusLabel, deviceIdLabel], title: L10n.tr("ui_status")))
+        content.addArrangedSubview(UIHelpers.makeCard([
+            makeFieldRow("W", widthField, "H", heightField),
+            makeFieldRow("Corner", cornerField, "ThumbW", thumbWField),
+            makeFieldRow("ThumbH", thumbHField, "ThumbR", thumbCornerField),
+            makeSwitchRow(L10n.tr("wf_ai_style_anime"), animeSwitch),
+            makeSwitchRow(L10n.tr("wf_ai_style_pencil"), pencilSwitch)
+        ], title: L10n.tr("ui_parameters")))
+        content.addArrangedSubview(UIHelpers.makeCard([UIHelpers.makeGrid([presetBtn, startBtn, applyBtn, stopBtn])], title: L10n.tr("ui_actions")))
+        content.addArrangedSubview(UIHelpers.makeCard([UIHelpers.makeLabel(L10n.tr("wf_ai_result"), style: .footnote), resultImage, UIHelpers.makeLabel(L10n.tr("wf_ai_preview"), style: .footnote), previewImage, progress], title: L10n.tr("ui_results")))
+        content.addArrangedSubview(UIHelpers.makeLogSection(logView))
 
         bridge.onLog = { [weak self] msg in self?.append(msg) }
         bridge.onStatus = { [weak self] msg in self?.statusLabel.text = msg }

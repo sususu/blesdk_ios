@@ -1,1 +1,1 @@
-/Users/sujiang/Projects/sdkdemo/Vendor/HwBluetoothSDK/HwBluetoothSDK.framework/Headers/HwBluetoothTimer.h
+../../HwBluetoothSDK.framework/Headers/HwBluetoothTimer.h

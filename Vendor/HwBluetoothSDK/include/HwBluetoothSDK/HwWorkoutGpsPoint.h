@@ -1,1 +1,1 @@
-/Users/sujiang/Projects/sdkdemo/Vendor/HwBluetoothSDK/HwBluetoothSDK.framework/Headers/HwWorkoutGpsPoint.h
+../../HwBluetoothSDK.framework/Headers/HwWorkoutGpsPoint.h

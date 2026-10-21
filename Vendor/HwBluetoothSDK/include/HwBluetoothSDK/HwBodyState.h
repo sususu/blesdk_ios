@@ -1,1 +1,1 @@
-/Users/sujiang/Projects/sdkdemo/Vendor/HwBluetoothSDK/HwBluetoothSDK.framework/Headers/HwBodyState.h
+../../HwBluetoothSDK.framework/Headers/HwBodyState.h

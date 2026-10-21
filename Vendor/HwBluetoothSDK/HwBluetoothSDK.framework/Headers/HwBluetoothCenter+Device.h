@@ -5,9 +5,11 @@
  @copyright  2021年 huawo. All rights reserved.
  */
 #import "HwBluetoothCenter.h"
+#import "HwMonitorDataType.h"
 #import "HwDeviceDefines.h"
 #import "HwTimeFaceStyleModel.h"
 #import "HwVibrationModel.h"
+#import "HwVibrationSettings.h"
 #import "HwDontDisturbModel.h"
 #import "HwTimeZone.h"
 #import "HwWeatherInfo.h"
@@ -308,6 +310,7 @@
 - (HwBluetoothTask *_Nullable) getWorldClockCitiesAndCountriesCallback:(void(^_Nullable)(NSArray<HwLocalizeTimeZone *> *timeZones, NSError * _Nullable error))callback;
 
 - (HwBluetoothTask *_Nullable) findDeviceWithCallback:(HwBoolCallback _Nullable)callback;
+- (HwBluetoothTask *_Nullable) stopFindingDeviceWithCallback:(HwBoolCallback _Nullable)callback;
 
 #pragma mark - 手表设置 [watch setting]
 
@@ -601,8 +604,29 @@ typedef void (^HwGpsShouldUpdateCallback)(long validStartTime, long validEndTime
 - (HwBluetoothTask *_Nullable) setVibrationStrengthWithType:(HwVibrationStrengthType)type
                                                    callback:(HwBoolCallback _Nullable)callback;
 
+/*! @brief
+ 获取设备震动开关与强度 [get vibration on/off and intensity]
+ */
+- (HwBluetoothTask *_Nullable) getVibrationSettingsWithCallback:(HwVibrationSettingsCallback _Nullable)callback;
+
+/*! @brief
+ 设置设备震动开关与强度 [set vibration on/off and intensity]
+ */
+- (HwBluetoothTask *_Nullable) setVibrationSettings:(HwVibrationSettings *_Nonnull)settings
+                                           callback:(HwBoolCallback _Nullable)callback;
+
 - (HwBluetoothTask *_Nullable) startSpO2MonitoringWithCallback:(HwBoolCallback _Nullable)callback;
 - (HwBluetoothTask *_Nullable) stopSpO2MonitoringWithCallback:(HwBoolCallback _Nullable)callback;
+
+/*! @brief
+ Start a one-shot health measurement [开始即时测量]
+ */
+- (HwBluetoothTask *_Nullable) startMonitoringWithType:(HwMonitorDataType)type callback:(HwBoolCallback _Nullable)callback;
+
+/*! @brief
+ Stop a one-shot health measurement [停止即时测量]
+ */
+- (HwBluetoothTask *_Nullable) stopMonitoringWithType:(HwMonitorDataType)type callback:(HwBoolCallback _Nullable)callback;
 
 //设备断开BLE连接
 - (HwBluetoothTask *_Nullable) setDeviceBleDisconnectionWithCallback:(HwBoolCallback _Nullable)callback;

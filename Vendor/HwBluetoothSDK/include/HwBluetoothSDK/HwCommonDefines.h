@@ -1,1 +1,1 @@
-/Users/sujiang/Projects/sdkdemo/Vendor/HwBluetoothSDK/HwBluetoothSDK.framework/Headers/HwCommonDefines.h
+../../HwBluetoothSDK.framework/Headers/HwCommonDefines.h

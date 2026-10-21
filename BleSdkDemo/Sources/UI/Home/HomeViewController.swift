@@ -1,16 +1,15 @@
 import UIKit
 
-/// Home hub for scan/connect, bind, health sync, unbind, disconnect, and feature demos.
-///
-/// Bind / sync / unbind entry points live in the Actions section below and present
-/// `BindFlowViewController` / `UnbindFlowViewController` or call `syncHealthData`.
+/// Home hub with grouped device controls and feature demos.
 final class HomeViewController: UIViewController {
+    private var recognitionCallback: HwWorkoutTypeRecognitionCallback?
     private let repo = BleRepository.shared
 
     private var phase: DevicePhase = .idle
     private var device: BleDeviceItem?
     private var bound = false
     private var busy = false
+    var isPerformingOperation: Bool { busy }
     private var logs: [String] = []
     private var syncSummary = ""
     private var manualDisconnect = false
@@ -21,20 +20,53 @@ final class HomeViewController: UIViewController {
     private let statusSpinner = UIActivityIndicatorView(style: .medium)
     private let deviceLabel = UIHelpers.makeLabel("", style: .subheadline)
     private let syncLabel = UIHelpers.makeLabel("", style: .footnote)
-    private let logTitle = UIHelpers.makeLabel("", style: .headline)
+    private let logToggle = UIHelpers.makeButton("")
     private let logView = UITextView()
-    private var actionButtons: [UIButton] = []
-    private var featureTitleLabel: UILabel?
+    private var actionButtons: [String: UIButton] = [:]
+    private var sectionLabels: [String: UILabel] = [:]
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = .systemGroupedBackground
         setupUI()
         applyLocalizedChrome()
         bootstrap()
+        NotificationCenter.default.addObserver(self, selector: #selector(reminderUpdated(_:)), name: .jieliRemindersChanged, object: JieliReminderNotifyManager.shared)
+        let recognition: HwWorkoutTypeRecognitionCallback = { [weak self] category in
+            DispatchQueue.main.async { self?.showWorkoutRecognition(Int(category)) }
+        }
+        recognitionCallback = recognition
+        HwBluetoothSDK.sharedInstance().addWorkoutTypeRecognitionCallback(recognition)
         repo.addConnectionHandler { [weak self] event in
             self?.handleConnection(event)
         }
+    }
+
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+        if let recognitionCallback {
+            HwBluetoothSDK.sharedInstance().removeWorkoutTypeRecognitionCallback(recognitionCallback)
+        }
+    }
+
+    private func showWorkoutRecognition(_ category: Int) {
+        let settings = JieliAlarmRepository.shared
+        guard settings.canPromptWorkout, repo.isConnected(), !busy,
+              UIApplication.shared.applicationState == .active,
+              let key = JieliAlarmRepository.workoutTitleKey(category),
+              let top = navigationController?.topViewController,
+              (top === self || top is JieliAlarmReminderViewController),
+              top.presentedViewController == nil, top.viewIfLoaded?.window != nil else { return }
+        appendLog(L10n.tr(key))
+        let alert = UIAlertController(title: L10n.tr("jieli_auto_workout"), message: L10n.tr(key), preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: L10n.tr("jieli_detect_ignore"), style: .cancel))
+        alert.addAction(UIAlertAction(title: L10n.tr("jieli_detect_not_today"), style: .default) { _ in
+            settings.muteWorkoutToday()
+        })
+        alert.addAction(UIAlertAction(title: L10n.tr("jieli_detect_disable"), style: .destructive) { _ in
+            settings.autoDetectWorkouts = false
+        })
+        top.present(alert, animated: true)
     }
 
     private func setupUI() {
@@ -43,117 +75,121 @@ final class HomeViewController: UIViewController {
         view.addSubview(scroll)
 
         content.axis = .vertical
-        content.spacing = 10
+        content.spacing = 20
         content.translatesAutoresizingMaskIntoConstraints = false
         scroll.addSubview(content)
 
-        // 日志区默认隐藏：保留 appendLog 能力，不占用首页布局
-        logTitle.isHidden = true
+        logToggle.addTarget(self, action: #selector(tapLogs), for: .touchUpInside)
+        logView.font = .monospacedSystemFont(ofSize: 12, weight: .regular)
+        logView.isEditable = false
+        logView.isSelectable = true
+        logView.backgroundColor = .secondarySystemGroupedBackground
+        logView.layer.cornerRadius = 8
+        logView.textContainerInset = UIEdgeInsets(top: 8, left: 8, bottom: 8, right: 8)
+        logView.textColor = .label
         logView.isHidden = true
+
+        let logPanel = UIStackView(arrangedSubviews: [logToggle, logView])
+        logPanel.axis = .vertical
+        logPanel.spacing = 6
+        logPanel.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(logPanel)
 
         NSLayoutConstraint.activate([
             scroll.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             scroll.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             scroll.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            scroll.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
-
+            scroll.bottomAnchor.constraint(equalTo: logPanel.topAnchor, constant: -8),
             content.topAnchor.constraint(equalTo: scroll.contentLayoutGuide.topAnchor, constant: 16),
-            content.leadingAnchor.constraint(equalTo: scroll.frameLayoutGuide.leadingAnchor, constant: 16),
-            content.trailingAnchor.constraint(equalTo: scroll.frameLayoutGuide.trailingAnchor, constant: -16),
+            content.leadingAnchor.constraint(equalTo: scroll.contentLayoutGuide.leadingAnchor, constant: 16),
+            content.trailingAnchor.constraint(equalTo: scroll.contentLayoutGuide.trailingAnchor, constant: -16),
             content.bottomAnchor.constraint(equalTo: scroll.contentLayoutGuide.bottomAnchor, constant: -16),
-            content.widthAnchor.constraint(equalTo: scroll.frameLayoutGuide.widthAnchor, constant: -32)
+            content.widthAnchor.constraint(equalTo: scroll.frameLayoutGuide.widthAnchor, constant: -32),
+            logPanel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
+            logPanel.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
+            logPanel.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -8)
         ])
+        // A hidden arranged view must be able to collapse to zero height.
+        let logHeight = logView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.22)
+        logHeight.priority = .defaultHigh
+        logHeight.isActive = true
 
-        content.addArrangedSubview(makeStatusRow())
-        content.addArrangedSubview(deviceLabel)
+        let connection = makeSection("home_connection")
+        connection.addArrangedSubview(makeStatusRow())
+        deviceLabel.textColor = .secondaryLabel
+        connection.addArrangedSubview(deviceLabel)
+        connection.addArrangedSubview(UIHelpers.makeGrid([
+            makeAction("scan_connect", action: #selector(tapScan), primary: true),
+            makeAction("bind_watch", action: #selector(tapBind)),
+            makeAction("disconnect", action: #selector(tapDisconnect)),
+            makeAction("unbind_watch", action: #selector(tapUnbind))
+        ]))
+        actionButtons["unbind_watch"]?.setTitleColor(.systemRed, for: .normal)
+
+        let health = makeSection("home_health")
+        health.addArrangedSubview(UIHelpers.makeGrid([
+            makeAction("sync_data", action: #selector(tapSync)),
+            makeAction("jieli_sync_data", action: #selector(tapJieliSync)),
+            makeAction("jieli_manual_measure", action: #selector(tapJieliMeasure)),
+            makeAction("jieli_auto_monitor", action: #selector(tapJieliAutoMonitor)),
+            makeAction("goals", action: #selector(tapGoals))
+        ]))
         syncLabel.textColor = .systemBlue
-        content.addArrangedSubview(syncLabel)
+        health.addArrangedSubview(syncLabel)
 
-        // 对齐 Android：扫描整行；绑定|同步；解绑|断开
-        let scan = UIHelpers.makeButton("", primary: true)
-        scan.addTarget(self, action: #selector(tapScan), for: .touchUpInside)
-        content.addArrangedSubview(scan)
-        actionButtons.append(scan)
+        let daily = makeSection("home_daily")
+        daily.addArrangedSubview(UIHelpers.makeGrid([
+            makeAction("alarms", action: #selector(tapAlarms)),
+            makeAction("jieli_alarms", action: #selector(tapJieliAlarms)),
+            makeAction("jieli_reminder_notify", action: #selector(tapReminderNotify)),
+            makeAction("notify", action: #selector(tapNotify))
+        ]))
 
-        let bind = UIHelpers.makeButton("")
-        let sync = UIHelpers.makeButton("")
-        bind.addTarget(self, action: #selector(tapBind), for: .touchUpInside)
-        sync.addTarget(self, action: #selector(tapSync), for: .touchUpInside)
-        content.addArrangedSubview(makeRow([bind, sync]))
-        actionButtons.append(contentsOf: [bind, sync])
+        let media = makeSection("home_media")
+        media.addArrangedSubview(UIHelpers.makeGrid([
+            makeAction("watchface", action: #selector(tapWatchface)),
+            makeAction("watchface_jieli", action: #selector(tapJieliWatchface)),
+            makeAction("feature_watchface_studio", action: #selector(tapWatchfaceStudio)),
+            makeAction("music", action: #selector(tapMusic)),
+            makeAction("album", action: #selector(tapAlbum)),
+            makeAction("ai_section", action: #selector(tapAi))
+        ]))
 
-        let jieliSync = UIHelpers.makeButton("")
-        jieliSync.addTarget(self, action: #selector(tapJieliSync), for: .touchUpInside)
-        content.addArrangedSubview(jieliSync)
-        actionButtons.append(jieliSync)
+        let maintenance = makeSection("home_maintenance")
+        maintenance.addArrangedSubview(UIHelpers.makeGrid([
+            makeAction("agps", action: #selector(tapAgps)),
+            makeAction("ota", action: #selector(tapOta)),
+            makeAction("jieli_ota", action: #selector(tapJieliOta))
+        ]))
+    }
 
-        let unbind = UIHelpers.makeButton("")
-        let disconnect = UIHelpers.makeButton("")
-        unbind.addTarget(self, action: #selector(tapUnbind), for: .touchUpInside)
-        disconnect.addTarget(self, action: #selector(tapDisconnect), for: .touchUpInside)
-        content.addArrangedSubview(makeRow([unbind, disconnect]))
-        actionButtons.append(contentsOf: [unbind, disconnect])
+    private func makeSection(_ titleKey: String) -> UIStackView {
+        let heading = UIHelpers.makeLabel("", style: .headline)
+        heading.adjustsFontForContentSizeCategory = true
+        heading.accessibilityTraits.insert(.header)
+        sectionLabels[titleKey] = heading
 
-        let featureTitle = UIHelpers.makeLabel("", style: .headline)
-        featureTitleLabel = featureTitle
-        content.addArrangedSubview(featureTitle)
+        let section = UIHelpers.makeCard([heading])
+        content.addArrangedSubview(section)
+        return section
+    }
 
-        let featureActions: [Selector] = [
-            #selector(tapGoals), #selector(tapAlarms), #selector(tapNotify),
-            #selector(tapMusic), #selector(tapAlbum), #selector(tapAgps), #selector(tapOta),
-            #selector(tapJieliOta), #selector(tapJieliWatchface)
-        ]
-        // Goals|Alarms, Notify, Music|Album, Agps|OTA
-        let g = UIHelpers.makeButton(""); g.addTarget(self, action: #selector(tapGoals), for: .touchUpInside)
-        let a = UIHelpers.makeButton(""); a.addTarget(self, action: #selector(tapAlarms), for: .touchUpInside)
-        content.addArrangedSubview(makeRow([g, a]))
-        actionButtons.append(contentsOf: [g, a])
+    private func makeAction(_ key: String, action: Selector, primary: Bool = false) -> UIButton {
+        let button = UIHelpers.makeButton("", primary: primary)
+        button.accessibilityIdentifier = key
+        button.addTarget(self, action: action, for: .touchUpInside)
+        actionButtons[key] = button
+        return button
+    }
 
-        let jieliAlarms = UIHelpers.makeButton("")
-        jieliAlarms.addTarget(self, action: #selector(tapJieliAlarms), for: .touchUpInside)
-        content.addArrangedSubview(jieliAlarms)
-        actionButtons.append(jieliAlarms)
+    @objc private func tapLogs() {
+        logView.isHidden.toggle()
+        updateLogToggle()
+    }
 
-        let n = UIHelpers.makeButton(""); n.addTarget(self, action: #selector(tapNotify), for: .touchUpInside)
-        content.addArrangedSubview(n)
-        actionButtons.append(n)
-
-        let m = UIHelpers.makeButton(""); m.addTarget(self, action: #selector(tapMusic), for: .touchUpInside)
-        let al = UIHelpers.makeButton(""); al.addTarget(self, action: #selector(tapAlbum), for: .touchUpInside)
-        content.addArrangedSubview(makeRow([m, al]))
-        actionButtons.append(contentsOf: [m, al])
-
-        let ag = UIHelpers.makeButton(""); ag.addTarget(self, action: #selector(tapAgps), for: .touchUpInside)
-        let offlineMap = UIHelpers.makeButton("")
-        offlineMap.addTarget(self, action: #selector(tapOfflineMap), for: .touchUpInside)
-        content.addArrangedSubview(makeRow([ag, offlineMap]))
-        actionButtons.append(contentsOf: [ag, offlineMap])
-
-        let ota = UIHelpers.makeButton(""); ota.addTarget(self, action: #selector(tapOta), for: .touchUpInside)
-        content.addArrangedSubview(ota)
-        actionButtons.append(ota)
-
-        let jieliOta = UIHelpers.makeButton("")
-        jieliOta.addTarget(self, action: #selector(tapJieliOta), for: .touchUpInside)
-        content.addArrangedSubview(jieliOta)
-        actionButtons.append(jieliOta)
-
-        let wf = UIHelpers.makeButton(""); wf.addTarget(self, action: #selector(tapWatchface), for: .touchUpInside)
-        let jieliWf = UIHelpers.makeButton("")
-        jieliWf.addTarget(self, action: #selector(tapJieliWatchface), for: .touchUpInside)
-        content.addArrangedSubview(makeRow([wf, jieliWf]))
-        actionButtons.append(contentsOf: [wf, jieliWf])
-
-        let studio = UIHelpers.makeButton("")
-        studio.addTarget(self, action: #selector(tapWatchfaceStudio), for: .touchUpInside)
-        content.addArrangedSubview(studio)
-        actionButtons.append(studio)
-
-        let ai = UIHelpers.makeButton("")
-        ai.addTarget(self, action: #selector(tapAi), for: .touchUpInside)
-        content.addArrangedSubview(ai)
-        actionButtons.append(ai)
-        _ = featureActions
+    private func updateLogToggle() {
+        logToggle.setTitle(L10n.tr(logView.isHidden ? "home_show_logs" : "home_hide_logs"), for: .normal)
+        logToggle.setImage(UIImage(systemName: logView.isHidden ? "chevron.up" : "chevron.down"), for: .normal)
     }
 
     private func makeStatusRow() -> UIView {
@@ -166,14 +202,6 @@ final class HomeViewController: UIViewController {
         return row
     }
 
-    private func makeRow(_ buttons: [UIButton]) -> UIStackView {
-        let row = UIStackView(arrangedSubviews: buttons)
-        row.axis = .horizontal
-        row.spacing = 8
-        row.distribution = .fillEqually
-        return row
-    }
-
     private func applyLocalizedChrome() {
         title = L10n.tr("app_name")
         navigationItem.leftBarButtonItem = UIBarButtonItem(
@@ -183,20 +211,13 @@ final class HomeViewController: UIViewController {
             title: L10n.tr("language"), style: .plain, target: self, action: #selector(tapLanguage)
         )
 
-        let titles = [
-            L10n.tr("scan_connect"), L10n.tr("bind_watch"), L10n.tr("sync_data"),
-            L10n.tr("jieli_sync_data"), L10n.tr("unbind_watch"), L10n.tr("disconnect"),
-            L10n.tr("goals"), L10n.tr("alarms"), L10n.tr("jieli_alarms"),
-            L10n.tr("notify"), L10n.tr("music"), L10n.tr("album"), L10n.tr("agps"), L10n.tr("offline_map"),
-            L10n.tr("ota"), L10n.tr("jieli_ota"), L10n.tr("watchface"), L10n.tr("watchface_jieli"),
-            L10n.tr("feature_watchface_studio"),
-            L10n.tr("ai_section")
-        ]
-        for (i, t) in titles.enumerated() where i < actionButtons.count {
-            actionButtons[i].setTitle(t, for: .normal)
+        for (key, button) in actionButtons {
+            button.setTitle(L10n.tr(key), for: .normal)
         }
-        featureTitleLabel?.text = L10n.tr("feature_section")
-        logTitle.text = L10n.tr("logs")
+        for (key, label) in sectionLabels {
+            label.text = L10n.tr(key)
+        }
+        updateLogToggle()
         refreshUI()
         renderLogs()
     }
@@ -282,14 +303,16 @@ final class HomeViewController: UIViewController {
         let canUnbind = !busy && bound
         let canFeature = !busy && hasDevice && (bound || phase == .connected)
 
-        guard actionButtons.count >= 20 else { return }
-        actionButtons[0].isEnabled = !busy
-        actionButtons[1].isEnabled = canBind
-        actionButtons[2].isEnabled = canSync
-        actionButtons[3].isEnabled = canSync
-        actionButtons[4].isEnabled = canUnbind
-        actionButtons[5].isEnabled = !busy && hasDevice
-        for i in 6..<20 { actionButtons[i].isEnabled = canFeature }
+        for (key, button) in actionButtons {
+            switch key {
+            case "scan_connect", "jieli_reminder_notify": button.isEnabled = !busy
+            case "bind_watch": button.isEnabled = canBind
+            case "sync_data", "jieli_sync_data": button.isEnabled = canSync
+            case "unbind_watch": button.isEnabled = canUnbind
+            case "disconnect": button.isEnabled = !busy && hasDevice
+            default: button.isEnabled = canFeature
+            }
+        }
 
         if busy { statusSpinner.startAnimating() } else { statusSpinner.stopAnimating() }
     }
@@ -412,6 +435,16 @@ final class HomeViewController: UIViewController {
         }
     }
 
+    @objc private func tapJieliAutoMonitor() {
+        guard requireConnectedFeature() else { return }
+        navigationController?.pushViewController(JieliAutoMonitorViewController(), animated: true)
+    }
+
+    @objc private func tapJieliMeasure() {
+        guard requireConnectedFeature() else { return }
+        navigationController?.pushViewController(JieliManualMeasureViewController(), animated: true)
+    }
+
     @objc private func tapJieliSync() {
         guard requireConnectedFeature() else { return }
         navigationController?.pushViewController(JieliHealthSyncViewController(), animated: true)
@@ -469,6 +502,18 @@ final class HomeViewController: UIViewController {
         guard requireConnectedFeature() else { return }
         navigationController?.pushViewController(AlarmsViewController(), animated: true)
     }
+    @objc private func tapReminderNotify() {
+        navigationController?.pushViewController(JieliReminderNotifyViewController(), animated: true)
+    }
+
+    @objc private func reminderUpdated(_ note: Notification) {
+        if let text = note.userInfo?["log"] as? String { appendLog(text) }
+        if let count = note.userInfo?["goalCount"] as? Int, !busy {
+            syncSummary = L10n.tr("jl_notify_goal_synced", count)
+            refreshUI()
+        }
+    }
+
     @objc private func tapJieliAlarms() {
         guard requireConnectedFeature() else { return }
         navigationController?.pushViewController(JieliAlarmReminderViewController(), animated: true)
@@ -489,10 +534,6 @@ final class HomeViewController: UIViewController {
         guard requireConnectedFeature() else { return }
         navigationController?.pushViewController(AgpsUpdateViewController(), animated: true)
     }
-    @objc private func tapOfflineMap() {
-        guard requireConnectedFeature() else { return }
-        navigationController?.pushViewController(OfflineMapDownloadViewController(), animated: true)
-    }
     @objc private func tapOta() {
         guard requireConnectedFeature() else { return }
         navigationController?.pushViewController(OtaUpgradeViewController(), animated: true)
@@ -505,13 +546,13 @@ final class HomeViewController: UIViewController {
         guard requireConnectedFeature() else { return }
         navigationController?.pushViewController(WatchfaceHostViewController(), animated: true)
     }
-    @objc private func tapJieliWatchface() {
-        guard requireConnectedFeature() else { return }
-        navigationController?.pushViewController(JieliWatchfaceHostViewController(), animated: true)
-    }
     @objc private func tapWatchfaceStudio() {
         guard requireConnectedFeature() else { return }
         navigationController?.pushViewController(WatchFaceStudioViewController(), animated: true)
+    }
+    @objc private func tapJieliWatchface() {
+        guard requireConnectedFeature() else { return }
+        navigationController?.pushViewController(JieliWatchfaceHostViewController(), animated: true)
     }
 
     /// Usage guide first, then AI DEMO (iOS AiSDK / Example HwMainVC).

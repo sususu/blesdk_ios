@@ -1,1 +1,1 @@
-/Users/sujiang/Projects/sdkdemo/Vendor/HwBluetoothSDK/HwBluetoothSDK.framework/Headers/hw_aes.h
+../../HwBluetoothSDK.framework/Headers/hw_aes.h

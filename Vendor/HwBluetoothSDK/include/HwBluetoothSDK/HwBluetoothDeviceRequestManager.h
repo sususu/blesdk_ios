@@ -1,1 +1,1 @@
-/Users/sujiang/Projects/sdkdemo/Vendor/HwBluetoothSDK/HwBluetoothSDK.framework/Headers/HwBluetoothDeviceRequestManager.h
+../../HwBluetoothSDK.framework/Headers/HwBluetoothDeviceRequestManager.h

@@ -56,13 +56,13 @@ final class CustomWatchfaceViewController: UIViewController, PHPickerViewControl
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = .systemGroupedBackground
         statusLabel.text = L10n.tr("feature_ready")
         progress.isHidden = true
 
         scroll.translatesAutoresizingMaskIntoConstraints = false
         content.axis = .vertical
-        content.spacing = 10
+        content.spacing = 20
         content.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(scroll)
         scroll.addSubview(content)
@@ -71,11 +71,11 @@ final class CustomWatchfaceViewController: UIViewController, PHPickerViewControl
             scroll.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             scroll.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             scroll.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
-            content.topAnchor.constraint(equalTo: scroll.contentLayoutGuide.topAnchor, constant: 12),
-            content.leadingAnchor.constraint(equalTo: scroll.frameLayoutGuide.leadingAnchor, constant: 12),
-            content.trailingAnchor.constraint(equalTo: scroll.frameLayoutGuide.trailingAnchor, constant: -12),
-            content.bottomAnchor.constraint(equalTo: scroll.contentLayoutGuide.bottomAnchor, constant: -12),
-            content.widthAnchor.constraint(equalTo: scroll.frameLayoutGuide.widthAnchor, constant: -24)
+            content.topAnchor.constraint(equalTo: scroll.contentLayoutGuide.topAnchor, constant: 16),
+            content.leadingAnchor.constraint(equalTo: scroll.frameLayoutGuide.leadingAnchor, constant: 16),
+            content.trailingAnchor.constraint(equalTo: scroll.frameLayoutGuide.trailingAnchor, constant: -16),
+            content.bottomAnchor.constraint(equalTo: scroll.contentLayoutGuide.bottomAnchor, constant: -16),
+            content.widthAnchor.constraint(equalTo: scroll.frameLayoutGuide.widthAnchor, constant: -32)
         ])
 
         preview.backgroundColor = .secondarySystemBackground
@@ -103,7 +103,7 @@ final class CustomWatchfaceViewController: UIViewController, PHPickerViewControl
 
         logView.font = .monospacedSystemFont(ofSize: 11, weight: .regular)
         logView.isEditable = false
-        logView.backgroundColor = .secondarySystemBackground
+        logView.backgroundColor = .secondarySystemGroupedBackground
         logView.layer.cornerRadius = 8
         logView.heightAnchor.constraint(equalToConstant: 100).isActive = true
 
@@ -113,25 +113,24 @@ final class CustomWatchfaceViewController: UIViewController, PHPickerViewControl
         nameField.borderStyle = .roundedRect
         configureNumericFields()
 
-        content.addArrangedSubview(statusLabel)
-        content.addArrangedSubview(preview)
-        content.addArrangedSubview(preset)
-        content.addArrangedSubview(makeFieldRow("W", widthField, "H", heightField))
-        content.addArrangedSubview(makeFieldRow("Corner", cornerField, "Name", nameField))
-        content.addArrangedSubview(makeFieldRow("ThumbW", thumbWField, "ThumbH", thumbHField))
-        content.addArrangedSubview(makeFieldRow("ThumbR", thumbCornerField, "", UIView()))
-        content.addArrangedSubview(makeSwitchRow(L10n.tr("wf_widget_date"), dateSwitch))
-        content.addArrangedSubview(makeSwitchRow(L10n.tr("wf_widget_week"), weekSwitch))
-        content.addArrangedSubview(makeSwitchRow(L10n.tr("wf_widget_step"), stepSwitch))
-        content.addArrangedSubview(makeSwitchRow(L10n.tr("wf_widget_weather"), weatherSwitch))
-        content.addArrangedSubview(makeSwitchRow(L10n.tr("wf_widget_pointer"), pointerSwitch))
+        content.addArrangedSubview(UIHelpers.makeCard([statusLabel], title: L10n.tr("ui_status")))
+        content.addArrangedSubview(UIHelpers.makeCard([preview], title: L10n.tr("ui_preview")))
+        content.addArrangedSubview(UIHelpers.makeCard([
+            makeFieldRow("W", widthField, "H", heightField),
+            makeFieldRow("Corner", cornerField, "Name", nameField),
+            makeFieldRow("ThumbW", thumbWField, "ThumbH", thumbHField),
+            makeFieldRow("ThumbR", thumbCornerField, "", UIView()),
+            makeSwitchRow(L10n.tr("wf_widget_date"), dateSwitch),
+            makeSwitchRow(L10n.tr("wf_widget_week"), weekSwitch),
+            makeSwitchRow(L10n.tr("wf_widget_step"), stepSwitch),
+            makeSwitchRow(L10n.tr("wf_widget_weather"), weatherSwitch),
+            makeSwitchRow(L10n.tr("wf_widget_pointer"), pointerSwitch)
+        ], title: L10n.tr("ui_parameters")))
         dateSwitch.isOn = true
         weekSwitch.isOn = true
-        content.addArrangedSubview(pick)
-        content.addArrangedSubview(clear)
-        content.addArrangedSubview(sync)
-        content.addArrangedSubview(progress)
-        content.addArrangedSubview(logView)
+        content.addArrangedSubview(UIHelpers.makeCard([UIHelpers.makeGrid([preset, pick, clear, sync])], title: L10n.tr("ui_actions")))
+        content.addArrangedSubview(UIHelpers.makeCard([progress], title: L10n.tr("ui_results")))
+        content.addArrangedSubview(UIHelpers.makeLogSection(logView))
         refreshPreviewChrome()
     }
 

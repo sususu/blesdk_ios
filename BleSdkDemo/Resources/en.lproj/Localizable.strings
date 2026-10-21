@@ -23,7 +23,21 @@
 "step_failed" = "✕ Failed";
 "step_skipped" = "– Skipped";
 
+/* Feature layout */
+"ui_status" = "Status";
+"ui_actions" = "Actions";
+"ui_parameters" = "Parameters";
+"ui_preview" = "Preview";
+"ui_results" = "Results";
+
 /* Home */
+"home_connection" = "Device Connection";
+"home_health" = "Health Data";
+"home_daily" = "Reminders & Daily Use";
+"home_media" = "Watchfaces, Media & AI";
+"home_maintenance" = "Updates & Maintenance";
+"home_show_logs" = "Show Activity Logs";
+"home_hide_logs" = "Hide Activity Logs";
 "scan_connect" = "Scan & Connect";
 "bind_watch" = "Bind";
 "sync_data" = "Sync Data";
@@ -49,6 +63,12 @@
 "jieli_sport_detail_value" = "Calories: %d  Duration: %d min  Avg HR: %d bpm\nTime: %@";
 "jieli_get_stress" = "Read Stress Data";
 "jieli_get_blood_oxygen" = "Read Blood Oxygen Data";
+"jieli_get_skin_temperature" = "Read Skin Temperature Data";
+"jieli_get_breaths" = "Read Respiratory Rate Data";
+"jieli_skin_temperature_value" = "Skin temperature: %.1f °C";
+"jieli_breaths_value" = "Respiratory rate: %d breaths/min";
+"jieli_delete_skin_temperature" = "Delete Skin Temperature Data";
+"jieli_delete_breaths" = "Delete Respiratory Rate Data";
 "jieli_get_sport_detail" = "Read Sport Details";
 "jieli_get_workouts" = "Read Workout Data";
 "jieli_workout_value" = "Type: %d  Steps: %d  Distance: %d m";
@@ -134,6 +154,7 @@
 
 /* Scan */
 "scan_title" = "Scan & Connect";
+"scan_name_placeholder" = "Search by device name";
 "start_scan" = "Start Scan";
 "stop_scan" = "Stop Scan";
 "connecting" = "Connecting";
@@ -556,3 +577,147 @@
 "ai_err_aflash_version" = "AFlash version mismatch";
 "ai_err_aflash_config" = "AFlash config error";
 "ai_err_aflash_auth" = "AFlash user not authorized";
+
+/* Jieli manual measurement */
+"jieli_manual_measure" = "Manual Measurement (Jieli)";
+"jieli_measure_hr" = "Heart Rate";
+"jieli_measure_hrv" = "Heart Rate Variability (HRV)";
+"jieli_measure_spo2" = "Blood Oxygen";
+"jieli_measure_stress" = "Stress";
+"jieli_measure_skin" = "Skin Temperature";
+"jieli_measure_rpm" = "Respiratory Rate";
+"jieli_measure_rpm_unit" = "breaths/min";
+"jieli_measure_type" = "Select Measurement Type";
+"jieli_measure_tip" = "Wear the device snugly and keep still. Stop measuring before changing type. Leaving this page or entering the background stops measurement.";
+"jieli_measure_ready" = "Tap Start to measure";
+"jieli_measure_start" = "Start / Measure Again";
+"jieli_measure_starting" = "Starting measurement…";
+"jieli_measure_running" = "Measuring, up to 60 seconds…";
+"jieli_measure_stop" = "Stop Measurement";
+"jieli_measure_stopping" = "Stopping…";
+"jieli_measure_stopped" = "Measurement stopped";
+"jieli_measure_finished" = "Measurement complete";
+"jieli_measure_no_result" = "Measurement ended without valid data. Check the fit and try again.";
+"jieli_measure_timeout" = "60-second limit reached. Measurement stopped.";
+"jieli_measure_not_worn" = "The device reports improper wear. Adjust it snugly against your skin.";
+"jieli_measure_rejected" = "The device did not confirm measurement start";
+"jieli_measure_stop_failed" = "Stop was not confirmed. Tap Stop again.";
+"jieli_measure_background" = "Measurement stopped when entering the background";
+
+/* Jieli reminder settings */
+"jieli_low_battery" = "Low Battery Reminder";
+"jieli_vibration" = "Vibration / Intensity";
+"jieli_auto_workout" = "Auto-detect Workouts";
+"jieli_auto_workout_note" = "Controls workout recognition prompts in the app. Prompts appear on Home and this page when the device reports a recognized workout.";
+"jieli_current_setting" = "Current setting: %@";
+"jieli_vibration_current" = "Vibration: %@, intensity: %d";
+"jieli_vibration_weak" = "Weak (33)";
+"jieli_vibration_medium" = "Medium (66)";
+"jieli_vibration_strong" = "Strong (99)";
+"jieli_settings_reading" = "Reading device settings…";
+"jieli_settings_saving" = "Saving device settings…";
+"jieli_settings_empty" = "The device returned no vibration settings";
+"jieli_vibration_invalid" = "Vibration intensity must be between 0 and 100";
+"jieli_detect_walking" = "Walking detected by the device";
+"jieli_detect_running" = "Running detected by the device";
+"jieli_detect_cycling" = "Cycling detected by the device";
+"jieli_detect_elliptical" = "Elliptical training detected by the device";
+"jieli_detect_rowing" = "Rowing machine workout detected by the device";
+"jieli_detect_ignore" = "Ignore";
+"jieli_detect_not_today" = "Not Today";
+"jieli_detect_disable" = "Disable Recognition Prompts";
+
+/* Jieli auto monitoring */
+"jieli_auto_monitor" = "Auto Monitoring (Jieli)";
+"jieli_monitor_every" = "On, every %d minutes";
+"jieli_monitor_invalid_interval" = "The device returned an invalid monitoring interval";
+"jieli_monitor_note" = "Switches show device settings. Tap Refresh to retry failed reads. Enabling heart rate uses a 5-minute interval; skin temperature and respiratory rate use 60 minutes. Failed saves restore the previous state.";
+
+/* AI analysis */
+"ai_analysis_section" = "AI Analysis";
+"ai_analysis_exercise" = "Exercise & Health Analysis";
+"ai_analysis_insight" = "AI Insights";
+"ai_analysis_body" = "Body Status";
+"ai_analysis_sleep_day" = "AI Sleep (Day)";
+"ai_analysis_sleep_week" = "AI Sleep (Week)";
+"ai_analysis_sleep_month" = "AI Sleep (Month)";
+"ai_analysis_mock_note" = "Mock health measurements are sent to real AI services for integration testing. Requires a connected, AI-authorized device. OAS credentials are used only on this page and are not saved.";
+"ai_analysis_input" = "View Mock Input";
+"ai_analysis_generate" = "Generate AI Analysis";
+"ai_analysis_generating" = "Requesting AI analysis…";
+"ai_analysis_need_channel" = "Enter OAS Channel ID and App Key";
+"ai_analysis_need_device" = "Could not obtain a real device ID";
+"ai_analysis_timeout" = "AI request timed out. Please retry.";
+"ai_analysis_empty" = "AI returned an empty report";
+"ai_analysis_cancelled" = "Left the analysis page";
+"ai_analysis_reminder" = "Reminder category: %d";
+"ai_analysis_mock_exercise" = "Last 7 days: about 7000–8200 steps/day, HR 55/140/72 bpm, SpO2 95/99/97%, stress 20/55/32, sleep 475 min. Mock profile: age 30, 175 cm, 70 kg.";
+"ai_analysis_mock_insight" = "Last 7 days: steps 8200/7600/9100/6300/8500/7200/8800; activity 55/45/62/35/58/42/60 min, plus calories, mood, HR, HRV, stress and sleep. Goals: 8000 steps / 60 min / 350 kcal. Daily arrays are newest first.";
+"ai_analysis_mock_body" = "Today: 8200 steps, 55 activity min, 360 kcal; 6 hourly HR/resting HR/HRV/stress samples; 475 sleep min (250 light, 110 deep), sleep score 88.";
+
+/* Jieli reminder notifications */
+"jieli_reminder_notify" = "Reminder Listener (Jieli)";
+"jl_notify_start" = "Start Listening";
+"jl_notify_stop" = "Stop Listening";
+"jl_notify_clear" = "Clear History";
+"jl_notify_stopped" = "Reminder listener stopped";
+"jl_notify_listening" = "Listening for device reminders";
+"jl_notify_need_bound" = "Connect and bind the current device before starting";
+"jl_notify_permission" = "Notifications";
+"jl_notify_settings" = "System Settings";
+"jl_notify_permission_on" = "System notifications allowed";
+"jl_notify_permission_off" = "System notifications disabled";
+"jl_notify_permission_unknown" = "System notification permission not requested";
+"jl_notify_note" = "Listening continues after leaving. Background notifications require permission.";
+"jl_notify_goal_title" = "Activity Data";
+"jl_notify_goal_idle" = "Activity data is read after a daily goal is achieved.";
+"jl_notify_goal_synced" = "Activity data read: %d records";
+"jl_notify_goal_timeout" = "Activity read timed out; retry on the next reminder";
+"jl_notify_events" = "Recent Reminders (up to 200)";
+"jl_notify_empty" = "No reminders yet";
+"jl_notify_types" = "Supported Reminders · %d Types";
+"jl_notify_collapsed" = "Collapsed";
+"jl_notify_expanded" = "Expanded";
+"jl_notify_group_daily" = "Daily";
+"jl_notify_group_goals" = "Goals";
+"jl_notify_group_cycle" = "Cycle";
+"jl_notify_group_alarm" = "Alarm";
+"jl_notify_group_custom" = "Custom";
+"jl_notify_drink_type" = "Water";
+"jl_notify_wash_type" = "Handwashing";
+"jl_notify_low_battery_type" = "Low Battery";
+"jl_notify_sedentary_type" = "Sedentary";
+"jl_notify_goal_step_type" = "Steps";
+"jl_notify_goal_distance_type" = "Distance";
+"jl_notify_goal_calorie_type" = "Calories";
+"jl_notify_goal_duration_type" = "Active Time";
+"jl_notify_fertile_type" = "Fertile Window";
+"jl_notify_period_type" = "Period";
+"jl_notify_alarm_type" = "Alarm";
+"jl_notify_meeting_type" = "Meeting";
+"jl_notify_sleep_type" = "Sleep";
+"jl_notify_schedule_type" = "Schedule";
+"jl_notify_workout_type" = "Workout";
+"jl_notify_medicine_type" = "Medication";
+"jl_notify_meal_type" = "Meal";
+"jl_notify_bill_type" = "Bill";
+"jl_notify_custom_type" = "Other";
+"jl_notify_drink" = "How about another glass of water?";
+"jl_notify_wash" = "Here is your friendly hand wash reminder";
+"jl_notify_low_battery" = "Please charge as soon as possible";
+"jl_notify_sedentary" = "Getting up for a walk is a great idea";
+"jl_notify_goal_step" = "Steps goal achieved!";
+"jl_notify_goal_distance" = "Distance goal achieved!";
+"jl_notify_goal_calorie" = "Calories goal achieved!";
+"jl_notify_goal_duration" = "Active time goal achieved!";
+"jl_notify_fertile" = "Fertile window predicted for tomorrow";
+"jl_notify_period" = "Period predicted for tomorrow";
+"jl_notify_alarm" = "Alarm %@, time is up";
+"jl_notify_meeting" = "Meeting, it is time";
+"jl_notify_sleep" = "Sleep, it is time";
+"jl_notify_schedule" = "Schedule, it is time";
+"jl_notify_workout" = "Exercise, it is time";
+"jl_notify_medicine" = "Medication, it is time";
+"jl_notify_meal" = "Meal, it is time";
+"jl_notify_bill" = "Bill, it is time";
+"jl_notify_custom" = "Custom reminder, it is time";

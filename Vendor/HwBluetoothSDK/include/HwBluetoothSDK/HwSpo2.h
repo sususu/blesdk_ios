@@ -1,1 +1,1 @@
-/Users/sujiang/Projects/sdkdemo/Vendor/HwBluetoothSDK/HwBluetoothSDK.framework/Headers/HwSpo2.h
+../../HwBluetoothSDK.framework/Headers/HwSpo2.h

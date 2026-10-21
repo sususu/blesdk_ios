@@ -1,1 +1,1 @@
-/Users/sujiang/Projects/sdkdemo/Vendor/HwBluetoothSDK/HwBluetoothSDK.framework/Headers/HwTimeFaceStyleModel.h
+../../HwBluetoothSDK.framework/Headers/HwTimeFaceStyleModel.h

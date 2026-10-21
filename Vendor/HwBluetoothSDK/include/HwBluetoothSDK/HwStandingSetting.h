@@ -1,1 +1,1 @@
-/Users/sujiang/Projects/sdkdemo/Vendor/HwBluetoothSDK/HwBluetoothSDK.framework/Headers/HwStandingSetting.h
+../../HwBluetoothSDK.framework/Headers/HwStandingSetting.h

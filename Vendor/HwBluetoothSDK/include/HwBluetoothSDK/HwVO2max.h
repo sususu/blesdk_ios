@@ -1,1 +1,1 @@
-/Users/sujiang/Projects/sdkdemo/Vendor/HwBluetoothSDK/HwBluetoothSDK.framework/Headers/HwVO2max.h
+../../HwBluetoothSDK.framework/Headers/HwVO2max.h

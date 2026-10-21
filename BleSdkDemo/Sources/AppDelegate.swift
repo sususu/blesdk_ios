@@ -6,6 +6,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                      didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         LocaleHelper.apply()
         BleRepository.shared.initSDK()
+        JieliReminderNotifyManager.shared.install()
         return true
     }
 

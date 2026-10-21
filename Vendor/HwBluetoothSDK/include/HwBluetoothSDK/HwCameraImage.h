@@ -1,1 +1,1 @@
-/Users/sujiang/Projects/sdkdemo/Vendor/HwBluetoothSDK/HwBluetoothSDK.framework/Headers/HwCameraImage.h
+../../HwBluetoothSDK.framework/Headers/HwCameraImage.h

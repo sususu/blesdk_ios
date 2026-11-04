@@ -153,12 +153,13 @@ final class AiGuideViewController: UIViewController {
     required; replacing health data with mock data does not bypass authorization.
 
     - Exercise & health analysis: HwHealthData →
-      DefaultHealthAnalysisResultHandler.analysis(_:), appOnly = true.
-      Result: AiSDKCallback.aiHealthAnalysisDone.
+      AppOnlyHealthAnalysisResultHandler.analysis(_:).
+      Result: AiSDKCallback.aiHealthAnalysisDone. This handler does not write
+      the report back to the watch.
       Home → AI Health Analysis listens for the watch Generate Report request
       (startWorking, healthAnalysisAppOnly = false) and chains the current
       AiSDKCallback, so AI DEMO keeps its own events. It does not call stopWorking.
-      The page can also generate a sample report with this handler, appOnly = true.
+      The page can also generate a sample report with AppOnlyHealthAnalysisResultHandler.
     - AI insights: AiExerciseInsightInput → generateExerciseInsight(_:completion:).
     - Body status: AiBodyStatusInput → generateBodyStatus(_:completion:).
     - AI sleep day/week/month: AiSleepChronotypeInput →
@@ -185,7 +186,8 @@ final class AiGuideViewController: UIViewController {
 
     ## 8. Input rules and examples
 
-    Import AiSDK+HealthAgents.h and DefaultHealthAnalysisResultHandler.h through
+    Import AiSDK+HealthAgents.h, DefaultHealthAnalysisResultHandler.h, and
+    AppOnlyHealthAnalysisResultHandler.h through
     the app bridging header (already included by this Demo).
 
     ```

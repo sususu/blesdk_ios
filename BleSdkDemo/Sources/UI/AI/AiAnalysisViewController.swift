@@ -14,7 +14,7 @@ final class AiAnalysisViewController: FeatureBaseViewController, AiSDKCallback {
     private var timeout: DispatchWorkItem?
     private var completion: ((Result<String, Error>) -> Void)?
     private var previousCallback: AiSDKCallback?
-    private var handler: DefaultHealthAnalysisResultHandler?
+    private var handler: AppOnlyHealthAnalysisResultHandler?
 
     init(kind: Kind) { self.kind = kind; super.init(nibName: nil, bundle: nil) }
     required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
@@ -113,8 +113,7 @@ final class AiAnalysisViewController: FeatureBaseViewController, AiSDKCallback {
         case .exercise:
             previousCallback = ai.value(forKey: "callback") as? AiSDKCallback
             ai.callback = self
-            let handler = DefaultHealthAnalysisResultHandler()
-            handler.appOnly = true
+            let handler = AppOnlyHealthAnalysisResultHandler()
             self.handler = handler
             handler.analysis(AiAnalysisMock.exercise())
         case .insight:

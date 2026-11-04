@@ -16,7 +16,6 @@ PODS:
     - AFNetworking/NSURLSession
   - AiSDK (1.3.4):
     - AFNetworking (~> 4.0.1)
-    - HwBluetoothSDK
     - SSZipArchive
     - WatchfaceSDK
   - HwBluetoothSDK (3.2.17)
@@ -57,7 +56,7 @@ EXTERNAL SOURCES:
 
 CHECKOUT OPTIONS:
   AiSDK:
-    :commit: 373e3903206e489242f7b811d75405dabb94affc
+    :commit: 566274daf9d390e969afb425b90bd19179004297
     :git: https://github.com/HWdan/HwAiSDK.git
   JLBmpConvertKit:
     :git: https://github.com/sususu/JLBmpConvertKit.git
@@ -65,7 +64,7 @@ CHECKOUT OPTIONS:
 
 SPEC CHECKSUMS:
   AFNetworking: 3bd23d814e976cd148d7d44c3ab78017b744cd58
-  AiSDK: d889418c31a078688c6e33a8f7db5a5f46109510
+  AiSDK: cd68b4181f7bfa55e5c8e7d4c437009dd635cba2
   HwBluetoothSDK: 093abbfdd585d7be6c069d4ee1b1886ed9901353
   JLBmpConvertKit: 864be69abecfd00fbbaeb2ba3e8ac57158b2215a
   Masonry: 678fab65091a9290e40e2832a55e7ab731aad201
@@ -73,6 +72,6 @@ SPEC CHECKSUMS:
   WatchfaceSDK: c4ffae8ea9e708f0b6eb822256f4a8a89e1e4782
   Zip: b3fef584b147b6e582b2256a9815c897d60ddc67
 
-PODFILE CHECKSUM: 9f940079733b0e09e89e01e1002068b82af43f74
+PODFILE CHECKSUM: c4477a925248e626fd27e5c9a789561bcda9e702
 
 COCOAPODS: 1.16.2

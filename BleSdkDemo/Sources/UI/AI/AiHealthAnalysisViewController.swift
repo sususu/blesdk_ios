@@ -20,7 +20,7 @@ final class AiHealthAnalysisViewController: UIViewController {
     private var busy = false
     private var requestID: UUID?
     private var timeout: DispatchWorkItem?
-    private var handler: DefaultHealthAnalysisResultHandler?
+    private var handler: AppOnlyHealthAnalysisResultHandler?
     private var callbackProxy: AiHealthAnalysisCallbackProxy?
     private var listening = false
 
@@ -251,8 +251,7 @@ final class AiHealthAnalysisViewController: UIViewController {
 
     private func send(_ token: UUID) {
         guard requestID == token else { return }
-        let handler = DefaultHealthAnalysisResultHandler()
-        handler.appOnly = true
+        let handler = AppOnlyHealthAnalysisResultHandler()
         self.handler = handler
         handler.analysis(AiAnalysisMock.exercise())
     }

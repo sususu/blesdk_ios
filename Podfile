@@ -57,6 +57,16 @@ post_install do |installer|
     end
   end
 
+  # AiSDK now vendors HwBluetoothSDK.framework. This app already links the local
+  # static lib, so drop the extra -framework flag to avoid duplicate symbols.
+  %w[debug release].each do |cfg|
+    app_xcconfig = File.join(installer.sandbox.root, 'Target Support Files/Pods-BleSdkDemo', "Pods-BleSdkDemo.#{cfg}.xcconfig")
+    next unless File.exist?(app_xcconfig)
+    contents = File.read(app_xcconfig)
+    stripped = contents.gsub(' -framework "HwBluetoothSDK"', '')
+    File.write(app_xcconfig, stripped) if stripped != contents
+  end
+
   %w[debug release].each do |cfg|
     xcconfig_path = File.join(installer.sandbox.root, 'Target Support Files/AiSDK', "AiSDK.#{cfg}.xcconfig")
     next unless File.exist?(xcconfig_path)

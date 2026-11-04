@@ -5,6 +5,7 @@
 #import <AiSDK/AiSDK.h>
 #import <AiSDK/AiSDK+HealthAgents.h>
 #import <AiSDK/DefaultHealthAnalysisResultHandler.h>
+#import <AiSDK/AppOnlyHealthAnalysisResultHandler.h>
 #import "HaWoFFmpegBridge.h"
 #import "HWImageresizerViewController.h"
 #import "JPImageresizerConfigure.h"
